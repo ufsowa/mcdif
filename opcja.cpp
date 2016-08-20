@@ -1528,7 +1528,7 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 				find_migration_path(rnd_vac,DIR,migration_path);	
 				dislocation_walk(migration_path);
 				
-				update_biny(migration_path);
+//				update_biny(migration_path);
 				
 				//odswiezyc BINY, HISTY, REZ, VAC -> site_indexy :)
 					//dla danego situ _. sprawdz do ktorego BIN, HIST nalezy.
