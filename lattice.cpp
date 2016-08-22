@@ -3774,17 +3774,5 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 //	control_output<<"After create events: "<<tmp_events.size()<<endl;
 }
 
-void lattice :: exchange_sites( site* VAC, site* B){
 
-	control_output<<"Przed:"<<endl;
-	VAC->show_site();
-	B->show_site();
-	site bufor(VAC);
-	VAC->change_to( *B );
-	update_events( VAC );
-	B->change_to(bufor);
-	control_output<<"Po:"<<endl;
-	VAC->show_site();
-	B->show_site();	
-}
 

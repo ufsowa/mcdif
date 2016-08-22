@@ -1413,23 +1413,63 @@ void opcja :: dislocation_walk(vector <site*> &path){
 			vector<site*>::iterator prev = i; --prev;
 		//	(*prev)->show_site();
 		//	(*i)->show_site();
-			SAMPLE->exchange_sites( (*prev), *i);
-			
+			virtual_jump_vac_atom( (*prev), *i);	
 		}	
 		reset_site( *(--i) );
-		Vtoadd.push_back(*(--i));
+
 	}else if( last->get_atom()== 0 ){	//backward vacancy in
 		vector<site*>::reverse_iterator i = path.rbegin(); ++i;
 		for ( ; i != path.rend(); ++i ){
 			vector<site*>::reverse_iterator prev = i; --prev;
 		//	(*prev)->show_site();
 		//	(*i)->show_site();
-			SAMPLE->exchange_sites( (*prev), *i);
+			virtual_jump_vac_atom( (*prev), *i);
 		}	
-		reset_site( *(--i) );
-		Vtoadd.push_back(*(--i));
+		reset_site( *(--i) );	
 	}else{
 		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);
+	}
+}
+
+void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
+
+	//one direction exchange of sites. Virtual jump of vac to atom.
+	control_output<<"Przed:"<<endl;
+	VAC->show_site();
+	ATOM->show_site();
+	if(VAC->get_atom() != 0){control_output<<"ERROR in lattice::exchange_sites(). Type of vacancy not 0: "<<VAC->get_atom()<<endl;exit(1);}
+	if(ATOM->get_atom() <= 0){control_output<<"ERROR in lattice::exchange_sites(). Type of atom not >0: "<<ATOM->get_atom()<<endl;exit(1);}
+
+	update_opcja(VAC,0);
+	update_opcja(ATOM,0);
+
+	site bufor(VAC);
+	VAC->change_to( *ATOM );
+	SAMPLE->update_events( VAC );
+	ATOM->change_to(bufor);
+
+	update_opcja(VAC,1);
+	update_opcja(ATOM,1);
+
+	control_output<<"Po:"<<endl;
+	VAC->show_site();
+	ATOM->show_site();	
+}
+
+void opcja :: update_opcja( site* node, bool status){
+																		//refresh opcja::fields: BLOCKS, HIST, REZ
+	unsigned ID_B = node->get_block_index();
+	unsigned ID_H = node->get_hist_index();
+	unsigned ID_R = node->get_rez_index();
+
+	if(ID_B >=0){
+		BLOKS[ID_B].update_plaster(node,status);
+	}
+	if(ID_H >=0){
+		HIST[ID_B].update_plaster(node,status);
+	}
+	if(ID_R >=0){
+		reservuars[ID_B].update_plaster(node,status);
 	}
 }
 
@@ -1470,69 +1510,12 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 			
 			N1=(long)(rnd()*(BLOKS[b].size(0)));	
 			rnd_vac=BLOKS[b].get_site(0,N1);
-			
-			/*
-			 * //rezerwuary nie sluza do wymiany. Jedynie jako monitor zmiany liczby atomow na powierzchni.
-			 * //zachowane zostaje przesuwanie obszaru symulacji gdy w rezeruwarze zmiana rowna bedzie jednej plaszczyznie 
-			 * 			 
-			 * if(TRYB==2){
-			 * 		vector <site*> migration_path = find_migration_path(rnd_vac);	
-			 * 		walk_over(migration_path,rnd_vac);	//wykonaj wedrowke po path	
-			 * 		check_reserwuars()	//sprawdz zmmiane w rezerwuarach prawym i lewym
-			 * 		MOVE	//Jesli zmiana wieksza niz N przesun obszar symulacji
-			 * 				//	1) przerwij rownowazenie					-> break
-			 * 				//	2) wykonaj ponownie rownowazenie 			-> do_equi()
-			 * 				//		- sprawdz czy trzeba przesunac probke	-> if(MOVE)
-			 * 				//		- Jak trzeba to przesun					-> move()
-			 * 				//		- wykonaj normalnie rownowazenie		-> do_equi()
-			 * 				//	3) Zakoncz rownowazenia						- ostatnia iteracja jest wlasciwa
-			 * 
-			 * }
-			 * 
-			 * 
-			 * 
-			 * Zanim przystapie do dodawania/odejmowania musze okreslic plaszczyzne matano w do_equi() po move()
-			 * find_matano_plane()		-> zapisuje do zmiennej w opcja::MATANO_POSITION
-			 * 
-			 * 
-			 * find_migration_path(rnd_vac):
-			 * 		1)	Okresl kierunek migracji wzgledem MATANO_POSITION
-			 * 		2)	Wczytaj sasiadow z odpowiedniej polowy
-			 * 		3)	Wykonaj RTA	-> okresl sajt ktory bedzie nalezal do sciezki
-			 * 		4)	Dodaj sajt do sciezki
-			 * 		5)	Powtarzaj 1-4 dopoki nie trafi vakancja na wkancje
-			 * 		6)	Zwroc sciezke i czas
-			 * 
-			 * KMENTARZ:
-			 * Wykorzystac PAIRJUMP jako sciezke. Wazna jest kolejnosc elementow na sciezce. 
-			 * Potrzeba iterowac po sciezce od przodu (remove) lub od tylu (create) 
-			 * VECTOR
-			 * 
-			 * 
-			 * walk_over(migration_path,rnd_vac):
-			 * 		Dla kolejnych saitow z listy
-			 * 			1) update_site zamiast reset	-> trzeba w calosci przepisac sity.
-			 * 			2) update_site_events			-> poniwaz zmienione zostaly typy
-			 * 
-			 * KOMENTARZ:
-			 * W class SITE, dodac funckje kopiowania calego sita		-> operator=
-			 * 
-			 * 
-			 * UWAGI:
-			 * Zastanawiam sie czy dzielic to na dwa etapy, czy moze skombinowac wszystko razem?
-			 * */
-			
+						
 			if(TRYB==2){
 				int DIR = -decide_direction(rnd_vac);	//	-1 left;	+1 right
 				vector <site*> migration_path; migration_path.reserve(2000);
 				find_migration_path(rnd_vac,DIR,migration_path);	
-				dislocation_walk(migration_path);
-				
-//				update_biny(migration_path);
-				
-				//odswiezyc BINY, HISTY, REZ, VAC -> site_indexy :)
-					//dla danego situ _. sprawdz do ktorego BIN, HIST nalezy.
-							
+				dislocation_walk(migration_path);							
 			}
 			else if(TRYB==1){ //swap
 				rez=choose_reservuar(rnd_vac);

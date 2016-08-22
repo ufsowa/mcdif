@@ -225,3 +225,13 @@ void plaster :: init_calc(int FLAG){
 		control_output<<"|"<<endl; 
 		}
 	}
+
+
+void plaster :: update_plaster(site* node, bool status){
+
+	if(status){
+		plaster_add_site(node);
+	}else{
+		plaster_delete_site(node);
+	}
+}
