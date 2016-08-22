@@ -1,5 +1,5 @@
 #!/bin/bash 
 
-list="opcja.h opcja.cpp plaster.h plaster.cpp lattice.h lattice.cpp mc.h mc.cpp"
+list="opcja.h opcja.cpp plaster.h plaster.cpp lattice.h lattice.cpp mc.h mc.cpp site.h site.cpp"
 
 geany $list

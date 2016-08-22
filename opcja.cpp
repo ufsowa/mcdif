@@ -1457,18 +1457,18 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 }
 
 void opcja :: update_opcja( site* node, bool status){
-																		//refresh opcja::fields: BLOCKS, HIST, REZ
+	control_output<<"update_opcja: ";								//refresh opcja::fields: BLOCKS, HIST, REZ
 	unsigned ID_B = node->get_block_index();
 	unsigned ID_H = node->get_hist_index();
 	unsigned ID_R = node->get_rez_index();
-
+	control_output<<ID_B<<" "<<ID_H<<" "<<ID_R<<endl;
 	if(ID_B >=0){
 		BLOKS[ID_B].update_plaster(node,status);
 	}
 	if(ID_H >=0){
-		HIST[ID_B].update_plaster(node,status);
-	}
-	if(ID_R >=0){
+	//	HIST[ID_B].update_plaster(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
+	}																	//if ON, then it means that flux comming from dislocation movement 
+	if(ID_R >=0){														// is added to flux of particles. 	
 		reservuars[ID_B].update_plaster(node,status);
 	}
 }
@@ -1595,7 +1595,7 @@ void opcja :: refresh_sim_area(vector <site*> &kontener){
 		Vtoadd.clear();
 		kontener.clear();
 		//przepisz i nadaj Vindexy sitom
-		for (unsigned int i=0; i < tmp.size(); i++){
+		for (int i=0; i < tmp.size(); i++){
 			tmp[i]->set_vindex(i);
 			kontener.push_back(tmp[i]);
 		} 

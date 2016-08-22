@@ -36,7 +36,10 @@ class plaster {
 	struct is_equal{
 		is_equal(site* to_find) : to_find(to_find) {}
 		bool operator()(site* const in_list){
-			return in_list == to_find;
+			if(in_list == to_find){
+				control_output<<in_list<<endl;
+				return true;
+			}else{ return false;}
 		}
 		site* to_find;
 	};
@@ -86,6 +89,7 @@ class plaster {
 	};
 
 	void	plaster_delete_site(site* node){
+		control_output<<"del site in plaster "<<node<<endl;
 		unsigned int typ = node->get_atom();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
 		eq_flux_delta(typ,0);

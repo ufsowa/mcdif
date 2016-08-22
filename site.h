@@ -42,10 +42,10 @@ std :: vector <long int> nr_jump; 			// licza wszystkich skokow situ
 std :: vector <site*> site_at_neigh; 		//sasiedzie dla bcc przy liczeniu skokow
 std :: vector<std::vector <site*> > site_en_neigh;		//sasiedzie dla bcc przy liczeniu energii w kolejnych strefach
 std :: vector < list <pairjump>::iterator > site_events;
-unsigned long int Vindex;
-unsigned int hist_index;
-unsigned int block_index;
-unsigned int rez_index;
+long int Vindex;
+int hist_index;
+int block_index;
+int rez_index;
  
 public:
 site ();
@@ -72,10 +72,10 @@ void set_drz(double _z);
 void set_jumps(long int _z, int zon=0);
 void set_jumps( std :: vector <long int> &jumps);
 void set_z_coordination(int z_cor, int typ);
-void set_vindex(unsigned long int i);
-void set_hist_index(unsigned int i);
-void set_block_index(unsigned int i);
-void set_rez_index(unsigned int i);
+void set_vindex(long int i);
+void set_hist_index(int i);
+void set_block_index(int i);
+void set_rez_index(int i);
 //get site parameters
 int get_latt_number();
 int get_z_coordination(int typ);
@@ -92,10 +92,10 @@ double get_drz();
 long int get_jumps(int zon=0);
 void get_jumps( std::vector <long int > &jumps);
 int get_no_zones();
-unsigned long get_vindex();
-unsigned int get_hist_index();
-unsigned int get_block_index();
-unsigned int get_rez_index();
+long get_vindex();
+int get_hist_index();
+int get_block_index();
+int get_rez_index();
 
 //site operations
 void reset_site ();
