@@ -45,6 +45,7 @@ std :: vector < list <pairjump>::iterator > site_events;
 unsigned long int Vindex;
 unsigned int hist_index;
 unsigned int block_index;
+unsigned int rez_index;
  
 public:
 site ();
@@ -74,7 +75,7 @@ void set_z_coordination(int z_cor, int typ);
 void set_vindex(unsigned long int i);
 void set_hist_index(unsigned int i);
 void set_block_index(unsigned int i);
-
+void set_rez_index(unsigned int i);
 //get site parameters
 int get_latt_number();
 int get_z_coordination(int typ);
@@ -94,6 +95,7 @@ int get_no_zones();
 unsigned long get_vindex();
 unsigned int get_hist_index();
 unsigned int get_block_index();
+unsigned int get_rez_index();
 
 //site operations
 void reset_site ();
