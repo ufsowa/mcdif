@@ -22,6 +22,7 @@ site :: site ()
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
+	rez_index=-1;
 	sub_latt_name=-1;
 };
 
@@ -41,7 +42,7 @@ site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name)
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
-
+	rez_index=-1;
 }
 
 site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name, int latt_num)
@@ -60,7 +61,7 @@ site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name, int latt
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
-
+	rez_index=-1;
 }  
 
 site :: site(site* Site)	//przesylam adres komorki
@@ -82,7 +83,7 @@ site :: site(site* Site)	//przesylam adres komorki
 	Vindex=Site->Vindex;
 	hist_index=Site->hist_index;
 	block_index=Site->block_index;
-
+	rez_index=Site->rez_index;
 }
 
 site :: site(const site &Site)
@@ -104,7 +105,7 @@ site :: site(const site &Site)
 	Vindex=Site.Vindex;
 	hist_index=Site.hist_index;
 	block_index=Site.block_index;
-
+	rez_index=Site.rez_index;
 }
 
 /*----------------------------------------------*/
@@ -318,10 +319,10 @@ void site :: set_dry(double _y){dy=_y;}
 void site :: set_drz(double _z){dz=_z;}
 void site :: set_jumps(long int _z, int zon){nr_jump[zon]=_z;}
 void site :: set_jumps( std :: vector <long int> &input){nr_jump=input;}
-void site :: set_vindex(unsigned long _i){Vindex=_i;}
-void site :: set_hist_index(unsigned int _i){hist_index=_i;}
-void site :: set_block_index(unsigned int _i){block_index=_i;}
-void site :: set_rez_index(unsigned int _i){rez_index=_i;}
+void site :: set_vindex(long _i){if( (_i >=0) ){Vindex=_i;}else{control_output<<"ERROR in site::set_Vindex()"<<endl;exit(1);}}
+void site :: set_hist_index(int _i){if( (_i >=0) ){hist_index=_i;}else{control_output<<"ERROR in site::set_hist_index()"<<endl;exit(1);}}
+void site :: set_block_index(int _i){if( (_i >=0) ){block_index=_i;}else{control_output<<"ERROR in site::set_bloks_index()"<<endl;exit(1);}}
+void site :: set_rez_index(int _i){if( (_i >=0) ){rez_index=_i;}else{control_output<<"ERROR in site::set_rez_index()"<<endl;exit(1);}}
 /*--------------------------------------------------------------*/
 double site :: get_x(){return x;}
 double site :: get_y(){return y;}
@@ -334,10 +335,10 @@ void site :: get_jumps( std :: vector <long int> &output){output=nr_jump;}
 int site :: get_latt_number(){return latt_number;}
 int site :: get_atom(){if(atom<0){ cout<<"ERROR: atom type < 0. Bad lattice introduction."<<endl;exit(0);}return atom;}
 int site :: get_sub_latt(){return sub_latt_name;}
-unsigned long site :: get_vindex(){return Vindex;}
-unsigned int site :: get_hist_index(){return hist_index;}
-unsigned int site :: get_block_index(){return block_index;}
-unsigned int site :: get_rez_index(){return rez_index;}
+long site :: get_vindex(){return Vindex;}
+int site :: get_hist_index(){return hist_index;}
+int site :: get_block_index(){return block_index;}
+int site :: get_rez_index(){return rez_index;}
 
 
 /*--------------------------------------------------------------*/
