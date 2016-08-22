@@ -34,7 +34,7 @@ class plaster {
 	unsigned long PL_JUMPS;
 	public:
 	
-	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name = "rezerv");	
+	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name );	
 
 	void	cumulate();
 	void	call_avg(vector<double>& results);

@@ -764,7 +764,7 @@ void opcja :: init_reservuar(vector <double> &parameters){
 	
 	//liczba sitow w plastrze komorek elementarnych
 	double LATT = SAMPLE->get_latice_const(BIN_DIRECTION, 0);
-	plaster tmp_rozmiar(2000,BIN_ATOMS_TYP,BIN_DIRECTION,0,0,LATT);
+	plaster tmp_rozmiar(2000,BIN_ATOMS_TYP,BIN_DIRECTION,0,0,LATT, "tmp");
 	SAMPLE->get_sites(tmp_rozmiar);
 	long rozmiar = (tmp_rozmiar.size()/2)*(parameters[2]);
 	ROZMIAR.push_back(rozmiar);				//liczba sitow o ktore moze zmienic sie rezerwuar (domyslnie jedna plaszczyzna)
@@ -783,7 +783,7 @@ void opcja :: init_reservuar(vector <double> &parameters){
 	par=parameters;
 	reservuars_par.push_back(par);
 
-	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,(ROZMIAR.size()-1),od_kod,do_kod);
+	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,(ROZMIAR.size()-1),od_kod,do_kod, "rez");
 	SAMPLE->get_sites(tmp);
 	control_output<<"do init_calc in reservuar: "; 
 	tmp.init_calc(1);
@@ -902,7 +902,7 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	ST_VOL=min(od_kod,ST_VOL);
 	END_VOL=max(do_kod,END_VOL);
 	
-	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,nr,od_kod,do_kod);
+	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,nr,od_kod,do_kod, "rez");
 	SAMPLE->get_sites(tmp);
 	control_output<<"reinit reservuar: "<<nr<<" "<<odkod<<"|"<<stwidth<<"|"<<dokod<<"||"<<od_kod<<"|"<<width<<"|"<<do_kod<<" "<<direction<<endl;
 	control_output<<"do init_calc in reservuar: "; 

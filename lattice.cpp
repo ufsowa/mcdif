@@ -3135,6 +3135,7 @@ void lattice :: get_sites(plaster &tmp){
 			unsigned int id=tmp.get_index();
 			if(tmp.get_name() == "block"){wsk_to_site->set_block_index(id);}
 			if(tmp.get_name() == "hist"){wsk_to_site->set_hist_index(id);}	
+			if(tmp.get_name() == "rez"){wsk_to_site->set_rez_index(id);}
 			tmp.push_back(wsk_to_site);
 		}
 	}
@@ -3179,6 +3180,7 @@ void lattice :: get_sites(vector <plaster> &tmp){
 				if(id==ik){
 					if(tmp[ik].get_name() == "block"){wsk_to_site->set_block_index(id);}
 					if(tmp[ik].get_name() == "hist"){wsk_to_site->set_hist_index(id);}
+					if(tmp[ik].get_name() == "rez"){wsk_to_site->set_rez_index(id);}
 				}
 				tmp[ik].push_back(wsk_to_site);
 			}
