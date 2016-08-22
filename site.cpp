@@ -321,6 +321,7 @@ void site :: set_jumps( std :: vector <long int> &input){nr_jump=input;}
 void site :: set_vindex(unsigned long _i){Vindex=_i;}
 void site :: set_hist_index(unsigned int _i){hist_index=_i;}
 void site :: set_block_index(unsigned int _i){block_index=_i;}
+void site :: set_rez_index(unsigned int _i){rez_index=_i;}
 /*--------------------------------------------------------------*/
 double site :: get_x(){return x;}
 double site :: get_y(){return y;}
@@ -336,6 +337,7 @@ int site :: get_sub_latt(){return sub_latt_name;}
 unsigned long site :: get_vindex(){return Vindex;}
 unsigned int site :: get_hist_index(){return hist_index;}
 unsigned int site :: get_block_index(){return block_index;}
+unsigned int site :: get_rez_index(){return rez_index;}
 
 
 /*--------------------------------------------------------------*/
