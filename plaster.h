@@ -32,9 +32,18 @@ class plaster {
 	vector<double> PL_ATOMS;
 	vector<double> PL_AVG_PARS;	//p0,p1,A,B,V,flux_A,...,eq_fluxA,..., counter;
 	unsigned long PL_JUMPS;
+	
+	struct is_equal{
+		is_equal(site* to_find) : to_find(to_find) {}
+		bool operator()(site* const in_list){
+			return in_list == to_find;
+		}
+		site* to_find;
+	};
+
 	public:
 	
-	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name = "rezerv");	
+	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name );	
 
 	void	cumulate();
 	void	call_avg(vector<double>& results);
@@ -48,27 +57,14 @@ class plaster {
 	int		get_end(){return PL_P1;};
 	int		get_index(){return PL_INDEX;};
 	string		get_name(){return PL_NAME;};
+	void update_plaster(site* node, bool status);
 
-
-	void	push_back( site* item ){
-				PL_REF_TO_SITES.push_back(item);
-			};
-		
-	unsigned int	size(){
-		return PL_REF_TO_SITES.size();
-	};
-	
-	unsigned int	size(int typ){
-		return PL_SITES_TYP[typ].size();
-	};
-	
-	unsigned int	get_size_types(){
-		return PL_SITES_TYP.size();
-	};
-	
-	site* get_site(long pozition){
-		return PL_REF_TO_SITES[pozition];
-	}
+	void	push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
+	unsigned int	size(){return PL_REF_TO_SITES.size();};
+	unsigned int	size(int typ){return PL_SITES_TYP[typ].size();};
+	unsigned int	get_size_types(){return PL_SITES_TYP.size();};
+	site* get_site(long pozition){return PL_REF_TO_SITES[pozition];};
+	void jump_occured(){PL_JUMPS++;};
 	
 	site* get_site(int typ,int nr){
 		list<site*>::iterator it= PL_SITES_TYP[typ].begin();
@@ -88,11 +84,21 @@ class plaster {
 		PL_SITES_TYP[typ].push_back(new_site);
 		eq_flux_delta(typ,1);
 	};
-	
-	void jump_occured(){
-		PL_JUMPS++;
-	};
 
+	void	plaster_delete_site(site* node){
+		unsigned int typ = node->get_atom();
+		PL_SITES_TYP[typ].remove_if(is_equal(node));
+		eq_flux_delta(typ,0);
+		prob_update(typ,0);
+	};
+	
+	void	plaster_add_site(site* node){
+		unsigned int typ = node->get_atom();
+		PL_SITES_TYP[typ].push_back(node);
+		eq_flux_delta(typ,1);
+		prob_update(typ,1);
+	};
+	
 	void eq_flux_delta(unsigned int typ, int flaga){
 		//flaga =0 -> site remved; flaga=1 -> site created in plaster
 		if(typ>=PL_EQ_FLUX.size()){cout<<"ERROR in plaster::eq_flux: "<<typ<<endl;exit(1);}
@@ -150,11 +156,9 @@ class plaster {
 		}
 		return PL_REF_TO_SITES[i];
 	};
- 		
 
 	double get_stech(){
-		double stech = static_cast<double> (PL_ATOMS[1])/(static_cast<double> (PL_ATOMS[2]) + static_cast<double> (PL_ATOMS[1]));
-	
+		double stech = static_cast<double> (PL_ATOMS[1])/(static_cast<double> (PL_ATOMS[2]) + static_cast<double> (PL_ATOMS[1]));	
 		return stech;
 	};
 

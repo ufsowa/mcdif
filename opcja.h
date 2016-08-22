@@ -130,5 +130,6 @@ void find_migration_path(site *node,int DIR, vector <site*> &migration_path);
 void dislocation_walk(vector <site*> &migration_path);
 void cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);
 void cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);
-
+void virtual_jump_vac_atom( site* VAC, site* B);
+void update_opcja( site* node, bool status );
 };
