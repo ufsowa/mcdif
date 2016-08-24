@@ -1416,7 +1416,7 @@ void opcja :: dislocation_walk(vector <site*> &path){
 			virtual_jump_vac_atom( (*prev), *i);	
 		}	
 		reset_site( *(--i) );
-
+		Vtoadd.push_back( *i );	
 	}else if( last->get_atom()== 0 ){	//backward vacancy in
 		vector<site*>::reverse_iterator i = path.rbegin(); ++i;
 		for ( ; i != path.rend(); ++i ){
@@ -1425,7 +1425,8 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		//	(*i)->show_site();
 			virtual_jump_vac_atom( (*prev), *i);
 		}	
-		reset_site( *(--i) );	
+		reset_site( *(--i) );
+		Vtoadd.push_back( *i );	
 	}else{
 		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);
 	}
@@ -1457,19 +1458,22 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 }
 
 void opcja :: update_opcja( site* node, bool status){
-	control_output<<"update_opcja: ";								//refresh opcja::fields: BLOCKS, HIST, REZ
-	unsigned ID_B = node->get_block_index();
-	unsigned ID_H = node->get_hist_index();
-	unsigned ID_R = node->get_rez_index();
+	control_output<<"\nupdate_opcja: ";								//refresh opcja::fields: BLOCKS, HIST, REZ
+	int ID_B = node->get_block_index();
+	int ID_H = node->get_hist_index();
+	int ID_R = node->get_rez_index();
 	control_output<<ID_B<<" "<<ID_H<<" "<<ID_R<<endl;
 	if(ID_B >=0){
+		control_output<<"in block ";
 		BLOKS[ID_B].update_plaster(node,status);
 	}
 	if(ID_H >=0){
-	//	HIST[ID_B].update_plaster(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
+		control_output<<"in hist "<<endl;;
+	//	HIST[ID_H].update_plaster(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
 	}																	//if ON, then it means that flux comming from dislocation movement 
 	if(ID_R >=0){														// is added to flux of particles. 	
-		reservuars[ID_B].update_plaster(node,status);
+		control_output<<"in rez ";
+		reservuars[ID_R].update_plaster(node,status);
 	}
 }
 
@@ -1583,15 +1587,16 @@ void opcja :: refresh_sim_area(vector <site*> &kontener){
 		}
 		if(SINGLE){control_output<<"|>"<<tmp.size()<<endl;}
 		//teraz trzeba dodac nowe wakancje z Vtoadd
+		int count_vac_ok=0;
 		for (unsigned int i=0; i < Vtoadd.size(); i++){
 			typ=Vtoadd[i]->get_atom();
 			log=SAMPLE->check_site_belonging_to_sim_area(Vtoadd[i]);
-			if( log and (typ == 0) ){tmp.push_back(Vtoadd[i]);}
+			if( log and (typ == 0) ){tmp.push_back(Vtoadd[i]);count_vac_ok++;}
 //		{control_output<<"ERROR: opcja::refresh_vac_vector, atoms in Vtoadd: "<<log<<"/"<<typ<<endl; 
 			Vtoadd[i]->show_site();
 //			exit(1);}
 		}
-		if(SINGLE){control_output<<"|+"<<Vtoadd.size();}
+		if(SINGLE){control_output<<"|+"<<count_vac_ok;}
 		Vtoadd.clear();
 		kontener.clear();
 		//przepisz i nadaj Vindexy sitom

@@ -119,7 +119,7 @@ void site :: refresh_site ()
 void site :: reset_site ()		
 {
 	for(unsigned int i=0; i< nr_jump.size();i++){nr_jump[i]=0;}
-	Vindex=-1;
+	Vindex=-10;
 	dx=0; dy=0; dz=0;
 }
 
@@ -320,9 +320,19 @@ void site :: set_drz(double _z){dz=_z;}
 void site :: set_jumps(long int _z, int zon){nr_jump[zon]=_z;}
 void site :: set_jumps( std :: vector <long int> &input){nr_jump=input;}
 void site :: set_vindex(long _i){if( (_i >=0) ){Vindex=_i;}else{control_output<<"ERROR in site::set_Vindex()"<<endl;exit(1);}}
-void site :: set_hist_index(int _i){if( (_i >=0) ){hist_index=_i;}else{control_output<<"ERROR in site::set_hist_index()"<<endl;exit(1);}}
-void site :: set_block_index(int _i){if( (_i >=0) ){block_index=_i;}else{control_output<<"ERROR in site::set_bloks_index()"<<endl;exit(1);}}
-void site :: set_rez_index(int _i){if( (_i >=0) ){rez_index=_i;}else{control_output<<"ERROR in site::set_rez_index()"<<endl;exit(1);}}
+
+void site :: set_hist_index(int _i){if( (_i >=0) ){	
+//	control_output<<"Setting hist index "<<_i<<" to "; show_site(); 
+	hist_index=_i;
+	}else{control_output<<"ERROR in site::set_hist_index()"<<endl;exit(1);}}
+
+void site :: set_block_index(int _i){if( (_i >=0) ){
+//	control_output<<"Setting block index "<<_i<<" to "; show_site(); 
+	block_index=_i;}else{control_output<<"ERROR in site::set_bloks_index()"<<endl;exit(1);}}
+
+void site :: set_rez_index(int _i){if( (_i >=0) ){
+//	control_output<<"Setting rez index "<<_i<<" to "; show_site(); 
+	rez_index=_i;}else{control_output<<"ERROR in site::set_rez_index()"<<endl;exit(1);}}
 /*--------------------------------------------------------------*/
 double site :: get_x(){return x;}
 double site :: get_y(){return y;}
