@@ -36,10 +36,13 @@ class plaster {
 	struct is_equal{
 		is_equal(site* to_find) : to_find(to_find) {}
 		bool operator()(site* const in_list){
+//			control_output<<to_find<<" ?? "<<in_list<<" "; in_list->show_site();
 			if(in_list == to_find){
-				control_output<<in_list<<endl;
+//				control_output<<"found and removed: "<<in_list<<" ";in_list->show_site();
 				return true;
-			}else{ return false;}
+			}else{ 
+//				control_output<<"Site: "<<to_find<<" not found"<<endl;
+				return false;}
 		}
 		site* to_find;
 	};
@@ -89,18 +92,24 @@ class plaster {
 	};
 
 	void	plaster_delete_site(site* node){
-		control_output<<"del site in plaster "<<node<<endl;
+		control_output<<" del site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
+		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
 		eq_flux_delta(typ,0);
 		prob_update(typ,0);
+		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
+
 	};
 	
 	void	plaster_add_site(site* node){
+		control_output<<" add site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
+		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].push_back(node);
 		eq_flux_delta(typ,1);
 		prob_update(typ,1);
+		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 	};
 	
 	void eq_flux_delta(unsigned int typ, int flaga){

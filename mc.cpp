@@ -650,6 +650,7 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double yjumper=vac_to_jump->get_y();
 	double zjumper=vac_to_jump->get_z();
 	long int Vindex = vac_to_jump->get_vindex();
+	control_output<<"Vindex: "<<Vindex<<endl;
 	double xvac=atom_to_jump->get_x();		//xvac - pozycja na osi x wakancji po przeskoku
 	double yvac=atom_to_jump->get_y();
 	double zvac=atom_to_jump->get_z();
@@ -1216,8 +1217,6 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 				control_output<<" in step: "<<RTA_energy_executions<<endl;
 				EVENTS_size=EVENTS.size();
 			}
-
-
 		}}
 
 	double SUM=0;	
@@ -1245,7 +1244,6 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 //		(*event).second.show();
 //		counter++;
 //	}	
-
 	
 	site* vac_to_jump=0;
 	site* atom_to_jump=0;
@@ -1265,7 +1263,7 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		if( R>=Lvalue and R < Rvalue){
 
 //			control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-//			(*event).second.show();
+			(*event).second.show();
 			
 			vac_to_jump=(*event).second.get_vac_to_jump();
 			atom_to_jump=(*event).second.get_atom_to_jump();

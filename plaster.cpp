@@ -230,8 +230,10 @@ void plaster :: init_calc(int FLAG){
 void plaster :: update_plaster(site* node, bool status){
 
 	if(status){
+		control_output<<"stat: "<<status;;
 		plaster_add_site(node);
 	}else{
+		control_output<<"stat: "<<status;
 		plaster_delete_site(node);
 	}
 }
