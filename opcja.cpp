@@ -1155,7 +1155,7 @@ void opcja :: cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vec
 	vector <site*>::iterator atom;
 	int dir = get_direction();
 	
-	node->show_site();
+//	node->show_site();
 	wektor r0 = node->get_position();
 	double x0 = r0[dir];
 	bool IN_VOLUME = check_x_belonging_volume(r0[dir]);
@@ -1238,7 +1238,7 @@ void opcja :: cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_
 	wynik_at.clear();
 	wynik_vac.clear();
 	int dir = get_direction();
-	node->show_site();
+//	node->show_site();
 	wektor r0 = node->get_position();
 	double x0 = r0[dir];
 	bool IN_VOLUME = check_x_belonging_volume(r0[dir]);
@@ -1339,7 +1339,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			if(typ==0 ){													//jesli jestes w rezerwuar i jesli vacanc to zakoncz szukanie siezki
 				if(first_node->get_atom()>0){								
 					migration_path.push_back( (site_bufor[rndIndex]) );
-					(site_bufor[rndIndex])->show_site();					
+		//			(site_bufor[rndIndex])->show_site();					
 				}											
 				node=site_bufor[rndIndex];									//w node jest vacans stop while
 				break;
@@ -1358,7 +1358,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			if(typ==0){
 				if(first_node->get_atom()>0){								
 					migration_path.push_back( (vac_bufor[rndIndex]) );		//zapisz adres vacancy do sciezki jesli poczatek byl atom. Create vac.
-					(vac_bufor[rndIndex])->show_site();
+		//			(vac_bufor[rndIndex])->show_site();
 				}
 				node=vac_bufor[rndIndex];									//w node jest vacans stop while	
 				break;
@@ -1398,7 +1398,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 
 void opcja :: dislocation_walk(vector <site*> &path){
 	
-	control_output<<"Path size: "<<path.size()<<endl;
+//	control_output<<"Path size: "<<path.size()<<endl;
 	site* first = path.front();
 	site* last = path.back();
 	
@@ -1435,9 +1435,9 @@ void opcja :: dislocation_walk(vector <site*> &path){
 void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 
 	//one direction exchange of sites. Virtual jump of vac to atom.
-	control_output<<"Przed:"<<endl;
-	VAC->show_site();
-	ATOM->show_site();
+//	control_output<<"Przed:"<<endl;
+//	VAC->show_site();
+//	ATOM->show_site();
 	if(VAC->get_atom() != 0){control_output<<"ERROR in lattice::exchange_sites(). Type of vacancy not 0: "<<VAC->get_atom()<<endl;exit(1);}
 	if(ATOM->get_atom() <= 0){control_output<<"ERROR in lattice::exchange_sites(). Type of atom not >0: "<<ATOM->get_atom()<<endl;exit(1);}
 
@@ -1452,27 +1452,27 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 	update_opcja(VAC,1);
 	update_opcja(ATOM,1);
 
-	control_output<<"Po:"<<endl;
-	VAC->show_site();
-	ATOM->show_site();	
+//	control_output<<"Po:"<<endl;
+//	VAC->show_site();
+//	ATOM->show_site();	
 }
 
 void opcja :: update_opcja( site* node, bool status){
-	control_output<<"\nupdate_opcja: ";								//refresh opcja::fields: BLOCKS, HIST, REZ
+//	control_output<<"\nupdate_opcja: ";								//refresh opcja::fields: BLOCKS, HIST, REZ
 	int ID_B = node->get_block_index();
 	int ID_H = node->get_hist_index();
 	int ID_R = node->get_rez_index();
-	control_output<<ID_B<<" "<<ID_H<<" "<<ID_R<<endl;
+//	control_output<<ID_B<<" "<<ID_H<<" "<<ID_R<<endl;
 	if(ID_B >=0){
-		control_output<<"in block ";
+//		control_output<<"in block ";
 		BLOKS[ID_B].update_plaster(node,status);
 	}
 	if(ID_H >=0){
-		control_output<<"in hist "<<endl;;
+//		control_output<<"in hist "<<endl;;
 	//	HIST[ID_H].update_plaster(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
 	}																	//if ON, then it means that flux comming from dislocation movement 
 	if(ID_R >=0){														// is added to flux of particles. 	
-		control_output<<"in rez ";
+//		control_output<<"in rez ";
 		reservuars[ID_R].update_plaster(node,status);
 	}
 }
