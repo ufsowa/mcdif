@@ -650,7 +650,7 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double yjumper=vac_to_jump->get_y();
 	double zjumper=vac_to_jump->get_z();
 	long int Vindex = vac_to_jump->get_vindex();
-	control_output<<"Vindex: "<<Vindex<<endl;
+//	control_output<<"Vindex: "<<Vindex<<endl;
 	double xvac=atom_to_jump->get_x();		//xvac - pozycja na osi x wakancji po przeskoku
 	double yvac=atom_to_jump->get_y();
 	double zvac=atom_to_jump->get_z();
@@ -2366,9 +2366,10 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 	//		}
 		}
 	control_output<<"RTA finished... "<<endl;				
-	control_output<<"EVENTS: "<<EVENTS.size()<<endl;
+	control_output<<"VAC: "<<Vatoms.size()<<" EVENTS: "<<EVENTS.size()<<endl;
 	simple_bars.clear();
 	EVENTS.clear();
+	Vatoms.clear();
 	}  
 				
 	if(name=="RTA_RAND_ALLOY")

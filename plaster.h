@@ -92,24 +92,24 @@ class plaster {
 	};
 
 	void	plaster_delete_site(site* node){
-		control_output<<" del site in plaster "<<node<<" ";
+//		control_output<<" del site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
-		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
+//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
 		eq_flux_delta(typ,0);
 		prob_update(typ,0);
-		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
+//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 
 	};
 	
 	void	plaster_add_site(site* node){
-		control_output<<" add site in plaster "<<node<<" ";
+//		control_output<<" add site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
-		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
+//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].push_back(node);
 		eq_flux_delta(typ,1);
 		prob_update(typ,1);
-		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
+//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 	};
 	
 	void eq_flux_delta(unsigned int typ, int flaga){

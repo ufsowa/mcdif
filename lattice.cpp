@@ -3680,8 +3680,8 @@ void lattice :: clear_dR()
 
 void lattice :: update_events(site* sajt){
 	
-	sajt->show_site();
-	control_output<<"prze events: "<<EVENTY->size()<<endl;
+//	sajt->show_site();
+//	control_output<<"prze events: "<<EVENTY->size()<<endl;
 	if( check_site_belonging_to_sim_area(sajt) ){	
 	update_site_events(sajt);
 	//search for vacancy in neigh for sajt and update
@@ -3694,7 +3694,7 @@ void lattice :: update_events(site* sajt){
 		}
 	}
 	}
-	control_output<<"po events: "<<EVENTY->size()<<endl;
+//	control_output<<"po events: "<<EVENTY->size()<<endl;
 }
 
 void lattice :: update_site_events(site* sajt){
