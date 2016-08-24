@@ -1102,9 +1102,9 @@ int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz	
 	double right_area = -HIST[id].eq_flux_get(0);
 
 	//policz prace dla skoku w lewo/prawo
-	double W_left = -left_area/SAVE_MCtime;
-	double W_right = right_area/SAVE_MCtime;
-	if(SAVE_MCtime==0){
+	double W_left = -left_area/Actual_MCtime;
+	double W_right = right_area/Actual_MCtime;
+	if(Actual_MCtime==0){
 		W_left = -left_area/1;
 		W_right = right_area/1;
 	}
@@ -1398,7 +1398,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 
 void opcja :: dislocation_walk(vector <site*> &path){
 	
-//	control_output<<"Path size: "<<path.size()<<endl;
+	control_output<<"Path size: "<<path.size()<<endl;
 	site* first = path.front();
 	site* last = path.back();
 	
@@ -1411,22 +1411,23 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		vector<site*>::iterator i = path.begin(); ++i;
 		for ( ; i != path.end(); ++i ){
 			vector<site*>::iterator prev = i; --prev;
-		//	(*prev)->show_site();
-		//	(*i)->show_site();
+			(*prev)->show_site();
 			virtual_jump_vac_atom( (*prev), *i);	
 		}	
 		reset_site( *(--i) );
 		Vtoadd.push_back( *i );	
+		(*i)->show_site();
+
 	}else if( last->get_atom()== 0 ){	//backward vacancy in
 		vector<site*>::reverse_iterator i = path.rbegin(); ++i;
 		for ( ; i != path.rend(); ++i ){
 			vector<site*>::reverse_iterator prev = i; --prev;
-		//	(*prev)->show_site();
-		//	(*i)->show_site();
+			(*prev)->show_site();
 			virtual_jump_vac_atom( (*prev), *i);
 		}	
 		reset_site( *(--i) );
 		Vtoadd.push_back( *i );	
+		(*i)->show_site();
 	}else{
 		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);
 	}
