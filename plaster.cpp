@@ -17,7 +17,7 @@ plaster ::	plaster(int i, int atoms_type, int dir, int id, double x0, double x1,
 			PL_PROB_DEL.push_back(0);
 		}
 		PL_JUMPS=0;
-		PL_AVG_COUNT=0;
+		PL_JUMPS_EQ=0;
 		PL_AVG_PARS.reserve(20);
 		PL_AVG_PARS.push_back(0);
 		PL_AVG_PARS.push_back(0);
@@ -27,7 +27,8 @@ plaster ::	plaster(int i, int atoms_type, int dir, int id, double x0, double x1,
 		for(unsigned int i=0;i<PL_EQ_FLUX.size();i++){PL_AVG_PARS.push_back(PL_EQ_FLUX[i]);};
 		for(unsigned int i=0;i<PL_PROB_ADD.size();i++){PL_AVG_PARS.push_back(PL_PROB_ADD[i]);};
 		for(unsigned int i=0;i<PL_PROB_DEL.size();i++){PL_AVG_PARS.push_back(PL_PROB_DEL[i]);};
-
+		PL_AVG_PARS.push_back(0);
+		PL_AVG_PARS.push_back(0);
 }
 
 void plaster :: cumulate(){
@@ -40,7 +41,8 @@ void plaster :: cumulate(){
 	for(unsigned int i=0;i<PL_EQ_FLUX.size();i++,j++){PL_AVG_PARS[j]+=(PL_EQ_FLUX[i]);};
 	for(unsigned int i=0;i<PL_PROB_ADD.size();i++,j++){PL_AVG_PARS[j]+=(PL_PROB_ADD[i]);};
 	for(unsigned int i=0;i<PL_PROB_DEL.size();i++,j++){PL_AVG_PARS[j]+=(PL_PROB_DEL[i]);};
-	PL_AVG_COUNT=PL_JUMPS;
+	PL_AVG_PARS[j]=PL_JUMPS;j++;
+	PL_AVG_PARS[j]=PL_JUMPS_EQ;
 }
 
 void plaster :: call_avg(vector<double>& results){
@@ -49,7 +51,6 @@ void plaster :: call_avg(vector<double>& results){
 	for(unsigned int i=0;i<PL_AVG_PARS.size();i++){
 		tmp.push_back(PL_AVG_PARS[i]);
 		};
-		tmp.push_back(PL_AVG_COUNT);
 	results=tmp;
 	
 //	for(unsigned int i=0;i<PL_ATOMS.size();i++){PL_ATOMS[i]=0;};
@@ -59,7 +60,6 @@ void plaster :: call_avg(vector<double>& results){
 //	for(unsigned int i=0;i<PL_PROB_DEL.size();i++){PL_PROB_DEL[i]=0;};
 //	for(unsigned int i=0;i< (3 + PL_ATOMS.size());i++){PL_AVG_PARS[i]=0;};
 
-//	PL_AVG_COUNT=0;
 	for(unsigned int i=0;i< (PL_AVG_PARS.size());i++){PL_AVG_PARS[i]=0;};
 	
 }

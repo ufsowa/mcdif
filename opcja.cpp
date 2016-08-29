@@ -590,6 +590,7 @@ void opcja :: flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>&
 	}	
 }
 
+/*
 void opcja :: flux_add(double pos_V, double pos_A, int typ, vector<plaster>& layer){
 	int id_A=-2,id_V=-2;
 	double dir = pos_V - pos_A;	//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
@@ -632,50 +633,133 @@ void opcja :: flux_add(double pos_V, double pos_A, int typ, vector<plaster>& lay
 
 	}	
 }
+*/
 
-void opcja :: flux_add_dislocation(double pos_V, double pos_A, int typ, vector<plaster>& layer){
-	int id_A=-2,id_V=-2;
-	double dir = pos_V - pos_A;	//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
-								//													  Strumien dla atomu jest -
+void opcja :: flux_add(site* VAC, site* ATO, vector<plaster>& layer){
+	int id_A=-2,id_V=-2;				
+	unsigned int DIR = (layer[0]).get_direction();
+	double pos_V = VAC->get_position(DIR);
+	double pos_A = ATO->get_position(DIR);
+	double dir = pos_V - pos_A;											//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
+
 	//znajdz index bin dla x_A oraz x_V
-	for(unsigned int i=0; i< layer.size(); i++){
-		if(layer[i].get_st() <= pos_A  and pos_A < layer[i].get_end()){
-			id_A=i;
-		}
-		if(layer[i].get_st() <= pos_V  and pos_V < layer[i].get_end()){
-			id_V=i;
-		}
-	}
+	id_V=VAC->get_hist_index();
+	id_A=ATO->get_hist_index();
+
+	int typ = ATO->get_atom();
+//	for(unsigned int i=0; i< layer.size(); i++){
+//		if(layer[i].get_st() <= pos_A  and pos_A < layer[i].get_end()){
+//			id_A=i;
+//		}
+//		if(layer[i].get_st() <= pos_V  and pos_V < layer[i].get_end()){
+//			id_V=i;
+//		}
+//	}
+
 	if(id_V >=0 and (id_V != id_A)){
-		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
-	//	layer[id_V].flux_net_delta(typ, 0);
-	//	layer[id_V].jump_occured();
+		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V		
 		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
-			layer[id_V].prob_hist_l(0, 1);
-			layer[id_V].prob_hist_l(typ, 0);
+			for(int ID=id_V; ID>id_A; ){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].flux_net_delta(0, 1);
+				layer[ID].flux_net_delta(typ, 0);
+				ID--;
+			}
 		}
 		if(dir < 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
-			layer[id_V].prob_hist_r(0, 0);
-			layer[id_V].prob_hist_r(typ, 1);
-		}
-
+			for(int ID=id_V; ID<id_A; ){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].eq_flux_delta(0, 0);
+				layer[ID].eq_flux_delta(typ, 1);
+				ID++;
+			}
+		}	
 	}
 	if(id_A >=0 and (id_V != id_A)){
-		//vakancja znika z plastra id_A oraz atom pojawia sie w plastrze id_A
-	//	layer[id_A].flux_net_delta(typ, 1);
-	//	layer[id_A].jump_occured();
-		if(dir < 0){	//atom wplynal z lewej strony; wakancja wyplynela w lewo
-			layer[id_A].prob_hist_l(typ, 1);
-			layer[id_A].prob_hist_l(0, 0);
+		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
+		if(dir < 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
+			for(int ID=id_A ;ID>id_V ;){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].flux_net_delta(typ, 1);
+				layer[ID].flux_net_delta(0, 0);
+				ID--;
+			}
 		}
-		if(dir > 0){	//atom wplynal z prawej strony; wakancja wyplynela w prawo
-			layer[id_A].prob_hist_r(typ, 0);
-			layer[id_A].prob_hist_r(0, 1);
-		}
+		if(dir > 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
+			for(int ID=id_A ;ID<id_V ;){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].eq_flux_delta(typ, 0);
+				layer[ID].eq_flux_delta(0, 1);
+				ID++;
+			}
+		}	
+	}
 
-	}	
+
 }
 
+void opcja :: flux_add_dislocation(site* VAC, site* ATO, vector<plaster>& layer){
+	int id_A=-2,id_V=-2;				
+	unsigned int DIR = (layer[0]).get_direction();
+	double pos_V = VAC->get_position(DIR);
+	double pos_A = ATO->get_position(DIR);
+	double dir = pos_V - pos_A;											//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
+
+	//znajdz index bin dla x_A oraz x_V
+	id_V=VAC->get_hist_index();
+	id_A=ATO->get_hist_index();
+
+	int typ = ATO->get_atom();
+//	for(unsigned int i=0; i< layer.size(); i++){
+//		if(layer[i].get_st() <= pos_A  and pos_A < layer[i].get_end()){
+//			id_A=i;
+//		}
+//		if(layer[i].get_st() <= pos_V  and pos_V < layer[i].get_end()){
+//			id_V=i;
+//		}
+//	}
+
+	if(id_V >=0 and (id_V != id_A)){
+		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V		
+		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
+			for(int ID=id_V; ID>id_A; ){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].prob_hist_l(0, 1);
+				layer[ID].prob_hist_l(typ, 0);
+				ID--;
+			}
+		}
+		if(dir < 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
+			for(int ID=id_V; ID<id_A; ){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].prob_hist_r(0, 0);
+				layer[ID].prob_hist_r(typ, 1);
+				ID++;
+			}
+		}	
+	}
+	if(id_A >=0 and (id_V != id_A)){
+		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
+		if(dir < 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
+			for(int ID=id_A ;ID>id_V ;){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].prob_hist_l(typ, 1);
+				layer[ID].prob_hist_l(0, 0);
+				ID--;
+			}
+		}
+		if(dir > 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
+			for(int ID=id_A ;ID<id_V ;){
+				layer[ID].jump_occured_dislocation();
+				layer[ID].prob_hist_r(typ, 0);
+				layer[ID].prob_hist_r(0, 1);
+				ID++;
+			}
+		}	
+	}
+
+
+}
 
 void opcja :: find_matano_plane(){
 	double x0 = BIN_ST + fabs(  (BIN_ST-BIN_END)/2.0 ) ;
@@ -711,17 +795,11 @@ void opcja :: call_flux(site* vac_after_jump,site* atom_after_jump){
 	int typ=atom_after_jump->get_atom();
 	flux_net_add(x_V,x_A,typ,BLOKS);
 	flux_net_add(x_V,x_A,typ,reservuars);
-	flux_add(x_V,x_A,typ,HIST);
-	
+	flux_add(vac_after_jump,atom_after_jump,HIST);
 }
 
 void opcja :: call_flux_dislocation(site* vac_after_jump,site* atom_after_jump){
-
-	double x_A = atom_after_jump->get_position(BIN_DIRECTION);
-	double x_V = vac_after_jump->get_position(BIN_DIRECTION);
-	int typ=atom_after_jump->get_atom();
-	flux_add_dislocation(x_V,x_A,typ,HIST);
-	
+	flux_add_dislocation(vac_after_jump,atom_after_jump,HIST);	
 }
 
 void opcja :: set_opcja_lattice(lattice *sample){
@@ -1831,7 +1909,7 @@ void opcja :: save_write(){
 	
 	for(unsigned int i =0;i<wsk2blok.size();i++){
 		wsk2blok[i].call_avg(results);
-		data_bin<<SAVE_MCstep<<" "<<SAVE_MCtime<<" "<<i;
+		data_bin<<SAVE_MCstep<<" "<<SAVE_MCtime;
 		for(unsigned int j=0;j<results.size();j++){
 			data_bin<<" "<<results[j];
 			}
@@ -1840,7 +1918,7 @@ void opcja :: save_write(){
 	}
 	for(unsigned int i =0;i<wsk2rez.size();i++){
 		wsk2rez[i].call_avg(results);
-		data_bin<<SAVE_MCstep<<" "<<SAVE_MCtime<<" "<<i;
+		data_bin<<SAVE_MCstep<<" "<<SAVE_MCtime;
 		for(unsigned int j=0;j<results.size();j++){
 			data_bin<<" "<<results[j];
 			}
@@ -1849,7 +1927,7 @@ void opcja :: save_write(){
 	data_bin<<endl;
 	for(unsigned int i =0;i<wsk2hist.size();i++){
 		wsk2hist[i].call_avg(results);
-		data_hist<<SAVE_MCstep<<" "<<SAVE_MCtime<<" "<<i;
+		data_hist<<SAVE_MCstep<<" "<<SAVE_MCtime;
 		for(unsigned int j=0;j<results.size();j++){
 			data_hist<<" "<<results[j];
 			}

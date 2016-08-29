@@ -32,6 +32,7 @@ class plaster {
 	vector<double> PL_ATOMS;
 	vector<double> PL_AVG_PARS;	//p0,p1,A,B,V,flux_A,...,eq_fluxA,..., counter;
 	unsigned long PL_JUMPS;
+	unsigned long PL_JUMPS_EQ;
 	
 	struct is_equal{
 		is_equal(site* to_find) : to_find(to_find) {}
@@ -72,6 +73,7 @@ class plaster {
 	unsigned int	get_size_types(){return PL_SITES_TYP.size();};
 	site* get_site(long pozition){return PL_REF_TO_SITES[pozition];};
 	void jump_occured(){PL_JUMPS++;};
+	void jump_occured_dislocation(){PL_JUMPS_EQ++;};
 	
 	site* get_site(int typ,int nr){
 		list<site*>::iterator it= PL_SITES_TYP[typ].begin();
