@@ -525,15 +525,15 @@ void opcja :: do_equi_vac(){
 //		control_output<<i<<" "<<stech<<" "<<vac<<" "<<size<<" "<<delta_vac<<" "<<endl;
 //lokalna zmienna MOVE zeby ominuac pozostale bloki
 		
-		if(delta_vac < 0){
+		if(delta_vac < -1){
 			remove_vac_new(i,-delta_vac, LOCAL_MOVE);
 		}
-		else if (delta_vac == 0)
+		else if (-1 <= delta_vac and delta_vac <= 1)
 		{
 			if(MOVE_FRAME or SINGLE){	
 			control_output<<" do nothing"<<endl;}
 		}
-		else if ( delta_vac > 0 )
+		else if ( delta_vac > 1 )
 		{
 			create_vac_new(i,delta_vac, LOCAL_MOVE);
 		}
@@ -633,6 +633,50 @@ void opcja :: flux_add(double pos_V, double pos_A, int typ, vector<plaster>& lay
 	}	
 }
 
+void opcja :: flux_add_dislocation(double pos_V, double pos_A, int typ, vector<plaster>& layer){
+	int id_A=-2,id_V=-2;
+	double dir = pos_V - pos_A;	//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
+								//													  Strumien dla atomu jest -
+	//znajdz index bin dla x_A oraz x_V
+	for(unsigned int i=0; i< layer.size(); i++){
+		if(layer[i].get_st() <= pos_A  and pos_A < layer[i].get_end()){
+			id_A=i;
+		}
+		if(layer[i].get_st() <= pos_V  and pos_V < layer[i].get_end()){
+			id_V=i;
+		}
+	}
+	if(id_V >=0 and (id_V != id_A)){
+		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
+	//	layer[id_V].flux_net_delta(typ, 0);
+	//	layer[id_V].jump_occured();
+		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
+			layer[id_V].prob_hist_l(0, 1);
+			layer[id_V].prob_hist_l(typ, 0);
+		}
+		if(dir < 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
+			layer[id_V].prob_hist_r(0, 0);
+			layer[id_V].prob_hist_r(typ, 1);
+		}
+
+	}
+	if(id_A >=0 and (id_V != id_A)){
+		//vakancja znika z plastra id_A oraz atom pojawia sie w plastrze id_A
+	//	layer[id_A].flux_net_delta(typ, 1);
+	//	layer[id_A].jump_occured();
+		if(dir < 0){	//atom wplynal z lewej strony; wakancja wyplynela w lewo
+			layer[id_A].prob_hist_l(typ, 1);
+			layer[id_A].prob_hist_l(0, 0);
+		}
+		if(dir > 0){	//atom wplynal z prawej strony; wakancja wyplynela w prawo
+			layer[id_A].prob_hist_r(typ, 0);
+			layer[id_A].prob_hist_r(0, 1);
+		}
+
+	}	
+}
+
+
 void opcja :: find_matano_plane(){
 	double x0 = BIN_ST + fabs(  (BIN_ST-BIN_END)/2.0 ) ;
 //	cout<<BIN_DIRECTION<<" "<<BIN_ST<<" "<<BIN_END<<" "<< x0<<endl;
@@ -668,6 +712,15 @@ void opcja :: call_flux(site* vac_after_jump,site* atom_after_jump){
 	flux_net_add(x_V,x_A,typ,BLOKS);
 	flux_net_add(x_V,x_A,typ,reservuars);
 	flux_add(x_V,x_A,typ,HIST);
+	
+}
+
+void opcja :: call_flux_dislocation(site* vac_after_jump,site* atom_after_jump){
+
+	double x_A = atom_after_jump->get_position(BIN_DIRECTION);
+	double x_V = vac_after_jump->get_position(BIN_DIRECTION);
+	int typ=atom_after_jump->get_atom();
+	flux_add_dislocation(x_V,x_A,typ,HIST);
 	
 }
 
@@ -1455,6 +1508,7 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 	update_opcja(VAC,1);
 	update_opcja(ATOM,1);
 
+	call_flux_dislocation(ATOM,VAC);
 //	control_output<<"Po:"<<endl;
 //	VAC->show_site();
 //	ATOM->show_site();	
@@ -1472,7 +1526,7 @@ void opcja :: update_opcja( site* node, bool status){
 	}
 	if(ID_H >=0){
 //		control_output<<"in hist "<<endl;;
-	//	HIST[ID_H].update_plaster(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
+//		HIST[ID_H].update_hist(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
 	}																	//if ON, then it means that flux comming from dislocation movement 
 	if(ID_R >=0){														// is added to flux of particles. 	
 //		control_output<<"in rez ";

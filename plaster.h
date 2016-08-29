@@ -64,6 +64,7 @@ class plaster {
 	int		get_index(){return PL_INDEX;};
 	string		get_name(){return PL_NAME;};
 	void update_plaster(site* node, bool status);
+	void update_hist(site* node, bool status);
 
 	void	push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
 	unsigned int	size(){return PL_REF_TO_SITES.size();};
@@ -133,6 +134,30 @@ class plaster {
 		}
 		else{cout<<"ERROR in plaster::net_flux"<<endl;exit(1);}
 	};
+
+	void prob_hist_l(unsigned int typ, int flaga){
+		//flaga =0 -> site remved; flaga=1 -> site created in plaster
+		if(typ>=PL_PROB_ADD.size()){cout<<"ERROR in plaster::flux: "<<typ<<endl;exit(1);}
+		if(flaga==1){
+			PL_PROB_ADD[typ]++;
+		}else if(flaga==0){
+			PL_PROB_ADD[typ]--;		
+		}
+		else{cout<<"ERROR in plaster::flux"<<endl;exit(1);}
+	};
+
+	void prob_hist_r(unsigned int typ, int flaga){
+		//flaga =0 -> site remved; flaga=1 -> site created in plaster
+		if(typ>=PL_PROB_DEL.size()){cout<<"ERROR in plaster::flux: "<<typ<<endl;exit(1);}
+		if(flaga==1){
+			PL_PROB_DEL[typ]++;
+		}else if(flaga==0){
+			PL_PROB_DEL[typ]--;		
+		}
+		else{cout<<"ERROR in plaster::flux"<<endl;exit(1);}
+	};
+
+
 	
 	void prob_update(unsigned int typ, int flaga){
 		//flaga =0 -> site remved; flaga=1 -> site created in plaster
