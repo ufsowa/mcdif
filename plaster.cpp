@@ -226,6 +226,11 @@ void plaster :: init_calc(int FLAG){
 		}
 	}
 
+void plaster :: reset_indexes(){
+	for (vector <site*>::iterator item = PL_REF_TO_SITES.begin(); item != PL_REF_TO_SITES.end(); ++item){
+		(*item)->reset_index(PL_NAME);
+	}
+}
 
 void plaster :: update_plaster(site* node, bool status){
 

@@ -429,6 +429,8 @@ void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
 				int DIR = decide_direction(rnd_at);	//	-1 left;	+1 right
 				vector <site*> migration_path; migration_path.reserve(2000);
 				find_migration_path(rnd_at,DIR,migration_path);	
+				
+				
 				dislocation_walk(migration_path);
 			}
 			if(TRYB==1){ //swap
@@ -867,15 +869,19 @@ void opcja :: init_EQ(vector <double> &parameters ){
 
 
 void opcja :: build_bins(vector<plaster>& layer, string name){	
+	
+	for ( vector<plaster>::iterator it2pl = layer.begin(); it2pl != layer.end(); ++it2pl){
+		it2pl->reset_indexes();
+	}	
 	layer.clear();
+	
 	int ile = (int((BIN_END - BIN_ST)/BIN_SIZE));
 	double miarka[ile];
 	miarka[0]=BIN_ST;
 	for(int ii=1; ii<=ile; ii++){miarka[ii] = miarka[ii-1] + BIN_SIZE;}
 	//for(int ij=0; ij<ile; ij++){control_output<<ij<<" "<<miarka[ij]<<endl;}
 
-	for (int i=0;i<ile;i++)
-	{
+	for (int i=0;i<ile;i++){
 		plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,i,miarka[i],miarka[i+1],name);
 		layer.push_back(tmp);
 	}
@@ -1033,6 +1039,8 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	ST_VOL=min(od_kod,ST_VOL);
 	END_VOL=max(do_kod,END_VOL);
 	
+	(reservuars[nr]).reset_indexes();
+	
 	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,nr,od_kod,do_kod, "rez");
 	SAMPLE->get_sites(tmp);
 	control_output<<"reinit reservuar: "<<nr<<" "<<odkod<<"|"<<stwidth<<"|"<<dokod<<"||"<<od_kod<<"|"<<width<<"|"<<do_kod<<" "<<direction<<endl;
@@ -1054,9 +1062,8 @@ void opcja :: reinit_reservuars(int nr, int typ){
 }
 
 void opcja :: reinit_bloks(){
-	build_bins(BLOKS);				
+	build_bins(BLOKS,"block");				
 	SAMPLE->get_sites(BLOKS);
-
 	control_output<<"do init_calc in blok: "<<endl;
 	for (unsigned int i=0; i < BLOKS.size(); i++){
 		control_output<<i<<" "; 
@@ -1298,11 +1305,11 @@ void opcja :: cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vec
 	for( it2REZ = reservuars.begin(); it2REZ != reservuars.end(); ++it2REZ){
 		double start = it2REZ->get_st();
 		double koniec = it2REZ->get_end();
-		if( x0 > start and x0 < koniec ){								//node is in reservuar
+		if( x0 > start and x0 < koniec ){								//node is in reservuar inside walls
 			IN_REZ=true;
 			break;
 		}
-		if( x0 == get_start_volume() or x0 == get_end_volume() ){								//node is in reservuar
+		if( x0 == get_start_volume() or x0 == get_end_volume() ){								//node is in reservuar on external wall
 			IN_REZ=true;
 			break;
 		}
@@ -1453,6 +1460,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 	site* node=first_node;
 	migration_path.push_back( first_node );
 	unsigned int TRY_WALL = 0;
+	unsigned int HARD_WALL = 0;
 	bool WALL = false;
 	do{		
 		vector <site*> site_bufor;
@@ -1504,11 +1512,21 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 		//	control_output<<"WARRNING in opcja::find_migration_path(). \
 			Path reached a wall. No atoms or vacancy available to contiune path."<<endl;//exit(1);		
 			WALL = true;TRY_WALL++;
-			if(TRY_WALL>3){
-				control_output<<"ERROR in opcja::find_migration_path(). \
-				Node is oscilating: "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
+			if(TRY_WALL>10){
+				control_output<<"WARRNING in opcja::find_migration_path(). \
+				Node can not find end "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
+				node->show_site();
+	//			kierunek = kierunek*(-1.0); TRY_WALL = 0; HARD_WALL++;
+	//			control_output<<"Oposite direction was set: "<<endl; kierunek.show();
 				exit(1);
-				}
+			}
+	//		if(HARD_WALL>1){
+	//			control_output<<"ERROR in opcja::find_migration_path(). \
+	//			Node is oscilating: "<<HARD_WALL<<" "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
+	//			control_output<<"Possible wrong definition of reservuars."<<endl;
+	//			exit(1);
+	//		}
+			
 		}else{
 			control_output<<"ERROR in opcja::find_migration_path(). \
 			Undefined condition: "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;

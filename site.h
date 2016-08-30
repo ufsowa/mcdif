@@ -96,6 +96,7 @@ long get_vindex();
 int get_hist_index();
 int get_block_index();
 int get_rez_index();
+void reset_index(string type);
 
 //site operations
 void reset_site ();
