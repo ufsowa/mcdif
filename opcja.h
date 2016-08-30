@@ -96,6 +96,7 @@ int choose_typ(plaster& bin, bool sig = true);
 int choose_reservuar(site* atom);
 int check_stech(double stech, double vac, double size);
 bool check_rezervuars(int i, int typ);
+bool check_rezervuars(site* node, site* &next_node);
 bool check_x_belonging_volume(double x);
 void create_vac(int i, int vac, bool &FLAG);
 void create_vac_new(int i, int vac, bool &FLAG);	
@@ -128,7 +129,7 @@ void set_temperature(double T){TEMPERATURE=T;}
 void find_matano_plane();
 
 int decide_direction(site *node);
-void find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
+bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);
 void cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);
 void cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);

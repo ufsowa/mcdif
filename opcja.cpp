@@ -36,9 +36,9 @@ int opcja :: choose_typ(plaster& bin, bool sig){
 //		control_output<<" nr wylosowanego situ B: "<<N<<" "<<TYP;
 	}
 	else if(sig){control_output<<"Error in opcja::choose_typ: "<<N<<" "<<A<<" "<<B<<" "<<SIZE<<endl;
-		control_output<<"Try to remove atom witch does not egzist "<<endl;exit(1);}
+		control_output<<"Try to remove atom witch does not exist "<<endl;exit(1);}
 	else if(!sig){control_output<<"Warrning in opcja::choose_typ: "<<N<<" "<<A<<" "<<B<<" "<<SIZE<<endl;
-		control_output<<"Try to remove atom witch does not egzist "<<endl;}
+		control_output<<"Try to remove atom witch does not exist "<<endl;}
 
 //	control_output<<N<<" "<<TYP<<endl;
 	return TYP;			//TYP < 0 means that there is no atoms in the bin
@@ -154,6 +154,56 @@ double opcja :: Ceq_vac(double stech){
 	return CV;
 }
 
+bool opcja :: check_rezervuars(site* first, site* &last){
+	
+	site* actual = last;
+	int TYP = first->get_atom();
+	int typ_od=-1,typ_do=-1;	
+	bool do_move=false;
+	
+	unsigned int nr_rez = actual->get_rez_index();
+
+	if(nr_rez<0){
+		control_output<<"ERROR: opcja::check_rez(). Site not in the reservuar"<<endl;
+		actual->show_site();
+		control_output<<"Wrong definition of res."<<endl;
+		exit(1);
+	}
+
+	if(TYP==0){
+		typ_od=1;typ_do=BIN_ATOMS_TYP-1;
+	}else if(TYP>0){
+		typ_od=0;typ_do=0;
+	}else{
+		control_output<<"ERROR: opcja::check_rez(). Wrong type: "<<endl;
+		first->show_site();
+		exit(1);
+	}
+	
+	if(reservuars[nr_rez].check(typ_od,typ_do,1)){
+		control_output<<"warrning in opcja::check_reservuars -> try remove typ which dose not exist in reservuar "<<TYP<<endl;
+		if(TYP>0)	//TYP>0 to znaczy ze w rezerwuarze zabraklo atomow -> probka w strone atomow
+		{TYP_TO_MOVE=1;}
+		else if(TYP==0)		//TYP==0 to znaczy ze w rezerwuarze zabraklo wakancji -> probka w strone wakancji
+		{TYP_TO_MOVE=-1;}
+		else{control_output<<"error in opcja::check_reservuars (problem with types < 0) "<<TYP<<endl;exit(1);}
+		do_move=true;
+		MOVE_FRAME=true;	//set global variable to true
+		REZ_TO_MOVE=nr_rez;	//set global var. which rezervuar to move
+	}else{
+		int typ = choose_type(reservuars[nr_rez]);
+		//choose_type
+		//choose randomly given site 
+		
+		unsigned long N1=(long)(rnd()*(BLOKS[nr].size(typ)));
+			
+		last=BLOKS[nr].get_site(typ,N1);
+	}
+	
+	return do_move;
+}
+
+
 bool opcja :: check_rezervuars(int i, int TYP){
 	
 	int typ_od=TYP,typ_do=TYP;	//,status=0;	//, ile_to_move=-1;
@@ -165,13 +215,9 @@ bool opcja :: check_rezervuars(int i, int TYP){
 //		A+=reservuars[i].eq_flux_get(t);}
 //		Z=A;
 //	}else{
-		V = reservuars[i].eq_flux_get(0) + reservuars[i].flux_net_get(0);
-		Z=labs(V)+1;
+	V = reservuars[i].eq_flux_get(0) + reservuars[i].flux_net_get(0);
+	Z=labs(V)+1;
 //		}	
-	
-	
-	
-	
 	if(Z > ROZMIAR[i]){//calkowita zmiana atomow wynosi tyle co 100% jednej plaszczyzny
 
 			if(V>0)	//dV>0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna wakancji -> probka w strone atomow
@@ -183,8 +229,7 @@ bool opcja :: check_rezervuars(int i, int TYP){
 			MOVE_FRAME=true;	//set global variable to true
 			REZ_TO_MOVE=i;	//set global var. which rezervuar to move
 			//status=1;
-			}
-	else{	//jesli nie ma nowej plaszczyzny ale zabraklo atomow typu TYP w rezerwuarze		<< nie mozliwy scenariusz bo typ losowany z rezerwuaru
+	}else{	//jesli nie ma nowej plaszczyzny ale zabraklo atomow typu TYP w rezerwuarze		<< nie mozliwy scenariusz bo typ losowany z rezerwuaru
 		if(reservuars[i].check(typ_od,typ_do,1)){	//ale jesli brakuje typow
 		
 		control_output<<"warrning in opcja::check_reservuars -> try remove typ which dose not exist in reservuar "<<TYP<<endl;
@@ -1293,7 +1338,7 @@ void opcja :: cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vec
 	vector <site*>::iterator atom;
 	int dir = get_direction();
 	
-//	node->show_site();
+	control_output<<"weak ";node->show_site();
 	wektor r0 = node->get_position();
 	double x0 = r0[dir];
 	bool IN_VOLUME = check_x_belonging_volume(r0[dir]);
@@ -1376,7 +1421,7 @@ void opcja :: cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_
 	wynik_at.clear();
 	wynik_vac.clear();
 	int dir = get_direction();
-//	node->show_site();
+	control_output<<"str "; node->show_site();
 	wektor r0 = node->get_position();
 	double x0 = r0[dir];
 	bool IN_VOLUME = check_x_belonging_volume(r0[dir]);
@@ -1450,8 +1495,9 @@ void opcja :: cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_
 }
 
 
-void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migration_path){
-	
+bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migration_path){
+
+	bool MOVE_MIG = false;
 	wektor kierunek;
 	if(DIR==1){ kierunek(1.0,0.0,0.0);}else if(DIR== -1){kierunek(-1.0,0.0,0.0);}
 	else{control_output<<"ERROR in opcja""find_migration_path(). Wrong direction: "<<DIR<<endl;exit(1);}
@@ -1489,7 +1535,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			}
 			else{	control_output<<"ERROR in opcja::find_migration_path(). \
 				Atom type < 0: "<<typ<<endl;exit(1);}
-			TRY_WALL = 0; WALL = false;
+			WALL = false;
 		}
 		else if(site_bufor.size() == 0 and vac_bufor.size()>0){				//Jesli w sim_area natrafisz na faze wakancyjna, por, klaster wakancji, to zakoncz sciezke.
 			int rndIndex = rand() % vac_bufor.size();						
@@ -1506,27 +1552,34 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 				control_output<<"ERROR in opcja::find_migration_path(). \
 				Wrong atom type: "<<typ<<endl;exit(1);
 			}
-			TRY_WALL = 0; WALL = false;
+			WALL = false;
 		}								
 		else if(site_bufor.size() == 0 and vac_bufor.size() == 0){			//Jesli path doszla do sciany?? Nie ma ani atomu ani wakancji do skoku. TO odbij wektor kierunek.
-		//	control_output<<"WARRNING in opcja::find_migration_path(). \
-			Path reached a wall. No atoms or vacancy available to contiune path."<<endl;//exit(1);		
+			control_output<<"WARRNING in opcja::find_migration_path(). 	\
+			Path reached a wall. No atoms or vacancy available to contiune path: "<<TRY_WALL<<endl;		
 			WALL = true;TRY_WALL++;
 			if(TRY_WALL>10){
 				control_output<<"WARRNING in opcja::find_migration_path(). \
 				Node can not find end "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
 				node->show_site();
-	//			kierunek = kierunek*(-1.0); TRY_WALL = 0; HARD_WALL++;
+				HARD_WALL++;
+	//			kierunek = kierunek*(-1.0); TRY_WALL = 0; 
 	//			control_output<<"Oposite direction was set: "<<endl; kierunek.show();
-				exit(1);
 			}
-	//		if(HARD_WALL>1){
-	//			control_output<<"ERROR in opcja::find_migration_path(). \
-	//			Node is oscilating: "<<HARD_WALL<<" "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
-	//			control_output<<"Possible wrong definition of reservuars."<<endl;
-	//			exit(1);
-	//		}
-			
+			if(HARD_WALL>1){
+				control_output<<"ERROR in opcja::find_migration_path().Node is oscilating: "<<HARD_WALL<<" "<<TRY_WALL<<endl;
+
+				MOVE_MIG=check_rezervuars(first_node, node);
+				if(MOVE_MIG){
+					migration_path.clear();
+					break;
+				}else{
+					if(node != migration_path.back()){							
+						migration_path.push_back( node );					//node is atom if first_node is vac. 
+					}
+					break;												//node is vac if first_node is atom. 
+				}
+			}
 		}else{
 			control_output<<"ERROR in opcja::find_migration_path(). \
 			Undefined condition: "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
@@ -1536,13 +1589,7 @@ void opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 	//migration_path.back()->show_site();	
 	}while(node->get_atom()>0);		
 	
-	//migration_path.back()->show_site();	
-	//node->show_site();
-																		//UWAGA: na perkolacje!					-> odbija wektor kierunek gdy dojdzie do sciany reserwuaru.
-																		//UWAGA: A co gdy mam juz wszedzie rownowage i w jednym miejscu musze dodac/odjac wakancje
-																		// +/- jeden rodzaj atomu w kazdym plasterku nic nie zmienia (wciaz w granicy sredniej stechiometrii)
-																		// +/- jedna wakancja w danym plasterku też nic nie zmienia (wciaz w granicy sredniej koncentracji)
-																		//Aktualnie algorytm omija wakancje w sim_area. Chyba ze zabraknie mu mozliwosci, to wybiera wakancje.
+	return MOVE_MIG;
 }
 
 void opcja :: dislocation_walk(vector <site*> &path){
@@ -1587,11 +1634,11 @@ void opcja :: dislocation_walk(vector <site*> &path){
 void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 
 	//one direction exchange of sites. Virtual jump of vac to atom.
-//	control_output<<"Przed:"<<endl;
-//	VAC->show_site();
-//	ATOM->show_site();
-	if(VAC->get_atom() != 0){control_output<<"ERROR in lattice::exchange_sites(). Type of vacancy not 0: "<<VAC->get_atom()<<endl;exit(1);}
-	if(ATOM->get_atom() <= 0){control_output<<"ERROR in lattice::exchange_sites(). Type of atom not >0: "<<ATOM->get_atom()<<endl;exit(1);}
+	control_output<<"Przed:"<<endl;
+	VAC->show_site();
+	ATOM->show_site();
+	if(VAC->get_atom() != 0){control_output<<"ERROR in opcja::virtual_jump(). Type of vacancy not 0: "<<VAC->get_atom()<<endl;exit(1);}
+	if(ATOM->get_atom() <= 0){control_output<<"ERROR in opcja::virtual_jump(). Type of atom not >0: "<<ATOM->get_atom()<<endl;exit(1);}
 
 	update_opcja(VAC,0);
 	update_opcja(ATOM,0);
@@ -1605,9 +1652,9 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 	update_opcja(ATOM,1);
 
 	call_flux_dislocation(ATOM,VAC);
-//	control_output<<"Po:"<<endl;
-//	VAC->show_site();
-//	ATOM->show_site();	
+	control_output<<"Po:"<<endl;
+	VAC->show_site();
+	ATOM->show_site();	
 }
 
 void opcja :: update_opcja( site* node, bool status){
