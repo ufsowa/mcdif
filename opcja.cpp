@@ -867,15 +867,19 @@ void opcja :: init_EQ(vector <double> &parameters ){
 
 
 void opcja :: build_bins(vector<plaster>& layer, string name){	
+	
+	for ( vector<plaster>::iterator it2pl = layer.begin(); it2pl != layer.end(); ++it2pl){
+		it2pl->reset_indexes();
+	}	
 	layer.clear();
+	
 	int ile = (int((BIN_END - BIN_ST)/BIN_SIZE));
 	double miarka[ile];
 	miarka[0]=BIN_ST;
 	for(int ii=1; ii<=ile; ii++){miarka[ii] = miarka[ii-1] + BIN_SIZE;}
 	//for(int ij=0; ij<ile; ij++){control_output<<ij<<" "<<miarka[ij]<<endl;}
 
-	for (int i=0;i<ile;i++)
-	{
+	for (int i=0;i<ile;i++){
 		plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,i,miarka[i],miarka[i+1],name);
 		layer.push_back(tmp);
 	}
@@ -1033,6 +1037,8 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	ST_VOL=min(od_kod,ST_VOL);
 	END_VOL=max(do_kod,END_VOL);
 	
+	(reservuars[nr]).reset_indexes();
+	
 	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,nr,od_kod,do_kod, "rez");
 	SAMPLE->get_sites(tmp);
 	control_output<<"reinit reservuar: "<<nr<<" "<<odkod<<"|"<<stwidth<<"|"<<dokod<<"||"<<od_kod<<"|"<<width<<"|"<<do_kod<<" "<<direction<<endl;
@@ -1054,9 +1060,8 @@ void opcja :: reinit_reservuars(int nr, int typ){
 }
 
 void opcja :: reinit_bloks(){
-	build_bins(BLOKS);				
+	build_bins(BLOKS,"block");				
 	SAMPLE->get_sites(BLOKS);
-
 	control_output<<"do init_calc in blok: "<<endl;
 	for (unsigned int i=0; i < BLOKS.size(); i++){
 		control_output<<i<<" "; 
