@@ -1203,9 +1203,7 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		control_output<<" in step: "<<RTA_energy_executions<<endl;
 					EVENTS_size=EVENTS.size();}
 	}
-
-
-
+	
 	for(long n=0;n<number_of_steps;n++){
 
 		if (equi_step > 0){
@@ -1221,19 +1219,22 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 
 	double SUM=0;	
 	typedef vector <pair <double,pairjump> > mykey;
-	mykey target(1,make_pair(SUM, EVENTS.front()));
-
-	double bar= EVENTS.front().get_barier();
-	SUM = SUM + exp(-beta*(bar));
-
+	mykey target;
 	if(!EVENTS.empty()){
-	list<pairjump>::iterator it = EVENTS.begin(); ++it;
-	for(; it != EVENTS.end(); ++it){	
-		target.push_back(make_pair( SUM, (*it) ));
-		double bar= (*it).get_barier();
+		target.push_back(make_pair(SUM, EVENTS.front()));
+		double bar= EVENTS.front().get_barier();
 		SUM = SUM + exp(-beta*(bar));
-	}}
-	target.push_back(make_pair( SUM, EVENTS.back() ));
+	}
+	
+	if(!EVENTS.empty()){
+		list<pairjump>::iterator it = EVENTS.begin(); ++it;
+		for(; it != EVENTS.end(); ++it){	
+			target.push_back(make_pair( SUM, (*it) ));
+			double bar= (*it).get_barier();
+			SUM = SUM + exp(-beta*(bar));
+		}
+		target.push_back(make_pair( SUM, EVENTS.back() ));
+	}
 
 	mykey::iterator event;
 //	control_output<<"Print target: "<<target.size()<<endl;
@@ -1253,47 +1254,40 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 
 //	control_output<<"Schoot target at: "<<R<<endl;
 //	control_output<<"Searching event: "<<target.size()<<endl;
-		
-	for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
-		double Lvalue = (*event).first;
-		double Rvalue = (*next_event).first;
-			
-//		control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-		
-		if( R>=Lvalue and R < Rvalue){
-
-//			control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-//			(*event).second.show();
-			
-			vac_to_jump=(*event).second.get_vac_to_jump();
-			atom_to_jump=(*event).second.get_atom_to_jump();
-			make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
-			sample->update_events(vac_to_jump);	
-			sample->update_events(atom_to_jump);
-			
+	
+	if(!target.empty()){	
+		for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
+			double Lvalue = (*event).first;
+			double Rvalue = (*next_event).first;	
+//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+			if( R>=Lvalue and R < Rvalue){
+//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+//	(*event).second.show();
+				vac_to_jump=(*event).second.get_vac_to_jump();
+				atom_to_jump=(*event).second.get_atom_to_jump();
+				make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
+				sample->update_events(vac_to_jump);	
+				sample->update_events(atom_to_jump);
 				if( (warrinig_jump_event <= 4) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after jump from:"<<EVENTS_size<<" to: "<<EVENTS.size();
 					control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
 					EVENTS_size=EVENTS.size();
 					(*event).second.show();
 					warrinig_jump_event++;
-					}
-				
-			break;
+				}
+				break;
+			}
+		}																//znalazlem event-> zamienilem atomy miejscami -> policzylem monitory-> uaktualnilem liste eventow
+		if( event==target.end() ){
+			control_output<<"ERROR in mc::resident(). Problem with event list. Probably inf or nan in calculation of probability. No event was choosen: "<<endl;
+			control_output<<"Find event: "<<(*event).first<<" "<<R<<" "<<(*next_event).first<<endl;
+			(*event).second.show();
+			exit(1);
 		}
-	}	//znalazlem event-> zamienilem atomy miejscami -> policzylem monitory-> uaktualnilem liste eventow
-	
-	if( event==target.end() ){
-		control_output<<"ERROR in mc::resident(). Problem with event list. Probably inf or nan in calculation of probability. No event was choosen: "<<endl;
-		control_output<<"Find event: "<<(*event).first<<" "<<R<<" "<<(*next_event).first<<endl;
-		(*event).second.show();
-		exit(1);
-		}
-	
-	//increment time
-	double dt =time_increment(SUM);	
-	time += dt;
-	opt_equi.add_MCtime(dt);
-	}// koniec petli for sub step
+		double dt =time_increment(SUM);									//increment time
+		time += dt;
+		opt_equi.add_MCtime(dt);
+	}
+	}																	// koniec petli for sub step
 
 	return time;
 }
