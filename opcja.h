@@ -80,7 +80,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar) : POT(pot_in), BARRIER
 ~opcja(){
 	};
 
-void build_bins(vector<plaster>& layer_new, string name="block");
+void build_bins(vector<plaster>& layer_new, string name);
 void init_EQ(vector <double> &parameters);
 void init_reservuar(vector <double> &parameters);
 void set_opcja_lattice(lattice *sample);

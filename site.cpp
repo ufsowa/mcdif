@@ -350,6 +350,19 @@ int site :: get_hist_index(){return hist_index;}
 int site :: get_block_index(){return block_index;}
 int site :: get_rez_index(){return rez_index;}
 
+void site :: reset_index(string type){
+	if(type=="hist"){
+		hist_index=-1;
+	}else if(type=="block"){
+		block_index=-1;
+	}else if(type=="rez"){
+		rez_index=-1;
+	}else{
+		control_output<<"ERROR in site::reset_index(): "<<type<<endl;exit(1);
+	}
+
+
+}
 
 /*--------------------------------------------------------------*/
 bool site :: operator ==(const site &A)

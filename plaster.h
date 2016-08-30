@@ -52,25 +52,26 @@ class plaster {
 	
 	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name );	
 
-	void	cumulate();
-	void	call_avg(vector<double>& results);
-	void	set_atoms_list(vector <site *> &kontener, int typ);
-	void	set_atoms_list(list <site *> &kontener, int typ);
-	void	init_calc(int FLAG=0);
-	bool	check(unsigned int typ_min, unsigned int typ_max, int delta);
-	void	swap(plaster source, int FLAG);
-	int		get_direction(){return PL_DIRECTION;};
-	int		get_st(){return PL_P0;};
-	int		get_end(){return PL_P1;};
-	int		get_index(){return PL_INDEX;};
-	string		get_name(){return PL_NAME;};
+	void cumulate();
+	void call_avg(vector<double>& results);
+	void set_atoms_list(vector <site *> &kontener, int typ);
+	void set_atoms_list(list <site *> &kontener, int typ);
+	void init_calc(int FLAG=0);
+	bool check(unsigned int typ_min, unsigned int typ_max, int delta);
+	void swap(plaster source, int FLAG);
+	int	get_direction(){return PL_DIRECTION;};
+	int	get_st(){return PL_P0;};
+	int	get_end(){return PL_P1;};
+	int	get_index(){return PL_INDEX;};
+	void reset_indexes();
+	string get_name(){return PL_NAME;};
 	void update_plaster(site* node, bool status);
 	void update_hist(site* node, bool status);
 
-	void	push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
-	unsigned int	size(){return PL_REF_TO_SITES.size();};
-	unsigned int	size(int typ){return PL_SITES_TYP[typ].size();};
-	unsigned int	get_size_types(){return PL_SITES_TYP.size();};
+	void push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
+	unsigned int size(){return PL_REF_TO_SITES.size();};
+	unsigned int size(int typ){return PL_SITES_TYP[typ].size();};
+	unsigned int get_size_types(){return PL_SITES_TYP.size();};
 	site* get_site(long pozition){return PL_REF_TO_SITES[pozition];};
 	void jump_occured(){PL_JUMPS++;};
 	void jump_occured_dislocation(){PL_JUMPS_EQ++;};
