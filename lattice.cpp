@@ -357,6 +357,7 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 			event=EVENTY->erase(event);
 		}
 		
+<<<<<<< HEAD
 		for(unsigned int i=0;i<kontener.size();i++){	
 			update_site_events(kontener[i]);
 		}
@@ -365,6 +366,8 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 //	it->show();
 //	}
 		
+=======
+>>>>>>> 2cf2badf3adc448879b2f44d7e9c78ae8df9351e
 		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
