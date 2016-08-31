@@ -1852,6 +1852,7 @@ void opcja :: refresh_sim_area(vector <site*> &kontener){
 		tmp.reserve(10000);
 		tmp.clear();
 		for (unsigned int i=0; i < kontener.size(); i++){
+			kontener[i]->show_site();
 			typ=kontener[i]->get_atom();
 			log=SAMPLE->check_site_belonging_to_sim_area(kontener[i]);
 			if((typ==0) and log ){tmp.push_back(kontener[i]);}else{

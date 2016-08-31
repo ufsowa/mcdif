@@ -346,8 +346,26 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 		}
 	}
 	
-	if(typ==0)
-	{control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
+	if(typ==0){
+		control_output<<"set atom list typ/size/EVENTS/po: "<<typ<<" / "<<kontener.size()<<" / "<<EVENTY->size();
+
+		list <pairjump>::iterator event=EVENTY->begin(); 
+		
+		while ( event != EVENTY->end() ){
+			site* node = event->get_vac_to_jump();
+			node->clear_events_index();
+			event=EVENTY->erase(event);
+		}
+		
+		for(unsigned int i=0;i<kontener.size();i++){	
+			update_site_events(kontener[i]);
+		}
+		
+//	for(list <pairjump>::iterator it=tablica.begin();it!=tablica.end();++it){
+//	it->show();
+//	}
+		
+		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
 //	{
@@ -3691,8 +3709,20 @@ void lattice :: update_events(site* sajt){
 	for( iters it=neighs.begin(); it != neighs.end();++it){
 		if( check_site_belonging_to_sim_area((*it)) ){	
 			update_site_events( (*it) );			
+		}else{
+			//clear just in case
 		}
 	}
+	}else{
+		typedef list <pairjump>::iterator it2list;
+		vector < it2list > to_del;
+		sajt->get_events_index(to_del);
+		for( unsigned int i=0; i<to_del.size();i++){
+			//		control_output<<"del event: "<<&(*to_del[i])<<endl;
+			//		(to_del[i])->show();
+			(*EVENTY).erase(to_del[i]);
+		}
+		sajt->clear_events_index();
 	}
 //	control_output<<"po events: "<<EVENTY->size()<<endl;
 }
