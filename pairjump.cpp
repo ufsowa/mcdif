@@ -6,6 +6,9 @@ pairjump :: pairjump(){
 		bariera=1000.0;
 		vac_to_jump=NULL;
 		atom_to_jump=NULL;
+		E1=0.0;
+		E2=0.0;
+		bar=1000.0;
 		}
 pairjump :: pairjump(site* from, site* to,double e1,double e2,double bar_con,double bar_act){
 		bariera=bar_act;

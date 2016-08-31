@@ -84,6 +84,12 @@ bool plaster :: check(unsigned int typ_min, unsigned int typ_max, int delta){
 	return status;
 }
 
+site* plaster :: choose_atom(unsigned int typ){
+	unsigned long N1=(long)(rnd()*(size(typ)));
+	site* node = get_site(typ,N1);
+	return node;
+}
+
 void plaster :: set_atoms_list(vector <site *> &kontener, int typ)
 {
 	site *pointer=0;

@@ -58,6 +58,7 @@ class plaster {
 	void set_atoms_list(list <site *> &kontener, int typ);
 	void init_calc(int FLAG=0);
 	bool check(unsigned int typ_min, unsigned int typ_max, int delta);
+	site* choose_atom(unsigned int typ);
 	void swap(plaster source, int FLAG);
 	int	get_direction(){return PL_DIRECTION;};
 	int	get_st(){return PL_P0;};
@@ -78,16 +79,25 @@ class plaster {
 	
 	site* get_site(int typ,int nr){
 		list<site*>::iterator it= PL_SITES_TYP[typ].begin();
-		advance(it, nr);
+		if( !(PL_SITES_TYP[typ].empty()) ){
+			advance(it, nr);
+		}else{
+			control_output<<"ERROR: plaster::get_site(). Type list empty: "<<typ<<endl;
+			exit(1);
+		}
 		return *it;
 	};
 	
-	void	delete_site(int typ, long numer){
+	void	delete_site(unsigned int typ, unsigned long numer){
 		list<site*>::iterator item = PL_SITES_TYP[typ].begin();
-		advance(item, numer);
-		PL_SITES_TYP[typ].erase(item);
-		eq_flux_delta(typ,0);
-		
+		if( !(PL_SITES_TYP[typ].empty()) ){
+			advance(item, numer);
+			PL_SITES_TYP[typ].erase(item);
+			eq_flux_delta(typ,0);
+		}else{
+			control_output<<"ERROR: plaster::delete_site(). Type list empty: "<<typ<<endl;
+			exit(1);
+		}
 	};
 	
 	void	add_site(int typ, site* new_site){
@@ -96,14 +106,18 @@ class plaster {
 	};
 
 	void	plaster_delete_site(site* node){
-//		control_output<<" del site in plaster "<<node<<" ";
+
 		unsigned int typ = node->get_atom();
-//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
+		
+		if( PL_SITES_TYP[typ].empty() ){
+			control_output<<"ERROR: plaster::delete_site(). Type list empty: "<<typ<<endl;
+			exit(1);
+		}																//		control_output<<" del site in plaster "<<node<<" ";
+																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
 		eq_flux_delta(typ,0);
 		prob_update(typ,0);
-//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
-
+																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 	};
 	
 	void	plaster_add_site(site* node){
