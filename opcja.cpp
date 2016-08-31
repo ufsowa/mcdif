@@ -428,8 +428,8 @@ void opcja :: do_equi_rez(){
 	
 	//	cout<<"rez: "<<i<<" size: "<<Nsize<<endl;
 		for (long iter=0; iter<DIRECT_STEPS; iter++){
-			long N1=(long)(ran01()*Nsize);
-			long N2=(long)(ran01()*Nsize);		
+			long N1=(long)(rnd()*Nsize);
+			long N2=(long)(rnd()*Nsize);		
 			site *site1=0;	
 			site *site2=0;
 			site1=reservuars[i].get_site(N1);
@@ -447,6 +447,8 @@ void opcja :: do_equi_rez(){
 				if(R >= p){
 				site1->set_atom(typ1);
 				site2->set_atom(typ2);
+				SAMPLE->update_events( site1 );
+				SAMPLE->update_events( site2 );
 				}
 			}
 	//	ofstream dir_file("dir_tmp.dat", ios::app); 
@@ -1123,7 +1125,7 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	//przerzuc zostawione atomy do nowego rezerwuaru (swap atom<->wakancja)
 	if(DIR==1){
 	tmp.init_calc(1);
-	tmp.swap(reservuars[nr],1);
+	swap(reservuars[nr],tmp,1);
 	}
 	tmp.init_calc(1);	
 	reservuars[nr]=tmp;
@@ -1910,6 +1912,49 @@ void opcja :: reset_site(site *sajt){
 	SAMPLE->update_events(sajt);
 	sajt->reset_site();
 	
+}
+
+void opcja :: swap(plaster &source, plaster &destination, int FLAG){
+																		//move all atoms (no vacancies) from source to destination
+	int count=0;
+	unsigned int dir = source.get_direction();
+	int P0 = destination.get_st();
+	int P1 = destination.get_end();
+	
+	if(FLAG){control_output<<source.size()<<" "<<destination.size()<<endl;}
+	
+	for(unsigned int i=0;i<source.size();i++){
+		
+			double x = (source[i])->get_position(dir);
+				
+	//	if(FLAG){control_output<<i<<" "<<P0<<" "<<x<<" "<<P1<<endl;}
+		if(!(P0<=x and x<P1)){		
+			int typ=source[i]->get_atom();
+	//		if(FLAG){control_output<<source.ref_to_sites[i]<<" "<<typ<<endl;}
+			if(typ>0){
+				long N =(long)(rnd()*(destination.size(0)) );site* rnd_vac=0;
+		//		if(FLAG){control_output<<size(0)<<" "<<N<<endl;}
+				rnd_vac=destination.get_site(0,N);
+
+				source[i]->set_atom(0);
+				rnd_vac->set_atom(typ);
+
+				count++;
+		//		if(FLAG){control_output<<"delete"<<endl;}
+				destination.delete_site(0,N);
+				destination.add_site(typ,rnd_vac);	
+			//	source.delete_site(typ,i);								//no need because later destroyed
+				source.add_site(0,source[i]);		
+				
+				SAMPLE->update_events(rnd_vac);
+				SAMPLE->update_events(source[i]);	
+			}
+		}
+	}
+	if(FLAG){control_output<<source.size()<<" "<<destination.size()<<" "<<count;
+		control_output<<" t:"<<source.size(0)<<"|"<<source.size(1)<<"|"<<source.size(2)<<" "<<destination.size(0);
+		control_output<<"|"<<destination.size(1)<<"|"<<destination.size(2)<<endl;
+		}
 }
 
 void opcja :: read_file(string filename){
