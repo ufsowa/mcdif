@@ -346,8 +346,18 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 		}
 	}
 	
-	if(typ==0)
-	{control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
+	if(typ==0){
+		control_output<<"set atom list typ/size/EVENTS/po: "<<typ<<" / "<<kontener.size()<<" / "<<EVENTY->size();
+
+		list <pairjump>::iterator event=EVENTY->begin(); 
+		
+		while ( event != EVENTY->end() ){
+			site* node = event->get_vac_to_jump();
+			node->clear_events_index();
+			event=EVENTY->erase(event);
+		}
+		
+		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
 //	{

@@ -120,6 +120,9 @@ void refresh(int on = 0);
 void remove_vac(int i, int vac, bool &FLAG);
 void remove_vac_new(int i, int vac, bool &FLAG);
 void refresh_sim_area(vector <site*> &pojemnik);
+
+void swap(plaster &source, plaster &destination, int FLAG);
+
 void init_save(double iod,double ido,double istep, double direction);
 bool save_stauts(){return SAVE_BUILDED;};
 void save_hist(double MCtime, double MCstep, string fileout);
@@ -127,8 +130,8 @@ void save_call();
 void save_write();
 void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
-void find_matano_plane();
 
+void find_matano_plane();
 int decide_direction(site *node);
 bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);

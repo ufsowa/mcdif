@@ -154,43 +154,6 @@ void plaster :: set_atoms_list(list <site*> &kontener, int typ)
 	
 }	
 
-void plaster :: swap(plaster source, int FLAG){
-	
-	double x=0.0;
-	int count=0;
-	
-	if(FLAG){control_output<<PL_REF_TO_SITES.size()<<" "<<source.PL_REF_TO_SITES.size()<<endl;}
-	
-	for(unsigned int i=0;i<source.PL_REF_TO_SITES.size();i++){
-		
-		if(PL_DIRECTION==1){ x = source.PL_REF_TO_SITES[i]->get_x();}
-		else if(PL_DIRECTION==2){ x = source.PL_REF_TO_SITES[i]->get_y();}
-		else if(PL_DIRECTION==3){ x = source.PL_REF_TO_SITES[i]->get_z();}
-		else{cout<<"wrong direction in plaster::swap"<<endl;exit(1);}
-		
-	//	if(FLAG){control_output<<i<<" "<<P0<<" "<<x<<" "<<P1<<endl;}
-		if(!(PL_P0<=x and x<PL_P1)){		
-			int typ=source.PL_REF_TO_SITES[i]->get_atom();
-	//		if(FLAG){control_output<<source.ref_to_sites[i]<<" "<<typ<<endl;}
-			if(typ>0){
-				long N =(long)(rnd()*size(0));site* rnd_vac=0;
-		//		if(FLAG){control_output<<size(0)<<" "<<N<<endl;}
-				rnd_vac=get_site(0,N);
-				source.PL_REF_TO_SITES[i]->set_atom(0);
-				rnd_vac->set_atom(typ);
-				count++;
-		//		if(FLAG){control_output<<"delete"<<endl;}
-				delete_site(0,N);
-				add_site(typ,rnd_vac);	
-			//	source.delete_site(typ,i);
-				source.add_site(0,source.PL_REF_TO_SITES[i]);			
-			}
-		}
-	}
-	if(FLAG){control_output<<PL_REF_TO_SITES.size()<<" "<<source.PL_REF_TO_SITES.size()<<" "<<count;
-		control_output<<" t:"<<size(0)<<"|"<<size(1)<<"|"<<size(2)<<" "<<source.size(0)<<"|"<<source.size(1)<<"|"<<source.size(2)<<endl;
-		}
-}
 
 //UWAGA: sprawdzic -> zaokraglanie, dzielenie przez 0 -> dodac warunki
 void plaster :: init_calc(int FLAG){

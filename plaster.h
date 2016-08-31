@@ -59,7 +59,6 @@ class plaster {
 	void init_calc(int FLAG=0);
 	bool check(unsigned int typ_min, unsigned int typ_max, int delta);
 	site* choose_atom(unsigned int typ);
-	void swap(plaster source, int FLAG);
 	int	get_direction(){return PL_DIRECTION;};
 	int	get_st(){return PL_P0;};
 	int	get_end(){return PL_P1;};
