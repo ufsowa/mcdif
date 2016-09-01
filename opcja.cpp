@@ -198,37 +198,34 @@ bool opcja :: check_rezervuars(site* first, site* &last){
 	return do_move;
 }
 
-bool opcja :: check_rezervuar(int i){
+bool opcja :: check_rez_dN(){
 	
 	bool do_move=false;
 	long int V=0, Z=0;
 	
-	if( (i<0) and (i>=reservuars.size()) ){
-		control_output<<"ERROR: opcja::check_rez(): 209. Wrong rez: "<<i<<endl;
-		exit(1);
-	}
+//	if( (i<0) and (i>=reservuars.size()) ){
+//		control_output<<"ERROR: opcja::check_rez(): 209. Wrong rez: "<<i<<endl;
+//		exit(1);}
 		
-//	if(TYP==0){
-//		for(int t=1;t<reservuars[i].get_size_types();t++){
-//		A+=reservuars[i].eq_flux_get(t);}
-//		Z=A;
-//	}else{
-	V = reservuars[i].eq_flux_get(0) + reservuars[i].flux_net_get(0);
-	Z=labs(V)+1;
-//		}	
-	if(Z > ROZMIAR[i]){//calkowita zmiana atomow wynosi tyle co 100% jednej plaszczyzny
+	vector <plaster>::iterator rez= reservuars.begin();
+	for(;rez !=reservuars.end();++rez){
+		V = rez->eq_flux_get(0) + rez->flux_net_get(0);
+		Z=labs(V)+1;
 
-		if(V>0){			//dV>0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna wakancji -> probka w strone atomow
-			TYP_TO_MOVE=1;
-		}else if(V<0){		//dV<0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna atomow -> probka w strone wakancji
-			TYP_TO_MOVE=-1;
-		}else{control_output<<"error in opcja::check_reservuars "<<V<<endl;
-			exit(1);
+		if(Z > ROZMIAR[i]){												//calkowita zmiana atomow wynosi tyle co 100% jednej plaszczyzny
+			if(V>0){													//dV>0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna wakancji -> probka w strone atomow
+				TYP_TO_MOVE=1;
+			}else if(V<0){													//dV<0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna atomow -> probka w strone wakancji
+				TYP_TO_MOVE=-1;
+			}else{control_output<<"error in opcja::check_reservuars "<<V<<endl;
+				exit(1);
+			}
+
+			do_move=true;
+			MOVE_FRAME=true;	//set global variable to true
+			REZ_TO_MOVE=i;	//set global var. which rezervuar to move
+			break;
 		}
-
-		do_move=true;
-		MOVE_FRAME=true;	//set global variable to true
-		REZ_TO_MOVE=i;	//set global var. which rezervuar to move
 	}
 }
 
@@ -1650,7 +1647,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 	}
 	
 	if(!MOVE_MIG){														//criteria if rez increase/decreased by plane
-		MOVE_MIG = check_rezervuar(node->get_rez_index());
+		MOVE_MIG = check_rez_dN();
 	}
 	return MOVE_MIG;
 }

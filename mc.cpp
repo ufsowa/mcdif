@@ -2256,7 +2256,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 		save_results(sample,savings,"0",0.0,0);
 		initialize();
 		initialize_seed();
-		sample->set_atoms_list(Vatoms,0);
+		
 		double Time= 0.0;
 		long step=0;
 		long main_step=parameters[0]+1;
@@ -2322,10 +2322,14 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 			exit(0);
 			}
 		}
-
+		
+		sample->set_atoms_list(Vatoms,0);
 
 		for(long j=1;j<main_step;j++)
 		{
+			
+			initialize();
+			initialize_seed();
 			
 			if(step==0 and Time==0.0)
 			{

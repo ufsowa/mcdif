@@ -356,18 +356,11 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 			node->clear_events_index();
 			event=EVENTY->erase(event);
 		}
-		
-<<<<<<< HEAD
+
 		for(unsigned int i=0;i<kontener.size();i++){	
 			update_site_events(kontener[i]);
 		}
-		
-//	for(list <pairjump>::iterator it=tablica.begin();it!=tablica.end();++it){
-//	it->show();
-//	}
-		
-=======
->>>>>>> 2cf2badf3adc448879b2f44d7e9c78ae8df9351e
+			
 		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
@@ -3787,16 +3780,23 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 	vector <site*> neighbour;
 	siteV->read_site_neighbours(neighbour,1,0);
 	
+//	control_output<<"nn: "<<neighbour.size()<<endl;
 	for(unsigned int k =0;k<neighbour.size();k++){
 		if(check_site_belonging_to_sim_area(neighbour[k])){	
 			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
+//			(neighbour[k])->show_site();
 			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	
+//			control_output<<"atom/zone: "<<atom<<"/"<<zone<<endl;
+
 			double E1= ( POTENCIALY->get_energy(siteV) ) + ( POTENCIALY->get_energy(neighbour[k]) ) - ( POTENCIALY->get_energy(siteV,neighbour[k]) );
 			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) ) 
 			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) ) 
 			+ ( POTENCIALY->get_energy(siteV,atom,neighbour[k],0) );
 			double barrier=1000.0;
-			barrier=(*BARIERY)[atom][zone];				
+//			control_output<<"E1/E2: "<<E1<<" / "<<E2<<endl;
+//			control_output<<"BAR: "<<BARIERY<<endl;		
+			barrier=(*BARIERY)[atom][zone];		
+//			control_output<<"bar: "<<barrier<<endl;		
 			double bariera=(E1+E2)/2+barrier-E1;		// 	--policz bariere
 			pairjump tmp(siteV,neighbour[k],E1,E2,barrier,bariera);
 			skoki.push_back(tmp);
