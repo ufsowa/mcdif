@@ -61,6 +61,7 @@ wektor end_region;
 						//obszar symulacji
 wektor st_sim_area;
 wektor end_sim_area;  
+bool TRANSPARENT,MOVE_SIM_REGION;										//true if boundary_plane is transparent for atoms/sim_area is allow to move
 						//warunki brzegowe
 wektor boundary_con_at;
 wektor boundary_con_en;
@@ -69,8 +70,6 @@ double latt_const;
 vector <double> x_trans;		//rozmiar komorki elementarnej. Wykorzytywany przy liczeniu dyfuzji r2. 
 vector <double> y_trans;
 vector <double> z_trans;
-
-
 
 double Rmin;			//zasieg skokow atomow - definiowany w conf.dat main()
 double Rmax;
@@ -81,18 +80,18 @@ int max_coordination_number;	//maksymalna liczba sasiadow atomu w probce
 public:
 int sublattice;
 int local_control_atom;
-lattice(int _o);
 lattice(int _sizex,int _sizey,int _sizez);
 ~lattice();
 
 //initialization of lattice
 void simulation_initialize(double _r_min, double _r_max,wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f);
+void init_sim_boundary(vector <double> &parameters);
 void atoms_list_init();
 void sim_atoms_list_init();
 void jumps_shell_init();
 void interaction_shell_init();
 void sites_zone_init(int typ,double rmin, double rmax,site *atom_list, vector <site*> &tmp_atom_list);
-void set_atoms_list(vector <site *> &kontener, int typ);
+void set_atoms_list(vector <site *> &kontener, int typ, bool ON_nn=false);
 void set_atoms_map(vector <site *> &kontener);
 void read_structure(string file_name,wektor start,wektor end,wektor set_st, int lattice_nr);
 void set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, potential &pot);
@@ -101,7 +100,8 @@ void set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, pote
 void sort_atoms(vector <site> &atoms);
 site* search_site(site *A);
 void refresh_structure(string file_name);
-void reinit_sim_area(wektor a, wektor b);
+bool reinit_sim_area(wektor a, wektor b, vector<site*> &vatoms);
+void update_vac_list( vector<site*> &ADD,  vector<site*> &OLD);
 double calc_energy();
 double calc_energy_global();
 
@@ -126,9 +126,6 @@ void put_atom(int x,int y,int z,site* Site);
 
 //operation on sites
 void exchange_sites( site* A, site* B);
-void update_site_events(site* sajt);	
-void update_events(site* sajt);
-void create_events_index(site* siteA, vector <pairjump> &events);
 void get_sites(vector <plaster> &tmp);
 void get_sites(plaster &tmp);
 site* get_site(long pozition);
@@ -156,11 +153,19 @@ void get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*> &tmp_ato
 //controls
 bool check_site_belonging_to_region(site *A);
 bool check_site_belonging_to_sim_area(site *A);
+bool check_site_mobile(site* node);
 bool check_boundary_conditions(wektor *wsk);
 void check_neighbours(int typ);
 void check_atoms();
 
 //alghoritms
 void init_events_list(vector <site *> &kontener);
+void update_events(site* sajt);
+
+private:
+void update_site_events(site* sajt);	
+void clear_events_index(site* sajt);
+void create_events_index(site* siteA, vector <pairjump> &events);
+
 };
 

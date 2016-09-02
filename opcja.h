@@ -33,8 +33,6 @@ int REZ_TO_MOVE, TYP_TO_MOVE,NEW_PLANE;
 bool MOVE_FRAME,SINGLE;													//true if frame was changed during do_equi()
 wektor del_L_sim, del_R_sim;											//przesuniecie obszaru symulacji -> korzystam w lattice::reinit_sim_area()
 
-bool TRANSPARENT,MOVE_SIM_REGION;										//true if boundary_plane is transparent for atoms/sim_area is allow to move
-
 lattice *SAMPLE;		
 potential &POT;
 vector < vector <double> > &BARRIERS;
@@ -71,8 +69,6 @@ opcja(potential& pot_in, vector < vector <double> > &bar, vector <site*> &vatoms
 	SAVE_BUILDED = false;
 	MOVE_FRAME = false;
 	NEW_PLANE = false;
-	MOVE_SIM_REGION = false;
-	TRANSPARENT = false;
 	SINGLE = true;
 	BIN_ATOMS_TYP=0;
 	DIRECT_STEPS=0;
@@ -87,7 +83,6 @@ opcja(potential& pot_in, vector < vector <double> > &bar, vector <site*> &vatoms
 void build_bins(vector<plaster>& layer_new, string name);
 void init_EQ(vector <double> &parameters);
 void init_reservuar(vector <double> &parameters);
-void init_boundary(vector <double> &parameters);
 void set_opcja_lattice(lattice *sample);
 
 void execute(string name, vector<double>&parameters);

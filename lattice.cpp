@@ -8,6 +8,9 @@ using namespace std;
 
 lattice :: lattice(int _xsize,int _ysize,int _zsize )
 { 
+	//init global lattice variable
+	MOVE_SIM_REGION = false;
+	TRANSPARENT = false;
 	//rezerwuje pamiec na symulacje. Buduje siec boxow.
 	x_size=_xsize;
 	y_size=_ysize;
@@ -325,6 +328,13 @@ site* lattice :: get_site(long pozition)
 	return sim_atom_list[pozition];
 }
 
+void lattice :: init_sim_boundary(vector <double> &parameters){
+	int if_move = parameters[0];	
+	int trans = parameters[1];
+	MOVE_SIM_REGION = (if_move != 0);
+	TRANSPARENT = (trans != 0);
+}
+
 void lattice :: init_events_list(vector <site *> &kontener){
 
 	control_output<<"set event list Vsize/EVENTS/po: "<<kontener.size()<<" / "<<EVENTY->size();		
@@ -353,42 +363,29 @@ void lattice :: init_events_list(vector <site *> &kontener){
 	control_output<<" / "<<EVENTY->size()<<endl;
 }
 	
-void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
+void lattice :: set_atoms_list(vector <site *> &kontener, int typ, bool ON_nn)
 {
 	site *pointer=0;
 	long int counter=0;
 	kontener.clear();
 	
-	for(unsigned int i=0;i<atom_list.size();i++)
-	{
+	for(unsigned int i=0;i<atom_list.size();i++){
 		pointer=atom_list[i];
-		
-		if(check_site_belonging_to_sim_area(pointer))
-		{
-		int atom = atom_list[i]->get_atom();
-		
+		int atom = pointer->get_atom();
 		if(atom==typ){
-			if(typ==0){pointer->set_vindex(counter); counter++;}	// jak wakancja to ustaw vindex
-			kontener.push_back(pointer);
+			if(check_site_belonging_to_sim_area(pointer)){
+				if(typ==0){pointer->set_vindex(counter); counter++;}	// jak wakancja to ustaw vindex
+				kontener.push_back(pointer);
+			}else{
+				if(TRANSPARENT){
+				//vac which have neig in sim_area
+				}
 			}
 		}
 	}
 	
 	if(typ==0){
 		control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
-
-//		list <pairjump>::iterator event=EVENTY->begin(); 	
-//		while ( event != EVENTY->end() ){
-//			site* node = event->get_vac_to_jump();
-//			node->clear_events_index();
-//			event=EVENTY->erase(event);
-//		}
-
-//		for(unsigned int i=0;i<kontener.size();i++){	
-//			update_site_events(kontener[i]);
-//		}
-			
-//		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
 //	{
@@ -1031,30 +1028,37 @@ bool lattice :: check_site_belonging_to_region(site *A)
 			return false;
 		}
 
-bool lattice :: check_site_belonging_to_sim_area(site *A)
-		{
-			
-			   
-			double x = (A->get_x());
-			double y = (A->get_y());
-			double z = (A->get_z());  
-			
-			//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
-		//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
-		//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
-		//	control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
-				if((set_prec(x)>=set_prec(st_sim_area.x)) and (set_prec(x)<set_prec(end_sim_area.x)))
-				{
-				if((set_prec(y)>=set_prec(st_sim_area.y)) and (set_prec(y)<set_prec(end_sim_area.y)))
-				{
-				if((set_prec(z)>=set_prec(st_sim_area.z)) and (set_prec(z)<set_prec(end_sim_area.z)))	
-				{
-					
+bool lattice :: check_site_belonging_to_sim_area(site *A){
+	double x = (A->get_x());
+	double y = (A->get_y());
+	double z = (A->get_z());  
+		
+	//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
+	//control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
+	//control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
+	//control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
+	if((set_prec(x)>=set_prec(st_sim_area.x)) and (set_prec(x)<set_prec(end_sim_area.x))){
+		if((set_prec(y)>=set_prec(st_sim_area.y)) and (set_prec(y)<set_prec(end_sim_area.y))){
+			if((set_prec(z)>=set_prec(st_sim_area.z)) and (set_prec(z)<set_prec(end_sim_area.z))){
 					return true;
-				}}}
-			
-			return false;
-		}
+	}}}
+		
+	return false;
+}
+
+/*
+bool lattice :: check_site_mobile(site* node){
+	bool is_mobile = false;
+	is_mobile = check_site_belonging_to_sim_area(node);
+
+	if( !is_mobile){
+		//check if site has neig in sim_area
+		bool nn_sim = site_neigh_sim(node);	
+	}
+	
+	return is_mobile;
+}
+*/
 
 void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*> &tmp_atom_list)
 	{
@@ -2611,17 +2615,60 @@ void lattice :: refresh_structure(string file_name)
 
 /*-----------------------------------------------------------*/
 	
-void lattice :: reinit_sim_area(wektor a, wektor b){
-	control_output<<"reinit_sim_area:"<<endl;
-	st_sim_area.show();
-	end_sim_area.show();
-	st_sim_area += a;
-	end_sim_area += b;
-	st_sim_area.show();
-	end_sim_area.show();
+bool lattice :: reinit_sim_area(wektor a, wektor b, vector<site*> &vatoms){
+	
+	if(MOVE_SIM_REGION){	//przesunac obszar symulacji
+		control_output<<"reinit_sim_area:"<<endl;
+		st_sim_area.show();
+		end_sim_area.show();
+		st_sim_area += a;
+		end_sim_area += b;
+		st_sim_area.show();
+		end_sim_area.show();
+		sim_atoms_list_init();  	
 
-	sim_atoms_list_init();  	
+		set_atoms_list(vatoms,0);
+		init_events_list(vatoms);
+		return true;
+	}
+	return false;
 }
+
+void lattice :: update_vac_list( vector<site*> &ADD,  vector<site*> &OLD){
+	
+		int typ=-1;
+		bool log=false;
+		vector <site* > tmp;
+		tmp.reserve(10000);
+		tmp.clear();
+		for (unsigned int i=0; i < OLD.size(); i++){
+			typ=OLD[i]->get_atom();
+			log=check_site_belonging_to_sim_area(OLD[i]);
+			if((typ==0) and log ){tmp.push_back(OLD[i]);}else{
+				OLD[i]->show_site();
+			}
+		}
+		control_output<<"|>"<<tmp.size()<<endl;
+		int count_vac_ok=0;
+		for (unsigned int i=0; i < ADD.size(); i++){
+			typ=ADD[i]->get_atom();
+			log=check_site_belonging_to_sim_area(ADD[i]);
+			if( log and (typ == 0) ){tmp.push_back(ADD[i]);count_vac_ok++;}
+//		{control_output<<"ERROR: opcja::refresh_vac_vector, atoms in Vtoadd: "<<log<<"/"<<typ<<endl; 
+			ADD[i]->show_site();
+//			exit(1);}
+		}
+		control_output<<"|+"<<count_vac_ok;
+		ADD.clear();
+		OLD.clear();
+		//przepisz i nadaj Vindexy sitom
+		for (int i=0; i < tmp.size(); i++){
+			tmp[i]->set_vindex(i);
+			OLD.push_back(tmp[i]);
+		} 
+	
+}
+
 	
 /*-----------------------------------------------------------*/
 
@@ -3721,31 +3768,27 @@ void lattice :: clear_dR()
 
 void lattice :: update_events(site* sajt){
 	
-//	sajt->show_site();
-//	control_output<<"prze events: "<<EVENTY->size()<<endl;
+																		//	sajt->show_site();
+																		//	control_output<<"prze events: "<<EVENTY->size()<<endl;
 	if( check_site_belonging_to_sim_area(sajt) ){	
-	update_site_events(sajt);
-	//search for vacancy in neigh for sajt and update
-	vector <site*> neighs;
-	typedef vector <site*>::iterator iters;
-	sajt->read_site_neighbours(neighs,1,0);
-	for( iters it=neighs.begin(); it != neighs.end();++it){
-		if( check_site_belonging_to_sim_area((*it)) ){	
-			update_site_events( (*it) );			
-		}else{
-			//clear just in case
+		update_site_events(sajt);
+																		//search for vacancy in neigh for sajt and update
+		vector <site*> neighs;
+		typedef vector <site*>::iterator iters;
+		sajt->read_site_neighbours(neighs,1,0);
+		for( iters it=neighs.begin(); it != neighs.end();++it){
+			if( check_site_belonging_to_sim_area(*it) ){	
+				update_site_events( (*it) );			
+			}else{
+				clear_events_index((*it));
+			}
 		}
-	}
 	}else{
-		typedef list <pairjump>::iterator it2list;
-		vector < it2list > to_del;
-		sajt->get_events_index(to_del);
-		for( unsigned int i=0; i<to_del.size();i++){
-			//		control_output<<"del event: "<<&(*to_del[i])<<endl;
-			//		(to_del[i])->show();
-			(*EVENTY).erase(to_del[i]);
+		if(TRANSPARENT){
+			update_site_events(sajt);
+		}else{
+			clear_events_index(sajt);
 		}
-		sajt->clear_events_index();
 	}
 //	control_output<<"po events: "<<EVENTY->size()<<endl;
 }
@@ -3755,23 +3798,10 @@ void lattice :: update_site_events(site* sajt){
 //	control_output<<"\nupdating site events: "<<EVENTY->size()<<endl;
 //	sajt->show_site();
 
-	typedef list <pairjump>::iterator it2list;
-	vector < it2list > to_del;
-	sajt->get_events_index(to_del);
-	
-
-	for( unsigned int i=0; i<to_del.size();i++){
-//		control_output<<"del event: "<<&(*to_del[i])<<endl;
-//		(to_del[i])->show();
-
-		(*EVENTY).erase(to_del[i]);
-		}
-	sajt->clear_events_index();
-
+	clear_events_index(sajt);
 //	control_output<<"deleted site events: "<<EVENTY->size()<<endl;
-	
 
-	typedef vector <pairjump>::iterator iterev;
+	typedef vector <pairjump>::iterator iterevec;
 	vector <pairjump> tmp_events; 
 	int typ = sajt->get_atom();
 	if(typ==0){
@@ -3779,7 +3809,7 @@ void lattice :: update_site_events(site* sajt){
 	}
 
 	list <pairjump>::iterator point2l; 
-	for( iterev it=tmp_events.begin(); it != tmp_events.end();++it){
+	for( iterevec it=tmp_events.begin(); it != tmp_events.end();++it){
 		site* tmp=(*it).get_vac_to_jump();
 		if(sajt == tmp){
 		point2l = EVENTY->insert( EVENTY->end(),(*it));
@@ -3801,7 +3831,7 @@ void lattice :: update_site_events(site* sajt){
 void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 
 //	control_output<<"Create events"<<endl;
-	if(check_site_belonging_to_sim_area(siteV)){
+//	if(check_site_belonging_to_sim_area(siteV)){
 	vector <pairjump> skoki;
 	skoki.reserve(50);
 	vector <site*> neighbour;
@@ -3809,7 +3839,7 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 	
 //	control_output<<"nn: "<<neighbour.size()<<endl;
 	for(unsigned int k =0;k<neighbour.size();k++){
-		if(check_site_belonging_to_sim_area(neighbour[k])){	
+		if(check_site_belonging_to_sim_area(neighbour[k])){				//<<<----- check_site_mobile()
 			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
 //			(neighbour[k])->show_site();
 			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	
@@ -3830,9 +3860,17 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 		}
 	}
 	tmp_events=skoki;
-}
+//}
 //	control_output<<"After create events: "<<tmp_events.size()<<endl;
 }
 
-
+void lattice :: clear_events_index(site* sajt){
+	typedef list <pairjump>::iterator it2list;
+	vector < it2list > to_del;
+	sajt->get_events_index(to_del);
+	for( unsigned int i=0; i<to_del.size();i++){
+		(*EVENTY).erase(to_del[i]);
+	}
+	sajt->clear_events_index();
+}
 

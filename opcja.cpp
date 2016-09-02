@@ -8,8 +8,8 @@ void opcja :: execute(string name, vector<double>&parameters){
 		this->init_EQ(parameters);
 	}else if(name=="RESERVUAR"){
 		this->init_reservuar(parameters);
-	}else if(name=="BOUNDARY"){
-		this->init_boundary(parameters);
+	}else if(name=="L_SIM_B"){
+		SAMPLE->init_sim_boundary(parameters);
 	}else{
 		control_output<<"No posibility of doing "<<name<<" as an option."<<endl;
 	}
@@ -915,13 +915,6 @@ void opcja :: build_bins(vector<plaster>& layer, string name){
 //	control_output<<ile<<" "<<layer.size()<<endl;
 }	
 
-void opcja :: init_boundary(vector <double> &parameters){
-	int if_move = parameters[0];	
-	int trans = parameters[1];
-	MOVE_SIM_REGION = (if_move != 0);
-	TRANSPARENT = (trans != 0);
-}
-
 void opcja :: init_reservuar(vector <double> &parameters){
 	
 
@@ -1805,39 +1798,9 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 
 void opcja :: refresh_vac_list(){
 	
-	if(!MOVE_FRAME){													//nie bylo przesuwania rezerwuarow i blokow
+	if(!MOVE_FRAME){
 		if(SINGLE){control_output<<"refresh_vac_vector "<<VAC_LIST.size()<<endl;}
-		int typ=-1;
-		bool log=false;
-		vector <site* > tmp;
-		tmp.reserve(10000);
-		tmp.clear();
-		for (unsigned int i=0; i < VAC_LIST.size(); i++){
-			typ=VAC_LIST[i]->get_atom();
-			log=SAMPLE->check_site_belonging_to_sim_area(VAC_LIST[i]);
-			if((typ==0) and log ){tmp.push_back(VAC_LIST[i]);}else{
-				VAC_LIST[i]->show_site();
-			}
-		}
-		if(SINGLE){control_output<<"|>"<<tmp.size()<<endl;}
-		//teraz trzeba dodac nowe wakancje z Vtoadd
-		int count_vac_ok=0;
-		for (unsigned int i=0; i < Vtoadd.size(); i++){
-			typ=Vtoadd[i]->get_atom();
-			log=SAMPLE->check_site_belonging_to_sim_area(Vtoadd[i]);
-			if( log and (typ == 0) ){tmp.push_back(Vtoadd[i]);count_vac_ok++;}
-//		{control_output<<"ERROR: opcja::refresh_vac_vector, atoms in Vtoadd: "<<log<<"/"<<typ<<endl; 
-			Vtoadd[i]->show_site();
-//			exit(1);}
-		}
-		if(SINGLE){control_output<<"|+"<<count_vac_ok;}
-		Vtoadd.clear();
-		VAC_LIST.clear();
-		//przepisz i nadaj Vindexy sitom
-		for (int i=0; i < tmp.size(); i++){
-			tmp[i]->set_vindex(i);
-			VAC_LIST.push_back(tmp[i]);
-		} 
+		SAMPLE->update_vac_list(Vtoadd, VAC_LIST);
 		if(SINGLE){control_output<<"|= "<<VAC_LIST.size()<<endl;}
 	}
 }
@@ -1846,11 +1809,9 @@ void opcja :: refresh_simarea(){
 	
 	if(MOVE_FRAME){														//bylo przesowanie blokow i rezerwuwarow
 		control_output<<"opcja::refresh_sim_area "<<VAC_LIST.size()<<endl;
-		if(MOVE_SIM_REGION){	//przesunac obszar symulacji
-			SAMPLE -> reinit_sim_area(del_L_sim, del_R_sim);			
-			SAMPLE -> set_atoms_list(VAC_LIST,0);
-			SAMPLE -> init_events_list(VAC_LIST);
-		}else{
+	
+		bool NEW_SIM_AREA = SAMPLE->reinit_sim_area(del_L_sim, del_R_sim, VAC_LIST);			
+		if(! NEW_SIM_AREA){
 			refresh_vac_list();
 		}
 		//resetuj parametry kontrolne przesowania
