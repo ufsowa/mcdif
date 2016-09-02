@@ -222,6 +222,7 @@ bool opcja :: check_rez_dN(){
 
 			do_move=true;
 			MOVE_FRAME=true;	//set global variable to true
+			NEW_PLANE=true;
 			REZ_TO_MOVE=i;	//set global var. which rezervuar to move
 			break;
 		}
@@ -986,7 +987,7 @@ void opcja :: move_frame(){
 	
 	REZ_TO_MOVE = -1; 	
 	TYP_TO_MOVE = 0;
-	
+	NEW_PLANE = false;
 	refresh_simarea();
 	
 };
@@ -1084,8 +1085,10 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	tmp.init_calc(1);
 	swap(reservuars[nr],tmp,1);
 	}
-	tmp.init_calc(1);	
-	tmp.copy_fluxes(reservuars[nr]);
+	tmp.init_calc(1);
+	if(!NEW_PLANE){
+		tmp.copy_fluxes(reservuars[nr]);
+	}
 	reservuars[nr]=tmp;
 
 	wektor a(s[0],s[1],s[2]);

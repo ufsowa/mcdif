@@ -29,7 +29,7 @@ int BIN_ATOMS_TYP,BIN_DIRECTION;
 
 long DIRECT_STEPS;
 vector<long int> ROZMIAR;
-int REZ_TO_MOVE, TYP_TO_MOVE;
+int REZ_TO_MOVE, TYP_TO_MOVE,NEW_PLANE;
 bool MOVE_FRAME,SINGLE;													//true if frame was changed during do_equi()
 wektor del_L_sim, del_R_sim;											//przesuniecie obszaru symulacji -> korzystam w lattice::reinit_sim_area()
 
@@ -70,6 +70,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar, vector <site*> &vatoms
 	SAVE_AVG = false;
 	SAVE_BUILDED = false;
 	MOVE_FRAME = false;
+	NEW_PLANE = false;
 	MOVE_SIM_REGION = false;
 	TRANSPARENT = false;
 	SINGLE = true;
