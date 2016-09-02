@@ -84,6 +84,11 @@ bool plaster :: check(unsigned int typ_min, unsigned int typ_max, int delta){
 	return status;
 }
 
+void plaster :: copy_fluxes(plaster &source){
+	this->PL_EQ_FLUX=source.PL_EQ_FLUX;
+	this->PL_NET_FLUX=source.PL_NET_FLUX;
+}
+
 site* plaster :: choose_atom(unsigned int typ){
 	unsigned long N1=(long)(rnd()*(size(typ)));
 	site* node = get_site(typ,N1);

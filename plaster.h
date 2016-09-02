@@ -67,7 +67,7 @@ class plaster {
 	string get_name(){return PL_NAME;};
 	void update_plaster(site* node, bool status);
 	void update_hist(site* node, bool status);
-
+	void copy_fluxes(plaster &source);
 	void push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
 	unsigned int size(){return PL_REF_TO_SITES.size();};
 	unsigned int size(int typ){return PL_SITES_TYP[typ].size();};

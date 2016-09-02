@@ -461,17 +461,6 @@ void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
 	if(MOVE_FRAME or SINGLE){control_output<<" c: "<< ile;}
 	bool MOVE = false;
 	int rez = -1, j = -1;
-//	control_output<<"TRYB: "<<TRYB<<endl;
-//	vector <int> wybrane_typy; wybrane_typy.reserve(20);
-//	for( int i=0; i<(ile);i++){
-//		j=choose_typ(BLOKS[nr]);
-//		wybrane_typy.push_back(j);
-//	}
-//	control_output<<"c: "<<nr<<" "<<ile<<": ";
-//	for(int i=0;i<wybrane_typy.size();i++){
-//	control_output<<wybrane_typy[i];
-//	}
-//	control_output<<endl;
 
 	for(unsigned int i=0; i<ile;i++){
 //		for( int j=1;j<3;j++){		//MOZNA ZROBIC W ZALEZNOSCI OD TYPOW
@@ -1096,6 +1085,7 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	swap(reservuars[nr],tmp,1);
 	}
 	tmp.init_calc(1);	
+	tmp.copy_fluxes(reservuars[nr]);
 	reservuars[nr]=tmp;
 
 	wektor a(s[0],s[1],s[2]);
@@ -1852,7 +1842,7 @@ void opcja :: refresh_vac_list(){
 void opcja :: refresh_simarea(){
 	
 	if(MOVE_FRAME){														//bylo przesowanie blokow i rezerwuwarow
-		control_output<<"opcja::refresh_vac_vector "<<VAC_LIST.size()<<endl;
+		control_output<<"opcja::refresh_sim_area "<<VAC_LIST.size()<<endl;
 		if(MOVE_SIM_REGION){	//przesunac obszar symulacji
 			SAMPLE -> reinit_sim_area(del_L_sim, del_R_sim);			
 			SAMPLE -> set_atoms_list(VAC_LIST,0);
