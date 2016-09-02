@@ -44,7 +44,7 @@ unsigned long EVENTS_size = EVENTS.size();
 potential pot;
 vector <vector <double> > simple_bars;
 //vector <vector <double> > *wsk_simple_bars=&simple_bars;
-opcja opt_equi(pot, simple_bars);
+opcja opt_equi(pot, simple_bars,Vatoms);
 //3D
 double bar_list[3][2][2][3][3][3][3][3][3];
 static long RTA_energy_executions=-1;
@@ -570,7 +570,7 @@ double vac_mechanism(lattice *sample,long number_of_steps,long direct_step, doub
 	for(long n=0;n<number_of_steps;n++)
 	{
 		if (equi_step > 0 and !((RTA_energy_executions*number_of_steps+n) % equi_step)){
-			opt_equi.equilibrate(Vatoms);
+			opt_equi.equilibrate();
 		}
 		
 		//try make a jump for all vacancies in the system
@@ -731,9 +731,8 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	Vatoms[Vindex]=atom_to_jump;
 	
 	//collect flux data
-	if( ( opt_equi.save_stauts() ) ){	
-		opt_equi.call_flux(atom_to_jump,vac_to_jump);		//moze byc na odwrot znak?? trzeba sprawdzic 
-	}
+
+	opt_equi.call_flux(atom_to_jump,vac_to_jump);	
 	
 }
 
@@ -798,10 +797,7 @@ double residence_time_energy(lattice *sample,long number_of_steps,double T, int 
 		if(!((RTA_energy_executions*number_of_steps+n) % equi_step))
 		{
 			control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
-			opt_equi.refresh();
-			opt_equi.do_equi_vac();
-			opt_equi.refresh_sim_area(Vatoms);
-//			sample->set_atoms_list(Vatoms,0);
+			opt_equi.equilibrate();
 			
 		}}
 		//UWAGA NA WAKANCJE TRZEBA ODSWIEZYC po rownowazeniu liste Vatoms
@@ -1151,21 +1147,6 @@ double residence_time_energy(lattice *sample,long number_of_steps,double T, int 
 
 /******************************koniec residence_time_energy**********************************/	
 
-void init_events(lattice* sample){
-	control_output<<"Init ivents: "<<Vatoms.size()<<endl;
-
-//	tablica.clear();
-	for(unsigned int i=0;i<Vatoms.size();i++){	
-		sample->update_site_events(Vatoms[i]);
-	}
-	control_output<<"EVENTS size: "<<EVENTS.size()<<endl;
-	
-//	for(list <pairjump>::iterator it=tablica.begin();it!=tablica.end();++it){
-//	it->show();
-//	}
-
-}
-
 double time_increment(double norma){
 	double sid = rnd();
 	double sidL = log(sid); 
@@ -1198,7 +1179,7 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 //	control_output<<"EVENTS size: "<<EVENTS.size()<<endl;
 
 	if(EVENTS.empty()){
-		init_events(sample);
+		sample->init_events_list(Vatoms);
 		if(EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after init from:"<<EVENTS_size<<" to: "<<EVENTS.size();
 		control_output<<" in step: "<<RTA_energy_executions<<endl;
 					EVENTS_size=EVENTS.size();}
@@ -1210,7 +1191,7 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		if(!((RTA_energy_executions*number_of_steps+n) % equi_step))
 		{
 		//	control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
-			opt_equi.equilibrate(Vatoms);
+			opt_equi.equilibrate();
 			if(EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
 				control_output<<" in step: "<<RTA_energy_executions<<endl;
 				EVENTS_size=EVENTS.size();

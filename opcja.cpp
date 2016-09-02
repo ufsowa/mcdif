@@ -6,11 +6,11 @@ void opcja :: execute(string name, vector<double>&parameters){
 
 	if(name=="EQUILIBRATE"){
 		this->init_EQ(parameters);
-	}
-	else if(name=="RESERVUAR"){
+	}else if(name=="RESERVUAR"){
 		this->init_reservuar(parameters);
-	}
-	else{
+	}else if(name=="BOUNDARY"){
+		this->init_boundary(parameters);
+	}else{
 		control_output<<"No posibility of doing "<<name<<" as an option."<<endl;
 	}
 
@@ -207,10 +207,9 @@ bool opcja :: check_rez_dN(){
 //		control_output<<"ERROR: opcja::check_rez(): 209. Wrong rez: "<<i<<endl;
 //		exit(1);}
 		
-	vector <plaster>::iterator rez= reservuars.begin();
-	for(;rez !=reservuars.end();++rez){
-		V = rez->eq_flux_get(0) + rez->flux_net_get(0);
-		Z=labs(V)+1;
+	for(int i =0;i<reservuars.size();i++){
+		V = reservuars[i].eq_flux_get(0) + reservuars[i].flux_net_get(0);
+		Z=labs(V);
 
 		if(Z > ROZMIAR[i]){												//calkowita zmiana atomow wynosi tyle co 100% jednej plaszczyzny
 			if(V>0){													//dV>0 to znaczy ze w rezerwuarze powstala nowa plaszczyzna wakancji -> probka w strone atomow
@@ -227,6 +226,7 @@ bool opcja :: check_rez_dN(){
 			break;
 		}
 	}
+	return do_move;
 }
 
 bool opcja :: check_rezervuars(int i, int TYP){
@@ -503,6 +503,10 @@ void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
 				MOVE = find_migration_path(rnd_at,DIR,migration_path);	
 				if(!MOVE){
 					dislocation_walk(migration_path);
+					MOVE=check_rez_dN();
+					if(MOVE){
+						break;
+					}
 				}else{
 					break;
 				}
@@ -633,14 +637,12 @@ void opcja :: do_equi_vac(){
 	//uaktulanic liste wakancji w  resident !!!!!!!!!!!! UWAGA !!!!!!!!!	
 }
 
-void opcja :: equilibrate(vector <site*> &kontener){
+void opcja :: equilibrate(){
 	
 	refresh(0);
 	do_equi_vac();
+	refresh_vac_list();
 	do_equi_rez();
-	refresh_sim_area(kontener);
-
-	
 }
 
 void opcja :: flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>& layer){
@@ -666,52 +668,9 @@ void opcja :: flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>&
 	}	
 }
 
-/*
-void opcja :: flux_add(double pos_V, double pos_A, int typ, vector<plaster>& layer){
-	int id_A=-2,id_V=-2;
-	double dir = pos_V - pos_A;	//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
-								//													  Strumien dla atomu jest -
-	//znajdz index bin dla x_A oraz x_V
-	for(unsigned int i=0; i< layer.size(); i++){
-		if(layer[i].get_st() <= pos_A  and pos_A < layer[i].get_end()){
-			id_A=i;
-		}
-		if(layer[i].get_st() <= pos_V  and pos_V < layer[i].get_end()){
-			id_V=i;
-		}
-	}
-	if(id_V >=0 and (id_V != id_A)){
-		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
-	//	layer[id_V].flux_net_delta(typ, 0);
-		layer[id_V].jump_occured();
-		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
-			layer[id_V].flux_net_delta(0, 1);
-			layer[id_V].flux_net_delta(typ, 0);
-		}
-		if(dir < 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
-			layer[id_V].eq_flux_delta(0, 0);
-			layer[id_V].eq_flux_delta(typ, 1);
-		}
-
-	}
-	if(id_A >=0 and (id_V != id_A)){
-		//vakancja znika z plastra id_A oraz atom pojawia sie w plastrze id_A
-	//	layer[id_A].flux_net_delta(typ, 1);
-		layer[id_A].jump_occured();
-		if(dir < 0){	//atom wplynal z lewej strony; wakancja wyplynela w lewo
-			layer[id_A].flux_net_delta(typ, 1);
-			layer[id_A].flux_net_delta(0, 0);
-		}
-		if(dir > 0){	//atom wplynal z prawej strony; wakancja wyplynela w prawo
-			layer[id_A].eq_flux_delta(typ, 0);
-			layer[id_A].eq_flux_delta(0, 1);
-		}
-
-	}	
-}
-*/
-
 void opcja :: flux_add(site* VAC, site* ATO, vector<plaster>& layer){
+
+	if(SAVE_BUILDED){
 	int id_A=-2,id_V=-2;				
 	unsigned int DIR = (layer[0]).get_direction();
 	double pos_V = VAC->get_position(DIR);
@@ -770,7 +729,7 @@ void opcja :: flux_add(site* VAC, site* ATO, vector<plaster>& layer){
 			}
 		}	
 	}
-
+}
 
 }
 
@@ -872,6 +831,12 @@ void opcja :: call_flux(site* vac_after_jump,site* atom_after_jump){
 	flux_net_add(x_V,x_A,typ,BLOKS);
 	flux_net_add(x_V,x_A,typ,reservuars);
 	flux_add(vac_after_jump,atom_after_jump,HIST);
+	
+	MOVE_FRAME=check_rez_dN();
+	if(MOVE_FRAME){
+		move_frame();
+		
+	}	
 }
 
 void opcja :: call_flux_dislocation(site* vac_after_jump,site* atom_after_jump){
@@ -886,7 +851,7 @@ void opcja :: set_opcja_lattice(lattice *sample){
 
 void opcja :: init_EQ(vector <double> &parameters ){
 	
-	if(parameters.size()!=7){cout<<"ERROR in opcja::init. Wrong parameters list in conf.in"<<endl;exit(1);}
+	if(parameters.size()!=6){cout<<"ERROR in opcja::init. Wrong parameters list in conf.in"<<endl;exit(1);}
 
 	//dla -1: tylko monitoruj	+biny -rezerwuary +flux	+flux_eq -do_equi
 	//dla 0 nie rob nic:		-biny -rezerwuary -flux -flux_eq -do_equi
@@ -903,7 +868,6 @@ void opcja :: init_EQ(vector <double> &parameters ){
 	double do_kod = parameters[3]; 
 	double co_ile_bin = parameters[4]; 
 	int bin_direction = parameters[5]; 
-	int if_move = parameters[6];
 
 	TRYB=tryb;	
 	EQ_STEP=co_ile;			
@@ -913,8 +877,7 @@ void opcja :: init_EQ(vector <double> &parameters ){
 	BIN_DIRECTION=bin_direction;
 	ST_VOL=BIN_ST;
 	END_VOL=BIN_END;
-	
-	MOVE_SIM_REGION = (if_move != 0);
+
 	wektor a(0.0,0.0,0.0);
 	del_L_sim=a;
 	del_R_sim=a;
@@ -962,6 +925,12 @@ void opcja :: build_bins(vector<plaster>& layer, string name){
 //	control_output<<ile<<" "<<layer.size()<<endl;
 }	
 
+void opcja :: init_boundary(vector <double> &parameters){
+	int if_move = parameters[0];	
+	int trans = parameters[1];
+	MOVE_SIM_REGION = (if_move != 0);
+	TRANSPARENT = (trans != 0);
+}
 
 void opcja :: init_reservuar(vector <double> &parameters){
 	
@@ -1028,6 +997,8 @@ void opcja :: move_frame(){
 	
 	REZ_TO_MOVE = -1; 	
 	TYP_TO_MOVE = 0;
+	
+	refresh_simarea();
 	
 };
 
@@ -1646,9 +1617,6 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 		}
 	}
 	
-	if(!MOVE_MIG){														//criteria if rez increase/decreased by plane
-		MOVE_MIG = check_rez_dN();
-	}
 	return MOVE_MIG;
 }
 
@@ -1786,6 +1754,10 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 				MOVE = find_migration_path(rnd_vac,DIR,migration_path);	
 				if(!MOVE){
 					dislocation_walk(migration_path);
+					MOVE=check_rez_dN();
+					if(MOVE){
+						break;
+					}
 				}else{
 					break;
 				}
@@ -1838,22 +1810,20 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 	}
 }
 
-
-void opcja :: refresh_sim_area(vector <site*> &kontener){
+void opcja :: refresh_vac_list(){
 	
-	if(!MOVE_FRAME){		//nie bylo przesuwania rezerwuarow i blokow
-		if(SINGLE){control_output<<"refresh_vac_vector "<<kontener.size()<<endl;}
+	if(!MOVE_FRAME){													//nie bylo przesuwania rezerwuarow i blokow
+		if(SINGLE){control_output<<"refresh_vac_vector "<<VAC_LIST.size()<<endl;}
 		int typ=-1;
 		bool log=false;
 		vector <site* > tmp;
 		tmp.reserve(10000);
 		tmp.clear();
-		for (unsigned int i=0; i < kontener.size(); i++){
-			kontener[i]->show_site();
-			typ=kontener[i]->get_atom();
-			log=SAMPLE->check_site_belonging_to_sim_area(kontener[i]);
-			if((typ==0) and log ){tmp.push_back(kontener[i]);}else{
-				kontener[i]->show_site();
+		for (unsigned int i=0; i < VAC_LIST.size(); i++){
+			typ=VAC_LIST[i]->get_atom();
+			log=SAMPLE->check_site_belonging_to_sim_area(VAC_LIST[i]);
+			if((typ==0) and log ){tmp.push_back(VAC_LIST[i]);}else{
+				VAC_LIST[i]->show_site();
 			}
 		}
 		if(SINGLE){control_output<<"|>"<<tmp.size()<<endl;}
@@ -1869,25 +1839,32 @@ void opcja :: refresh_sim_area(vector <site*> &kontener){
 		}
 		if(SINGLE){control_output<<"|+"<<count_vac_ok;}
 		Vtoadd.clear();
-		kontener.clear();
+		VAC_LIST.clear();
 		//przepisz i nadaj Vindexy sitom
 		for (int i=0; i < tmp.size(); i++){
 			tmp[i]->set_vindex(i);
-			kontener.push_back(tmp[i]);
+			VAC_LIST.push_back(tmp[i]);
 		} 
-		if(SINGLE){control_output<<"|= "<<kontener.size()<<endl;}
-	}else{		//bylo przesowanie blokow i rezerwuwarow
-		control_output<<"opcja::refresh_vac_vector "<<kontener.size()<<endl;
+		if(SINGLE){control_output<<"|= "<<VAC_LIST.size()<<endl;}
+	}
+}
+
+void opcja :: refresh_simarea(){
+	
+	if(MOVE_FRAME){														//bylo przesowanie blokow i rezerwuwarow
+		control_output<<"opcja::refresh_vac_vector "<<VAC_LIST.size()<<endl;
 		if(MOVE_SIM_REGION){	//przesunac obszar symulacji
 			SAMPLE -> reinit_sim_area(del_L_sim, del_R_sim);			
+			SAMPLE -> set_atoms_list(VAC_LIST,0);
+			SAMPLE -> init_events_list(VAC_LIST);
+		}else{
+			refresh_vac_list();
 		}
-		SAMPLE -> set_atoms_list(kontener,0);
 		//resetuj parametry kontrolne przesowania
 		wektor a(0.0,0.0,0.0);
 		del_L_sim=a;
 		del_R_sim=a;
 		Vtoadd.clear();
-		//clear eq_flux in plasters
 	}
 	if(SINGLE or MOVE_FRAME){
 		for (unsigned int i=0; i < BLOKS.size(); i++){

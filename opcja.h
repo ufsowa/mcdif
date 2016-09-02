@@ -30,13 +30,15 @@ int BIN_ATOMS_TYP,BIN_DIRECTION;
 long DIRECT_STEPS;
 vector<long int> ROZMIAR;
 int REZ_TO_MOVE, TYP_TO_MOVE;
-bool MOVE_FRAME,SINGLE,MOVE_SIM_REGION;		//true if frame was changed during do_equi()
-wektor del_L_sim, del_R_sim;				//przesuniecie obszaru symulacji -> korzystam w lattice::reinit_sim_area()
+bool MOVE_FRAME,SINGLE;													//true if frame was changed during do_equi()
+wektor del_L_sim, del_R_sim;											//przesuniecie obszaru symulacji -> korzystam w lattice::reinit_sim_area()
+
+bool TRANSPARENT,MOVE_SIM_REGION;										//true if boundary_plane is transparent for atoms/sim_area is allow to move
 
 lattice *SAMPLE;		
-potential& POT;
-vector < vector <double> >& BARRIERS;
-
+potential &POT;
+vector < vector <double> > &BARRIERS;
+vector <site*> &VAC_LIST;
 
 string SAVE_file;
 bool SAVE_AVG, SAVE_BUILDED;
@@ -51,7 +53,7 @@ double END_VOL;
 	
 public:
 
-opcja(potential& pot_in, vector < vector <double> > &bar) : POT(pot_in), BARRIERS(bar){
+opcja(potential& pot_in, vector < vector <double> > &bar, vector <site*> &vatoms) : POT(pot_in), BARRIERS(bar), VAC_LIST(vatoms){
 	
 	TRYB=0;
 	EQ_STEP=0;
@@ -68,7 +70,8 @@ opcja(potential& pot_in, vector < vector <double> > &bar) : POT(pot_in), BARRIER
 	SAVE_AVG = false;
 	SAVE_BUILDED = false;
 	MOVE_FRAME = false;
-	MOVE_SIM_REGION = 0;
+	MOVE_SIM_REGION = false;
+	TRANSPARENT = false;
 	SINGLE = true;
 	BIN_ATOMS_TYP=0;
 	DIRECT_STEPS=0;
@@ -83,6 +86,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar) : POT(pot_in), BARRIER
 void build_bins(vector<plaster>& layer_new, string name);
 void init_EQ(vector <double> &parameters);
 void init_reservuar(vector <double> &parameters);
+void init_boundary(vector <double> &parameters);
 void set_opcja_lattice(lattice *sample);
 
 void execute(string name, vector<double>&parameters);
@@ -103,7 +107,7 @@ void create_vac(int i, int vac, bool &FLAG);
 void create_vac_new(int i, int vac, bool &FLAG);	
 void do_equi_vac();
 void do_equi_rez();
-void equilibrate(vector <site*> &kontener);
+void equilibrate();
 double errCeq_vac(double stech);
 void flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>& layer_new);
 void flux_add(site* V, site* A,vector<plaster>& layer_new);
@@ -119,8 +123,9 @@ void reinit_bloks();
 void refresh(int on = 0);
 void remove_vac(int i, int vac, bool &FLAG);
 void remove_vac_new(int i, int vac, bool &FLAG);
-void refresh_sim_area(vector <site*> &pojemnik);
-
+void refresh_simarea();
+void refresh_vac_list();
+	
 void swap(plaster &source, plaster &destination, int FLAG);
 
 void init_save(double iod,double ido,double istep, double direction);

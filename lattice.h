@@ -160,6 +160,7 @@ bool check_boundary_conditions(wektor *wsk);
 void check_neighbours(int typ);
 void check_atoms();
 
-
+//alghoritms
+void init_events_list(vector <site *> &kontener);
 };
 

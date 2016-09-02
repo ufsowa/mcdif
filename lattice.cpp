@@ -324,6 +324,34 @@ site* lattice :: get_site(long pozition)
 {
 	return sim_atom_list[pozition];
 }
+
+void lattice :: init_events_list(vector <site *> &kontener){
+
+	control_output<<"set event list Vsize/EVENTS/po: "<<kontener.size()<<" / "<<EVENTY->size();		
+
+	list <pairjump>::iterator event=EVENTY->begin(); 	
+	while ( event != EVENTY->end() ){
+		site* node = event->get_vac_to_jump();
+		node->clear_events_index();
+		event=EVENTY->erase(event);
+	}
+
+	site* pointer=0;
+	long int counter=0;
+
+	for(unsigned int i=0;i<kontener.size();i++)
+	{
+		pointer=kontener[i];
+		
+		if(check_site_belonging_to_sim_area(pointer)){
+			int atom = pointer->get_atom();
+			if(atom==0){
+				update_site_events(kontener[i]);			
+			}
+		}
+	}
+	control_output<<" / "<<EVENTY->size()<<endl;
+}
 	
 void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 {
@@ -347,21 +375,20 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 	}
 	
 	if(typ==0){
-		control_output<<"set atom list typ/size/EVENTS/po: "<<typ<<" / "<<kontener.size()<<" / "<<EVENTY->size();
+		control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
 
-		list <pairjump>::iterator event=EVENTY->begin(); 
-		
-		while ( event != EVENTY->end() ){
-			site* node = event->get_vac_to_jump();
-			node->clear_events_index();
-			event=EVENTY->erase(event);
-		}
+//		list <pairjump>::iterator event=EVENTY->begin(); 	
+//		while ( event != EVENTY->end() ){
+//			site* node = event->get_vac_to_jump();
+//			node->clear_events_index();
+//			event=EVENTY->erase(event);
+//		}
 
-		for(unsigned int i=0;i<kontener.size();i++){	
-			update_site_events(kontener[i]);
-		}
+//		for(unsigned int i=0;i<kontener.size();i++){	
+//			update_site_events(kontener[i]);
+//		}
 			
-		control_output<<" / "<<EVENTY->size()<<endl;
+//		control_output<<" / "<<EVENTY->size()<<endl;
 	
 //	for(int i=0;i<kontener.size();i++)
 //	{
