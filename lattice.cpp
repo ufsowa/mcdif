@@ -353,20 +353,24 @@ void lattice :: init_events_list(vector <site *> &kontener){
 	{
 		pointer=kontener[i];
 		
-		if(check_site_belonging_to_sim_area(pointer)){
+//		if(check_site_belonging_to_sim_area(pointer)){
 			int atom = pointer->get_atom();
 			if(atom==0){
-				update_site_events(kontener[i]);			
+				update_site_events(pointer);			
 			}
-		}
+//		}	
 	}
 	control_output<<" / "<<EVENTY->size()<<endl;
 }
 	
-void lattice :: set_atoms_list(vector <site *> &kontener, int typ, bool ON_nn)
+void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 {
 	site *pointer=0;
 	long int counter=0;
+	
+	for ( vector<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
+		(*it)->reset_vindex();
+	}
 	kontener.clear();
 	
 	for(unsigned int i=0;i<atom_list.size();i++){
@@ -378,7 +382,10 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ, bool ON_nn)
 				kontener.push_back(pointer);
 			}else{
 				if(TRANSPARENT){
-				//vac which have neig in sim_area
+					if(check_site_mobile(pointer)){																//vac which have neig in sim_area
+						if(typ==0){pointer->set_vindex(counter); counter++;}
+						kontener.push_back(pointer);
+					}
 				}
 			}
 		}
@@ -1046,19 +1053,27 @@ bool lattice :: check_site_belonging_to_sim_area(site *A){
 	return false;
 }
 
-/*
+
 bool lattice :: check_site_mobile(site* node){
 	bool is_mobile = false;
 	is_mobile = check_site_belonging_to_sim_area(node);
 
 	if( !is_mobile){
 		//check if site has neig in sim_area
-		bool nn_sim = site_neigh_sim(node);	
+		vector <site*> neighs;
+		node->read_site_neighbours(neighs,1,0);
+		typedef vector <site*>::iterator iters;
+		for( iters it=neighs.begin(); it != neighs.end();++it){
+			if( check_site_belonging_to_sim_area(*it) ){
+				is_mobile = true;
+				break;	
+			}
+		}
 	}
 	
 	return is_mobile;
 }
-*/
+
 
 void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*> &tmp_atom_list)
 	{
@@ -2643,8 +2658,18 @@ void lattice :: update_vac_list( vector<site*> &ADD,  vector<site*> &OLD){
 		tmp.clear();
 		for (unsigned int i=0; i < OLD.size(); i++){
 			typ=OLD[i]->get_atom();
-			log=check_site_belonging_to_sim_area(OLD[i]);
-			if((typ==0) and log ){tmp.push_back(OLD[i]);}else{
+			
+			if(typ==0){
+				if(check_site_belonging_to_sim_area(OLD[i])){
+					tmp.push_back(OLD[i]);
+				}else{
+					if(TRANSPARENT and check_site_mobile(OLD[i])){
+						tmp.push_back(OLD[i]);
+					}else{
+						OLD[i]->show_site();
+					}
+				}
+			}else{
 				OLD[i]->show_site();
 			}
 		}
@@ -2652,18 +2677,33 @@ void lattice :: update_vac_list( vector<site*> &ADD,  vector<site*> &OLD){
 		int count_vac_ok=0;
 		for (unsigned int i=0; i < ADD.size(); i++){
 			typ=ADD[i]->get_atom();
-			log=check_site_belonging_to_sim_area(ADD[i]);
-			if( log and (typ == 0) ){tmp.push_back(ADD[i]);count_vac_ok++;}
-//		{control_output<<"ERROR: opcja::refresh_vac_vector, atoms in Vtoadd: "<<log<<"/"<<typ<<endl; 
-			ADD[i]->show_site();
-//			exit(1);}
+			
+			if(typ==0){
+				if(check_site_belonging_to_sim_area(ADD[i])){
+					tmp.push_back(ADD[i]);count_vac_ok++;
+					ADD[i]->show_site();
+
+				}else{
+					if(TRANSPARENT and check_site_mobile(ADD[i])){
+						tmp.push_back(ADD[i]);count_vac_ok++;
+						ADD[i]->show_site();
+					}
+				}
+			}
 		}
 		control_output<<"|+"<<count_vac_ok;
+
+		for ( vector<site*>::iterator it = OLD.begin(); it != OLD.end(); ++it){
+			(*it)->reset_vindex();
+		}
+	
 		ADD.clear();
 		OLD.clear();
 		//przepisz i nadaj Vindexy sitom
 		for (int i=0; i < tmp.size(); i++){
 			tmp[i]->set_vindex(i);
+//			tmp[i]->show_site();
+//			tmp[i]->show_neigh(1);
 			OLD.push_back(tmp[i]);
 		} 
 	
@@ -3768,11 +3808,13 @@ void lattice :: clear_dR()
 
 void lattice :: update_events(site* sajt){
 	
-																		//	sajt->show_site();
-																		//	control_output<<"prze events: "<<EVENTY->size()<<endl;
+//	int o;																	//	sajt->show_site();
+//	cout<<"press"<<endl;
+//	cin>>o;																	//	control_output<<"prze events: "<<EVENTY->size()<<endl;
 	if( check_site_belonging_to_sim_area(sajt) ){	
+//		control_output<<"Main: "<<endl;
 		update_site_events(sajt);
-																		//search for vacancy in neigh for sajt and update
+//		control_output<<"Neighs: "<<endl;									//search for vacancy in neigh for sajt and update
 		vector <site*> neighs;
 		typedef vector <site*>::iterator iters;
 		sajt->read_site_neighbours(neighs,1,0);
@@ -3780,12 +3822,32 @@ void lattice :: update_events(site* sajt){
 			if( check_site_belonging_to_sim_area(*it) ){	
 				update_site_events( (*it) );			
 			}else{
-				clear_events_index((*it));
+				if(TRANSPARENT){
+					update_site_events((*it));
+				}else{
+					clear_events_index((*it));
+				}
 			}
 		}
 	}else{
 		if(TRANSPARENT){
+//			control_output<<"Main: "<<endl;
 			update_site_events(sajt);
+//			control_output<<"Neighs: "<<endl;	
+			vector <site*> neighs;
+			typedef vector <site*>::iterator iters;
+			sajt->read_site_neighbours(neighs,1,0);
+			for( iters it=neighs.begin(); it != neighs.end();++it){
+				if( check_site_belonging_to_sim_area(*it) ){	
+					update_site_events( (*it) );			
+				}else{
+					if(TRANSPARENT){
+						update_site_events((*it));
+					}else{
+						clear_events_index((*it));
+					}
+				}
+			}
 		}else{
 			clear_events_index(sajt);
 		}
@@ -3795,17 +3857,22 @@ void lattice :: update_events(site* sajt){
 
 void lattice :: update_site_events(site* sajt){
 	
-//	control_output<<"\nupdating site events: "<<EVENTY->size()<<endl;
 //	sajt->show_site();
-
+//	sajt->show_neigh(1);
+//	control_output<<"updating site events: "<<EVENTY->size();
+	
 	clear_events_index(sajt);
-//	control_output<<"deleted site events: "<<EVENTY->size()<<endl;
+//	control_output<<" deleted site events: "<<EVENTY->size();
 
 	typedef vector <pairjump>::iterator iterevec;
 	vector <pairjump> tmp_events; 
 	int typ = sajt->get_atom();
 	if(typ==0){
-		create_events_index(sajt,tmp_events);
+		if(TRANSPARENT){
+			create_events_trans(sajt,tmp_events);
+		}else{
+			create_events_index(sajt,tmp_events);
+		}
 	}
 
 	list <pairjump>::iterator point2l; 
@@ -3824,7 +3891,7 @@ void lattice :: update_site_events(site* sajt){
 		cout<<"Error in mc::update_site_events. Atom tries jump to atom."<<endl;exit(1);
 		}
 	}
-//	control_output<<"added site events: "<<EVENTY->size()<<endl;
+//	control_output<<" added site events: "<<EVENTY->size()<<endl;
 	
 }
 
@@ -3839,7 +3906,43 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 	
 //	control_output<<"nn: "<<neighbour.size()<<endl;
 	for(unsigned int k =0;k<neighbour.size();k++){
-		if(check_site_belonging_to_sim_area(neighbour[k])){				//<<<----- check_site_mobile()
+		if( check_site_belonging_to_sim_area(neighbour[k]) ){
+			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
+//			(neighbour[k])->show_site();
+			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	
+//			control_output<<"atom/zone: "<<atom<<"/"<<zone<<endl;
+
+			double E1= ( POTENCIALY->get_energy(siteV) ) + ( POTENCIALY->get_energy(neighbour[k]) ) - ( POTENCIALY->get_energy(siteV,neighbour[k]) );
+			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) ) 
+			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) ) 
+			+ ( POTENCIALY->get_energy(siteV,atom,neighbour[k],0) );
+			double barrier=1000.0;
+//			control_output<<"E1/E2: "<<E1<<" / "<<E2<<endl;
+//			control_output<<"BAR: "<<BARIERY<<endl;		
+			barrier=(*BARIERY)[atom][zone];		
+//			control_output<<"bar: "<<barrier<<endl;		
+			double bariera=(E1+E2)/2+barrier-E1;		// 	--policz bariere
+			pairjump tmp(siteV,neighbour[k],E1,E2,barrier,bariera);
+			skoki.push_back(tmp);
+		}
+	}
+	tmp_events=skoki;
+//}
+//	control_output<<"After create events: "<<tmp_events.size()<<endl;
+}
+
+void lattice :: create_events_trans(site* siteV, vector <pairjump> &tmp_events){
+
+//	control_output<<"Create events"<<endl;
+//	if(check_site_belonging_to_sim_area(siteV)){
+	vector <pairjump> skoki;
+	skoki.reserve(50);
+	vector <site*> neighbour;
+	siteV->read_site_neighbours(neighbour,1,0);
+	
+//	control_output<<"nn: "<<neighbour.size()<<endl;
+	for(unsigned int k =0;k<neighbour.size();k++){
+		if( (check_site_belonging_to_sim_area(siteV)) or (check_site_belonging_to_sim_area(neighbour[k])) ){				//<<<----- check_site_mobile()
 			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
 //			(neighbour[k])->show_site();
 			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	

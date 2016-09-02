@@ -129,9 +129,7 @@ void site :: read_site_neighbours(std :: vector <site*> &vac_neighbour, int typ,
 	if(typ){
 		vac_neighbour=site_at_neigh;
 //		control_output<<"jestem site at "<<endl;
-		}
-	else
-	{
+	}else{
 		int zones = get_no_zones();
 		if(zone >= zones){
 			cout<<"ERROR: site :: read_site_neighbours -> coordination szhell failed"<<endl;
@@ -319,7 +317,12 @@ void site :: set_dry(double _y){dy=_y;}
 void site :: set_drz(double _z){dz=_z;}
 void site :: set_jumps(long int _z, int zon){nr_jump[zon]=_z;}
 void site :: set_jumps( std :: vector <long int> &input){nr_jump=input;}
-void site :: set_vindex(long _i){if( (_i >=0) ){Vindex=_i;}else{control_output<<"ERROR in site::set_Vindex()"<<endl;exit(1);}}
+
+void site :: set_vindex(long _i){if( (_i >=0) ){
+	Vindex=_i;
+	}else{
+		control_output<<"ERROR in site::set_Vindex()"<<endl;exit(1);}
+	}
 
 void site :: set_hist_index(int _i){if( (_i >=0) ){	
 //	control_output<<"Setting hist index "<<_i<<" to "; show_site(); 
@@ -349,6 +352,8 @@ long site :: get_vindex(){return Vindex;}
 int site :: get_hist_index(){return hist_index;}
 int site :: get_block_index(){return block_index;}
 int site :: get_rez_index(){return rez_index;}
+
+void site :: reset_vindex(){ Vindex = -1;}
 
 void site :: reset_index(string type){
 	if(type=="hist"){

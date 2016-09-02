@@ -91,7 +91,7 @@ void sim_atoms_list_init();
 void jumps_shell_init();
 void interaction_shell_init();
 void sites_zone_init(int typ,double rmin, double rmax,site *atom_list, vector <site*> &tmp_atom_list);
-void set_atoms_list(vector <site *> &kontener, int typ, bool ON_nn=false);
+void set_atoms_list(vector <site *> &kontener, int typ);
 void set_atoms_map(vector <site *> &kontener);
 void read_structure(string file_name,wektor start,wektor end,wektor set_st, int lattice_nr);
 void set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, potential &pot);
@@ -166,6 +166,7 @@ private:
 void update_site_events(site* sajt);	
 void clear_events_index(site* sajt);
 void create_events_index(site* siteA, vector <pairjump> &events);
+void create_events_trans(site* siteA, vector <pairjump> &events);
 
 };
 

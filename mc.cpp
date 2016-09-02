@@ -717,7 +717,7 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	vac_to_jump->set_dry(Ady);
 	vac_to_jump->set_drz(Adz);
 	vac_to_jump->set_jumps(Ajp);
-	vac_to_jump->set_vindex(0);
+	vac_to_jump->reset_vindex();
 
 	//w tym momencie kontener Vatoms przechowuje adres do atomu (symulacja gubi wakancje)
 	//zamieniamy atom na wakacje
@@ -727,7 +727,8 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	atom_to_jump->set_drz(Vdz);
 	atom_to_jump->set_jumps(Vjp);
 	atom_to_jump->set_vindex(Vindex);
-				
+	
+	control_output<<"Vindex: "<<Vindex<<endl;			
 	Vatoms[Vindex]=atom_to_jump;
 	
 	//collect flux data
@@ -1242,8 +1243,8 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 			double Rvalue = (*next_event).first;	
 //	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
 			if( R>=Lvalue and R < Rvalue){
-//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-//	(*event).second.show();
+	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+	(*event).second.show();
 				vac_to_jump=(*event).second.get_vac_to_jump();
 				atom_to_jump=(*event).second.get_atom_to_jump();
 				make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
