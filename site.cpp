@@ -175,7 +175,9 @@ control_output<<" y/dy = "<<y<<"/";
 control_output<<dy<<"/";
 control_output<<" z/dz = "<<z<<"/";
 control_output<<dz<<"/";
-control_output<<" atom/subl = "<<atom<<"/"<<sub_latt_name<<endl;
+control_output<<" atom/subl = "<<atom<<"/"<<sub_latt_name<<" ";
+control_output<<" V/H/B/R/E: "<<Vindex<<"/"<<hist_index<<"/"<<block_index<<"/"<<rez_index<<"/"<<events_size()<<endl;
+
 }
 
 
@@ -245,13 +247,15 @@ void site :: add_events_index( list<pairjump>::iterator skok){
 }
 
 void site :: get_events_index(vector < list <pairjump>::iterator > &skoki){
-	
 		skoki=site_events;
 }
 
-void site :: clear_events_index(){
-	
+void site :: clear_events_index(){	
 		site_events.clear();
+}
+
+int site :: events_size(){	
+	return site_events.size();
 }
 
 void site :: put_neighbours( vector <site*> &neig_vect, int neigh_typ)

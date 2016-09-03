@@ -335,7 +335,7 @@ void lattice :: init_sim_boundary(vector <double> &parameters){
 	TRANSPARENT = (trans != 0);
 }
 
-void lattice :: init_events_list(vector <site *> &kontener){
+void lattice :: init_events_list(set <site *> &kontener){
 
 	control_output<<"set event list Vsize/EVENTS/po: "<<kontener.size()<<" / "<<EVENTY->size();		
 
@@ -349,14 +349,12 @@ void lattice :: init_events_list(vector <site *> &kontener){
 	site* pointer=0;
 	long int counter=0;
 
-	for(unsigned int i=0;i<kontener.size();i++)
-	{
-		pointer=kontener[i];
-		
+		for ( set<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
+				
 //		if(check_site_belonging_to_sim_area(pointer)){
-			int atom = pointer->get_atom();
+			int atom = (*it)->get_atom();
 			if(atom==0){
-				update_site_events(pointer);			
+				update_site_events((*it));			
 			}
 //		}	
 	}
@@ -385,6 +383,46 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 					if(check_site_mobile(pointer)){																//vac which have neig in sim_area
 						if(typ==0){pointer->set_vindex(counter); counter++;}
 						kontener.push_back(pointer);
+					}
+				}
+			}
+		}
+	}
+	
+	if(typ==0){
+		control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
+	
+//	for(int i=0;i<kontener.size();i++)
+//	{
+//		control_output<<"nr "<<i<<" "<<kontener[i]<<" "<<kontener[i]->get_vindex()<<endl;
+//		kontener[i]->show_site();
+//		kontener[i]->show_neigh(1);
+//	}	
+	}
+}	
+
+void lattice :: set_atoms_list(set <site *> &kontener, int typ)
+{
+	site *pointer=0;
+	long int counter=0;
+	
+	for ( set<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
+		(*it)->reset_vindex();
+	}
+	kontener.clear();
+	
+	for(unsigned int i=0;i<atom_list.size();i++){
+		pointer=atom_list[i];
+		int atom = pointer->get_atom();
+		if(atom==typ){
+			if(check_site_belonging_to_sim_area(pointer)){
+				if(typ==0){pointer->set_vindex(counter); counter++;}	// jak wakancja to ustaw vindex
+				kontener.insert(pointer);
+			}else{
+				if(TRANSPARENT){
+					if(check_site_mobile(pointer)){																//vac which have neig in sim_area
+						if(typ==0){pointer->set_vindex(counter); counter++;}
+						kontener.insert(pointer);
 					}
 				}
 			}
@@ -2630,7 +2668,7 @@ void lattice :: refresh_structure(string file_name)
 
 /*-----------------------------------------------------------*/
 	
-bool lattice :: reinit_sim_area(wektor a, wektor b, vector<site*> &vatoms){
+bool lattice :: reinit_sim_area(wektor a, wektor b, set<site*> &vatoms){
 	
 	if(MOVE_SIM_REGION){	//przesunac obszar symulacji
 		control_output<<"reinit_sim_area:"<<endl;
@@ -2649,62 +2687,67 @@ bool lattice :: reinit_sim_area(wektor a, wektor b, vector<site*> &vatoms){
 	return false;
 }
 
-void lattice :: update_vac_list( vector<site*> &ADD,  vector<site*> &OLD){
+void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 	
 		int typ=-1;
 		bool log=false;
-		vector <site* > tmp;
-		tmp.reserve(10000);
-		tmp.clear();
-		for (unsigned int i=0; i < OLD.size(); i++){
-			typ=OLD[i]->get_atom();
+		set <site* > tmp;
+
+		for (set<site*>::iterator it=OLD.begin(); it!=OLD.end(); ++it){
+
+			typ=(*it)->get_atom();
 			
 			if(typ==0){
-				if(check_site_belonging_to_sim_area(OLD[i])){
-					tmp.push_back(OLD[i]);
+				if(check_site_belonging_to_sim_area((*it))){
+					tmp.insert((*it));
 				}else{
-					if(TRANSPARENT and check_site_mobile(OLD[i])){
-						tmp.push_back(OLD[i]);
+					if(TRANSPARENT and check_site_mobile((*it))){
+						tmp.insert((*it));
 					}else{
-						OLD[i]->show_site();
+						(*it)->show_site();
 					}
 				}
 			}else{
-				OLD[i]->show_site();
+				(*it)->show_site();
 			}
 		}
 		control_output<<"|>"<<tmp.size()<<endl;
 		int count_vac_ok=0;
-		for (unsigned int i=0; i < ADD.size(); i++){
-			typ=ADD[i]->get_atom();
+
+		for (set<site*>::iterator it=ADD.begin(); it!=ADD.end(); ++it){
+
+			typ=(*it)->get_atom();
 			
 			if(typ==0){
-				if(check_site_belonging_to_sim_area(ADD[i])){
-					tmp.push_back(ADD[i]);count_vac_ok++;
-					ADD[i]->show_site();
+				if(check_site_belonging_to_sim_area( (*it) ) ){
+					tmp.insert((*it));count_vac_ok++;
+					(*it)->show_site();
 
 				}else{
-					if(TRANSPARENT and check_site_mobile(ADD[i])){
-						tmp.push_back(ADD[i]);count_vac_ok++;
-						ADD[i]->show_site();
+					if(TRANSPARENT and check_site_mobile((*it))){
+						tmp.insert((*it));count_vac_ok++;
+						(*it)->show_site();
 					}
 				}
 			}
 		}
 		control_output<<"|+"<<count_vac_ok;
 
-		for ( vector<site*>::iterator it = OLD.begin(); it != OLD.end(); ++it){
+		for ( set<site*>::iterator it = OLD.begin(); it != OLD.end(); ++it){
 			(*it)->reset_vindex();
 		}
 	
 		ADD.clear();
 		OLD.clear();
 		//przepisz i nadaj Vindexy sitom
-		for (int i=0; i < tmp.size(); i++){
-			tmp[i]->set_vindex(i);
+		int i = 0;
+		for ( set<site*>::iterator it = tmp.begin(); it != tmp.end(); ++it){
+		
+			(*it)->set_vindex(i);
 //			tmp[i]->show_site();
 //			tmp[i]->show_neigh(1);
-			OLD.push_back(tmp[i]);
+			OLD.insert((*it));
+			i++;
 		} 
 	
 }

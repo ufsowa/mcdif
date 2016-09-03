@@ -98,6 +98,7 @@ int get_block_index();
 int get_rez_index();
 void reset_index(string type);
 void reset_vindex();
+int events_size();
 
 //site operations
 void reset_site ();

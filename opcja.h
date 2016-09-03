@@ -10,6 +10,12 @@
 #include "plaster.h"
 #endif
 
+#ifndef SET_H
+#define SET_H
+#include <set>
+#endif
+
+
 class opcja
 {
 private:
@@ -19,7 +25,7 @@ vector <plaster> HIST;		//zawiera plasterki calej probki do monitorowania
 vector <plaster> reservuars; //0-lewa/1-prawa strona
 vector <vector <double> > reservuars_par;	//zawiera parametry inicjowania dla rezerwuarow z conf.dat ->init_reservuars
 
-vector <site* > Vtoadd;		//zawiera adresy wakancju dodane do symulacji podczas do_equi()
+set <site* > Vtoadd;		//zawiera adresy wakancju dodane do symulacji podczas do_equi()
 
 double TEMPERATURE, MATANO_POSITION;
 int EQ_STEP, TRYB;			//TRYB ==2 : path;	TRYB == 1 : swap;	TRYB == 0 : converse; set in opcja::init()
@@ -36,7 +42,7 @@ wektor del_L_sim, del_R_sim;											//przesuniecie obszaru symulacji -> korzy
 lattice *SAMPLE;		
 potential &POT;
 vector < vector <double> > &BARRIERS;
-vector <site*> &VAC_LIST;
+set <site*> &VAC_LIST;
 
 string SAVE_file;
 bool SAVE_AVG, SAVE_BUILDED;
@@ -51,7 +57,7 @@ double END_VOL;
 	
 public:
 
-opcja(potential& pot_in, vector < vector <double> > &bar, vector <site*> &vatoms) : POT(pot_in), BARRIERS(bar), VAC_LIST(vatoms){
+opcja(potential& pot_in, vector < vector <double> > &bar, set <site*> &vatoms) : POT(pot_in), BARRIERS(bar), VAC_LIST(vatoms){
 	
 	TRYB=0;
 	EQ_STEP=0;

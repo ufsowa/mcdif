@@ -32,6 +32,11 @@
 #include <sstream>
 #endif
 
+#ifndef SET_H
+#define SET_H
+#include <set>
+#endif
+
 using namespace std;
 
 class lattice
@@ -92,6 +97,7 @@ void jumps_shell_init();
 void interaction_shell_init();
 void sites_zone_init(int typ,double rmin, double rmax,site *atom_list, vector <site*> &tmp_atom_list);
 void set_atoms_list(vector <site *> &kontener, int typ);
+void set_atoms_list(set <site *> &kontener, int typ);
 void set_atoms_map(vector <site *> &kontener);
 void read_structure(string file_name,wektor start,wektor end,wektor set_st, int lattice_nr);
 void set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, potential &pot);
@@ -100,8 +106,8 @@ void set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, pote
 void sort_atoms(vector <site> &atoms);
 site* search_site(site *A);
 void refresh_structure(string file_name);
-bool reinit_sim_area(wektor a, wektor b, vector<site*> &vatoms);
-void update_vac_list( vector<site*> &ADD,  vector<site*> &OLD);
+bool reinit_sim_area(wektor a, wektor b, set<site*> &vatoms);
+void update_vac_list( set<site*> &ADD,  set<site*> &OLD);
 double calc_energy();
 double calc_energy_global();
 
@@ -159,7 +165,7 @@ void check_neighbours(int typ);
 void check_atoms();
 
 //alghoritms
-void init_events_list(vector <site *> &kontener);
+void init_events_list(set <site *> &kontener);
 void update_events(site* sajt);
 
 private:

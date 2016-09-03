@@ -387,7 +387,7 @@ Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(0);
 			reservuars[rez].delete_site(0,N2);
 			reservuars[rez].add_site(j,rnd_vac);
 			
-			Vtoadd.push_back(rnd_at);		// w obszarze symulacji pojawila sie nowa wakancja
+			Vtoadd.insert(rnd_at);		// w obszarze symulacji pojawila sie nowa wakancja
 			
 			break;
 		//	}
@@ -442,13 +442,21 @@ void opcja :: do_equi_rez(){
 			if(dE > 0 ){
 				p = exp(-beta*dE);
 				R = rnd();
-				if(R >= p){
+				if(R > p){
 				site1->set_atom(typ1);
 				site2->set_atom(typ2);
-				SAMPLE->update_events( site1 );
-				SAMPLE->update_events( site2 );
 				}
 			}
+			
+			SAMPLE->update_events( site1 );
+			SAMPLE->update_events( site2 );
+			if(site1->events_size() > 0){
+				Vtoadd.insert(site1);
+			}
+			if(site2->events_size() > 0){
+				Vtoadd.insert(site2);
+			}
+		
 	//	ofstream dir_file("dir_tmp.dat", ios::app); 
 	//	dir_file<<i<<" "<<iter<<" "<<E1<<"|-"<<E2<<"|="<<dE<<"|"<<p<<"<?"<<R<<endl;
 		}
@@ -518,7 +526,7 @@ void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
 					BLOKS[nr].delete_site(j,N1);
 					BLOKS[nr].add_site(0,rnd_at);
 					BLOKS[nr].prob_update(j,1);
-					Vtoadd.push_back(rnd_at);	
+					Vtoadd.insert(rnd_at);	
 				}else{
 					//	if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[nr].size(j)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
 					break;
@@ -530,7 +538,7 @@ void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
 				BLOKS[nr].delete_site(j,N1);
 				BLOKS[nr].add_site(0,rnd_at);
 				BLOKS[nr].prob_update(j,1);
-				Vtoadd.push_back(rnd_at);	
+				Vtoadd.insert(rnd_at);	
 			}
 	}//for(j=delta)
 	
@@ -631,8 +639,16 @@ void opcja :: equilibrate(){
 	
 	refresh(0);
 	do_equi_vac();
-	refresh_vac_list();
 	do_equi_rez();
+	refresh_vac_list();
+	
+	int eventy = 0;
+	for (std::set<site*>::iterator it=VAC_LIST.begin(); it!=VAC_LIST.end(); ++it){
+		(*it)->show_site();
+		eventy += (*it)->events_size();
+	}
+	control_output<<"Print VAC_LIST: "<<VAC_LIST.size()<<"/"<<eventy<<endl;
+	
 }
 
 void opcja :: flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>& layer){
@@ -1630,7 +1646,7 @@ void opcja :: dislocation_walk(vector <site*> &path){
 //			(*i)->show_site();
 		}	
 		reset_site( *(--i) );
-		Vtoadd.push_back( *i );	
+		Vtoadd.insert( *i );	
 		(*i)->show_site();
 
 	}else if( last->get_atom()== 0 ){	//backward vacancy in
@@ -1642,7 +1658,7 @@ void opcja :: dislocation_walk(vector <site*> &path){
 //			(*i)->show_site();
 		}	
 		reset_site( *(--i) );
-		Vtoadd.push_back( *i );	
+		Vtoadd.insert( *i );	
 		(*i)->show_site();
 	}else{
 		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);

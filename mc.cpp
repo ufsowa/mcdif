@@ -37,6 +37,8 @@ int debug_mode =0;
 						// kontenery na ktorych idzie cala symulacja
 						
 vector <site *> Vatoms;
+set <site *> V_LIST;
+
 list <pairjump> EVENTS;
 unsigned long EVENTS_size = EVENTS.size();
 //list <pairjump> *wsk_EVENTS=&EVENTS;
@@ -44,7 +46,7 @@ unsigned long EVENTS_size = EVENTS.size();
 potential pot;
 vector <vector <double> > simple_bars;
 //vector <vector <double> > *wsk_simple_bars=&simple_bars;
-opcja opt_equi(pot, simple_bars,Vatoms);
+opcja opt_equi(pot, simple_bars,V_LIST);
 //3D
 double bar_list[3][2][2][3][3][3][3][3][3];
 static long RTA_energy_executions=-1;
@@ -728,8 +730,8 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	atom_to_jump->set_jumps(Vjp);
 	atom_to_jump->set_vindex(Vindex);
 	
-	control_output<<"Vindex: "<<Vindex<<endl;			
-	Vatoms[Vindex]=atom_to_jump;
+	V_LIST.erase(vac_to_jump);
+	V_LIST.insert(atom_to_jump);		
 	
 	//collect flux data
 
@@ -1180,7 +1182,7 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 //	control_output<<"EVENTS size: "<<EVENTS.size()<<endl;
 
 	if(EVENTS.empty()){
-		sample->init_events_list(Vatoms);
+		sample->init_events_list(V_LIST);
 		if(EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after init from:"<<EVENTS_size<<" to: "<<EVENTS.size();
 		control_output<<" in step: "<<RTA_energy_executions<<endl;
 					EVENTS_size=EVENTS.size();}
@@ -2305,7 +2307,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 			}
 		}
 		
-		sample->set_atoms_list(Vatoms,0);
+		sample->set_atoms_list(V_LIST,0);
 
 		for(long j=1;j<main_step;j++)
 		{
@@ -2346,10 +2348,10 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 	//		}
 		}
 	control_output<<"RTA finished... "<<endl;				
-	control_output<<"VAC: "<<Vatoms.size()<<" EVENTS: "<<EVENTS.size()<<endl;
+	control_output<<"VAC: "<<V_LIST.size()<<" EVENTS: "<<EVENTS.size()<<endl;
 	simple_bars.clear();
 	EVENTS.clear();
-	Vatoms.clear();
+	V_LIST.clear();
 	}  
 				
 	if(name=="RTA_RAND_ALLOY")
