@@ -75,7 +75,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar, set <site*> &vatoms) :
 	SAVE_BUILDED = false;
 	MOVE_FRAME = false;
 	NEW_PLANE = false;
-	SINGLE = true;
+	SINGLE = false;
 	BIN_ATOMS_TYP=0;
 	DIRECT_STEPS=0;
 	ST_VOL=0;

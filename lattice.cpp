@@ -2704,14 +2704,14 @@ void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 					if(TRANSPARENT and check_site_mobile((*it))){
 						tmp.insert((*it));
 					}else{
-						(*it)->show_site();
+//						(*it)->show_site();
 					}
 				}
 			}else{
-				(*it)->show_site();
+//				(*it)->show_site();
 			}
 		}
-		control_output<<"|>"<<tmp.size()<<endl;
+//		control_output<<"|>"<<tmp.size()<<endl;
 		int count_vac_ok=0;
 
 		for (set<site*>::iterator it=ADD.begin(); it!=ADD.end(); ++it){
@@ -2721,17 +2721,17 @@ void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 			if(typ==0){
 				if(check_site_belonging_to_sim_area( (*it) ) ){
 					tmp.insert((*it));count_vac_ok++;
-					(*it)->show_site();
+//					(*it)->show_site();
 
 				}else{
 					if(TRANSPARENT and check_site_mobile((*it))){
 						tmp.insert((*it));count_vac_ok++;
-						(*it)->show_site();
+//						(*it)->show_site();
 					}
 				}
 			}
 		}
-		control_output<<"|+"<<count_vac_ok;
+//		control_output<<"|+"<<count_vac_ok;
 
 		for ( set<site*>::iterator it = OLD.begin(); it != OLD.end(); ++it){
 			(*it)->reset_vindex();

@@ -642,12 +642,12 @@ void opcja :: equilibrate(){
 	do_equi_rez();
 	refresh_vac_list();
 	
-	int eventy = 0;
-	for (std::set<site*>::iterator it=VAC_LIST.begin(); it!=VAC_LIST.end(); ++it){
-		(*it)->show_site();
-		eventy += (*it)->events_size();
-	}
-	control_output<<"Print VAC_LIST: "<<VAC_LIST.size()<<"/"<<eventy<<endl;
+//	int eventy = 0;
+//	for (std::set<site*>::iterator it=VAC_LIST.begin(); it!=VAC_LIST.end(); ++it){
+//		(*it)->show_site();
+//		eventy += (*it)->events_size();
+//	}
+//	control_output<<"Print VAC_LIST: "<<VAC_LIST.size()<<"/"<<eventy<<endl;
 	
 }
 
@@ -988,7 +988,6 @@ void opcja :: move_frame(){
 		control_output<<"ERROR: opcja:move_frame() TYP: "<<TYP_TO_MOVE<<endl;
 		exit(1);
 		}
-	save_write();
 	reinit_reservuars(REZ_TO_MOVE,TYP_TO_MOVE);
 	reinit_bloks();
 
@@ -1282,6 +1281,7 @@ bool opcja :: check_x_belonging_volume(double x){
 int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz			UWAGA UWAGA UWAGA		<----------------------------------------!!!!!!!!!!!!!!!!!!!
 
 	//pobrac strumien lewy i prawy
+	control_output<<"Decide for: ";node->show_site();
 	unsigned int id=node->get_hist_index();
 	double left_area = -HIST[id].net_flux_get(0);
 	double right_area = -HIST[id].eq_flux_get(0);
@@ -1314,11 +1314,10 @@ int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz	
 
 	int move = 0;
 	int event = -1;
-	control_output<<endl;
 	for (int i = 1; i < (target.size()); i++){
 		control_output<<" "<<W_left<<" "<<W_right<<" "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<" "<<kB*TEMPERATURE<<endl;
 		if( (target[i-1] <= shot) and (shot < target[i]) ){
-			control_output<<"take event: "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<endl;
+			control_output<<" take event: "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<endl;
 			//break;
 			event=i;
 		}
@@ -1513,7 +1512,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 	wektor kierunek;
 	if(DIR==1){ kierunek(1.0,0.0,0.0);}else if(DIR== -1){kierunek(-1.0,0.0,0.0);}
 	else{control_output<<"ERROR in opcja""find_migration_path(). Wrong direction: "<<DIR<<endl;exit(1);}
-	kierunek.show();
+//	kierunek.show();
 	
 	site* node=first_node;
 	migration_path.push_back( first_node );
@@ -1625,7 +1624,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 void opcja :: dislocation_walk(vector <site*> &path){
 	
 	if(path.size()>0){
-	control_output<<"Path size: "<<path.size()<<endl;
+//	control_output<<"Path size: "<<path.size()<<endl;
 	site* first = path.front();
 	site* last = path.back();
 
@@ -1642,24 +1641,24 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		for ( ; i != path.end(); ++i ){
 			vector<site*>::iterator prev = i; --prev;
 			virtual_jump_vac_atom( (*prev), *i);	
-			(*prev)->show_site();
+//			(*prev)->show_site();
 //			(*i)->show_site();
 		}	
 		reset_site( *(--i) );
 		Vtoadd.insert( *i );	
-		(*i)->show_site();
+//		(*i)->show_site();
 
 	}else if( last->get_atom()== 0 ){	//backward vacancy in
 		vector<site*>::reverse_iterator i = path.rbegin(); ++i;
 		for ( ; i != path.rend(); ++i ){
 			vector<site*>::reverse_iterator prev = i; --prev;
 			virtual_jump_vac_atom( (*prev), *i);
-			(*prev)->show_site();
+//			(*prev)->show_site();
 //			(*i)->show_site();
 		}	
 		reset_site( *(--i) );
 		Vtoadd.insert( *i );	
-		(*i)->show_site();
+//		(*i)->show_site();
 	}else{
 		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);
 	}

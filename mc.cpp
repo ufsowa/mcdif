@@ -1245,8 +1245,8 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 			double Rvalue = (*next_event).first;	
 //	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
 			if( R>=Lvalue and R < Rvalue){
-	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-	(*event).second.show();
+//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+//	(*event).second.show();
 				vac_to_jump=(*event).second.get_vac_to_jump();
 				atom_to_jump=(*event).second.get_atom_to_jump();
 				make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
