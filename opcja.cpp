@@ -588,6 +588,7 @@ void opcja :: do_equi_vac(){
 
 //	control_output<<"Rownowaga: "<<endl;
 	for (unsigned int i=0;i<BLOKS.size();i++){
+		if( 1 ){
 	//	bloks[i].calc_stech();
 		if(MOVE_FRAME or SINGLE)
 		{control_output<<i;}
@@ -625,6 +626,7 @@ void opcja :: do_equi_vac(){
 		if(LOCAL_MOVE){
 			control_output<<" po: "<<i<<"|"<<LOCAL_MOVE<<"|"<<MOVE_FRAME<<endl;
 			break;}	//jesli bylo do_move przestan rownowazyc pozostale bloki
+	}	//if exclude block
 	}	//for bloks
 	
 //	refresh(1);
@@ -1278,6 +1280,32 @@ bool opcja :: check_x_belonging_volume(double x){
 	return false;
 }
 
+int opcja :: decide_direction(site *node){
+	unsigned int x=node->get_position(BIN_DIRECTION);
+	int left = abs(BIN_ST-x);
+	int right = abs(BIN_END-x);
+	int dir=0;
+	if(left>right){
+		dir= 1;
+	}else if(left<right){
+		dir= -1;
+	}else if(left==right){
+		double Q = rnd();
+		if(Q<=0.5){
+			dir= -1;
+		}else{
+			dir= 1;
+		}
+	}else{
+		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
+	}
+
+	control_output<<"Decide for: "<<dir<<" ";node->show_site();
+	return dir;
+	
+}
+
+/*
 int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz			UWAGA UWAGA UWAGA		<----------------------------------------!!!!!!!!!!!!!!!!!!!
 
 	//pobrac strumien lewy i prawy
@@ -1328,10 +1356,15 @@ int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz	
 	else{
 		control_output<<"ERROR in opcja::decide_direction(): "<<event<<" "<<p_left<<" "<<p_right<<" "<<shot<<endl; exit(1);
 	} 
+
+	if(node->get_atom() == 0){
+		move = -move;
+	}
 	
 	return move;
 
 }
+*/
 
 void opcja :: cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac){
 	
@@ -1553,10 +1586,15 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			int typ = (vac_bufor[rndIndex])->get_atom();
 			if(typ==0){
 				if(first_node->get_atom()>0){								
-					migration_path.push_back( (vac_bufor[rndIndex]) );		//zapisz adres vacancy do sciezki jesli poczatek byl atom. Create vac.
-		//			(vac_bufor[rndIndex])->show_site();
+					migration_path.push_back( (vac_bufor[rndIndex]) );		//zapisz adres vacancy do sciezki jesli poczatek byl atom. Create vac.					
 				}
 				node=vac_bufor[rndIndex];									//w node jest vacans stop while	
+				control_output<<"Cluster Vac in sample: "; (vac_bufor[rndIndex])->show_site();
+				for(int i = 0; i<migration_path.size();i++){
+					migration_path[i]->show_site();
+				}
+				(vac_bufor[rndIndex])->show_neigh(1);
+				
 				break;
 			}
 			else{
@@ -1568,16 +1606,17 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 		else if(site_bufor.size() == 0 and vac_bufor.size() == 0){			//Jesli path doszla do sciany?? Nie ma ani atomu ani wakancji do skoku. TO odbij wektor kierunek.
 			control_output<<"WARRNING in opcja::find_migration_path(). 	\
 			Path reached a wall. No atoms or vacancy available to contiune path: "<<TRY_WALL<<endl;		
-			WALL = true;TRY_WALL++;
-			if(TRY_WALL>10){
-				control_output<<"WARRNING in opcja::find_migration_path(). \
-				Node can not find end "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
-				node->show_site();
-				HARD_WALL++;
+
+//			WALL = true;TRY_WALL++;
+//			if(TRY_WALL>10){
+//				control_output<<"WARRNING in opcja::find_migration_path(). \
+//				Node can not find end "<<TRY_WALL<<" "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
+//				node->show_site();
+//				HARD_WALL++;
 	//			kierunek = kierunek*(-1.0); TRY_WALL = 0; 
 	//			control_output<<"Oposite direction was set: "<<endl; kierunek.show();
-			}
-			if(HARD_WALL>1){
+//			}
+//			if(HARD_WALL>1){
 				control_output<<"ERROR in opcja::find_migration_path().Node is oscilating: "<<HARD_WALL<<" "<<TRY_WALL<<endl;
 
 				MOVE_MIG=check_rezervuars(first_node, node);
@@ -1590,7 +1629,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 					}
 					break;												//node is vac if first_node is atom. 
 				}
-			}
+//			}
 		}else{
 			control_output<<"ERROR in opcja::find_migration_path(). \
 			Undefined condition: "<<site_bufor.size()<<" "<<vac_bufor.size() <<endl;
@@ -1624,7 +1663,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 void opcja :: dislocation_walk(vector <site*> &path){
 	
 	if(path.size()>0){
-//	control_output<<"Path size: "<<path.size()<<endl;
+	control_output<<"Path size: "<<path.size()<<endl;
 	site* first = path.front();
 	site* last = path.back();
 
@@ -1750,7 +1789,7 @@ void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
 			rnd_vac=BLOKS[b].get_site(0,N1);
 						
 			if(TRYB==2){
-				int DIR = -decide_direction(rnd_vac);	//	-1 left;	+1 right
+				int DIR = decide_direction(rnd_vac);	//	-1 left;	+1 right
 				vector <site*> migration_path; migration_path.reserve(2000);
 				MOVE = find_migration_path(rnd_vac,DIR,migration_path);	
 				if(!MOVE){
