@@ -138,7 +138,7 @@ void save_write();
 void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
 
-void find_matano_plane();
+void find_interface();
 int decide_direction(site *node);
 bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);

@@ -804,17 +804,18 @@ void opcja :: flux_add_dislocation(site* VAC, site* ATO, vector<plaster>& layer)
 
 }
 
-void opcja :: find_matano_plane(){
+void opcja :: find_interface(){
 	double x0 = BIN_ST + fabs(  (BIN_ST-BIN_END)/2.0 ) ;
 //	cout<<BIN_DIRECTION<<" "<<BIN_ST<<" "<<BIN_END<<" "<< x0<<endl;
 
+	
 
 	vector <double> X;
 	vector <double> Y;
 	
 	double SUM=0;
 	typedef vector <plaster>::iterator it2pl;
-	for( it2pl IT=HIST.begin();IT!=HIST.end();++IT){
+	for( it2pl IT=reservuars.begin();IT!=reservuars.end();++IT){
 		double y = IT->flux_net_get(0);
 		double x1=IT->get_st();
 		double x2=IT->get_end();
@@ -1281,20 +1282,82 @@ bool opcja :: check_x_belonging_volume(double x){
 }
 
 int opcja :: decide_direction(site *node){
+
 	unsigned int x=node->get_position(BIN_DIRECTION);
-	int left = abs(BIN_ST-x);
-	int right = abs(BIN_END-x);
-	int dir=0;
-	if(left>right){
-		dir= 1;
-	}else if(left<right){
-		dir= -1;
-	}else if(left==right){
-		double Q = rnd();
-		if(Q<=0.5){
-			dir= -1;
+	unsigned int bin = node->get_block_index();	
+	double Cb = (BLOKS[bin]).get_stech();
+	double minY = -1, minX = -1; vector <int> rez;
+	for( int REZ = 0; REZ<reservuars.size(); REZ++){
+		double Y = fabs( Cb - (reservuars[REZ]).get_stech());
+		double XL = fabs( x - (reservuars[REZ]).get_st());
+		double XP = fabs( x - (reservuars[REZ]).get_end());
+		double X = min(XL,XP);		
+		if(minY < 0){
+			rez.push_back(REZ);
+			minY = Y;
+			minX = X;			
 		}else{
-			dir= 1;
+			if(Y < minY){
+				rez.clear();
+				rez.push_back(REZ);
+				minY = Y;
+				minX = X;			
+			}else if(Y == minY){
+				if(X < minX){
+					rez.clear();
+					rez.push_back(REZ);
+					minY = Y;
+					minX = X;
+				}else if(X == minY){
+					rez.push_back(REZ);
+				}else{
+					continue;
+				}
+			}else{
+				continue;
+			}
+		}
+	}
+
+
+	int REZ = -1;
+	
+	if(rez.size()==1){
+		REZ=rez[0];	
+	}else if(rez.size()>1){												//choose random element from rez
+		int rndIndex = rand() % rez.size();			
+		REZ = rez[rndIndex];
+	}else{
+		control_output<<"ERROR: opcja::decide_direction(): "<<rez.size()<<endl; exit(1);
+	}
+
+	double left = (reservuars[REZ]).get_st() - x;
+	double right = (reservuars[REZ]).get_end() - x;
+	double displace = min(left,right);
+	int dir=0;
+	if(displace > 0){
+		dir= 1;
+	}else if(displace < 0 ){
+		dir= -1;
+	}else if(displace == 0){
+		//check if reservuar is left or right
+		double X0 = (BIN_ST + BIN_END)/2.0;
+		double left = (reservuars[REZ]).get_st() - X0;
+		double right = (reservuars[REZ]).get_end() - X0;
+		double displace = min(left,right);
+		if(displace > 0){
+			dir = 1;
+		}else if(displace < 0){
+			dir = -1;
+		}else{
+			double displace = max(left,right);
+			if(displace > 0){
+				dir = 1;
+			}else if(displace < 0){
+				dir = -1;
+			}else{
+				control_output<<"ERROR: opcja: 1358. Not an option. Bad definition of reservours."<<endl;exit(1);				
+			}
 		}
 	}else{
 		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
