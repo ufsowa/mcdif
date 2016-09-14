@@ -19,7 +19,7 @@ srand(seed1+seed2.tv_usec);
 srandom (seed1+seed2.tv_usec);
 //history<<"seed: "<<seed1+seed2.tv_usec<<" start: "<<start<<" "<<start2<<endl;
 for(long j=0;j<10000;j++)
-double x=ran01();
+ran01();
 
 }
 
@@ -34,6 +34,11 @@ void initialize_seed()
 	srand(seed1+seed2.tv_usec);
 
 }
+
+
+double rnd(){
+	return ((double)rand())/((double)RAND_MAX+1.0);
+	}
 
 double ran01()
 {

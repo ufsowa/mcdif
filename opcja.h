@@ -81,6 +81,13 @@ opcja(potential& pot_in, vector < vector <double> > &bar, set <site*> &vatoms) :
 	ST_VOL=0;
 	END_VOL=0;
 
+	equi_curve.reserve(2000);
+	BLOKS.reserve(5000);
+	HIST.reserve(5000);
+	reservuars.reserve(20);
+	reservuars_par.reserve(20);
+
+
 	};
 
 ~opcja(){

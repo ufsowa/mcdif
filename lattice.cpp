@@ -346,9 +346,6 @@ void lattice :: init_events_list(set <site *> &kontener){
 		event=EVENTY->erase(event);
 	}
 
-	site* pointer=0;
-	long int counter=0;
-
 		for ( set<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
 				
 //		if(check_site_belonging_to_sim_area(pointer)){
@@ -2690,7 +2687,6 @@ bool lattice :: reinit_sim_area(wektor a, wektor b, set<site*> &vatoms){
 void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 	
 		int typ=-1;
-		bool log=false;
 		set <site* > tmp;
 
 		for (set<site*>::iterator it=OLD.begin(); it!=OLD.end(); ++it){
@@ -3297,7 +3293,7 @@ void lattice :: get_sites(plaster &tmp){
 		}
 		else
 		{
-			cout<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3"<<endl;
+			control_output<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3: "<<direction<<endl;
 			exit(1);
 		}
 	//		UWAGA zaokraglanie 	
@@ -3337,7 +3333,7 @@ void lattice :: get_sites(vector <plaster> &tmp){
 		}
 		else
 		{
-			cout<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3"<<endl;
+			control_output<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3: "<<direction<<endl;
 			exit(1);
 		}
 		

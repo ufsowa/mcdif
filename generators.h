@@ -32,4 +32,4 @@ long ranZ(long n);
 double rownomierny(double a,double b);
 void initialize();
 void initialize_seed();
-static double rnd(){return ((double)rand())/((double)RAND_MAX+1.0);}
+double rnd();

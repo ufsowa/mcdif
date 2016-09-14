@@ -24,7 +24,7 @@ class plaster {
 	
 	string PL_NAME;
 	unsigned int PL_TYPES,PL_DIRECTION,PL_INDEX;
-	double PL_P0,PL_P1,PL_AVG_COUNT;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
+	double PL_P0,PL_P1;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
 	vector <long> PL_EQ_FLUX;
 	vector <long> PL_NET_FLUX;
 	vector <long> PL_PROB_ADD;
@@ -50,6 +50,12 @@ class plaster {
 
 	public:
 	
+	
+//	plaster();
+//	plaster(const plaster &obj);
+//	~plaster(){control_output<<"plaster destructed"<<endl;};
+	
+
 	plaster(int i, int atoms_type, int direction, int id, double x0 , double x1 , string name );	
 
 	void cumulate();
@@ -60,8 +66,8 @@ class plaster {
 	bool check(unsigned int typ_min, unsigned int typ_max, int delta);
 	site* choose_atom(unsigned int typ);
 	int	get_direction(){return PL_DIRECTION;};
-	int	get_st(){return PL_P0;};
-	int	get_end(){return PL_P1;};
+	double	get_st(){return PL_P0;};
+	double	get_end(){return PL_P1;};
 	int	get_index(){return PL_INDEX;};
 	void reset_indexes();
 	string get_name(){return PL_NAME;};

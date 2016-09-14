@@ -35,3 +35,7 @@ double integral_data(std::vector<double> &X, std::vector<double> &Y, double a);
 float CalculateTrapezoidArea(float sideA, float sideB, float height);
 double rad2degree(double kat_in);
 double degree2rad(double kat_in);
+
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}

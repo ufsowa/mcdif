@@ -4,11 +4,13 @@ plaster ::	plaster(int i, int atoms_type, int dir, int id, double x0, double x1,
 
 		PL_NAME=name;
 		PL_REF_TO_SITES.reserve(i);
+		PL_SITES_TYP.reserve(10);
 		PL_TYPES=atoms_type;
 		PL_INDEX=id;
 		PL_DIRECTION=dir;
 		PL_P0=x0;
 		PL_P1=x1;
+		
 		for(unsigned int i=0;i<PL_TYPES;i++){
 			PL_ATOMS.push_back(0);
 			PL_EQ_FLUX.push_back(0);
@@ -29,8 +31,72 @@ plaster ::	plaster(int i, int atoms_type, int dir, int id, double x0, double x1,
 		for(unsigned int i=0;i<PL_PROB_DEL.size();i++){PL_AVG_PARS.push_back(PL_PROB_DEL[i]);};
 		PL_AVG_PARS.push_back(0);
 		PL_AVG_PARS.push_back(0);
+//		control_output<<"plaster initied"<<endl;
+
 }
 
+/*
+plaster ::	plaster(){
+
+		PL_NAME="null";
+		PL_REF_TO_SITES.reserve(5000);
+		PL_SITES_TYP.reserve(10);
+		PL_TYPES=0;
+		PL_INDEX=0;
+		PL_DIRECTION=0;
+		PL_P0=-1;
+		PL_P1=-1;
+		
+		for(unsigned int i=0;i<PL_TYPES;i++){
+			PL_ATOMS.push_back(0);
+			PL_EQ_FLUX.push_back(0);
+			PL_NET_FLUX.push_back(0);
+			PL_PROB_ADD.push_back(0);
+			PL_PROB_DEL.push_back(0);
+		}
+		PL_JUMPS=0;
+		PL_JUMPS_EQ=0;
+		PL_AVG_PARS.reserve(20);
+		PL_AVG_PARS.push_back(0);
+		PL_AVG_PARS.push_back(0);
+		PL_AVG_PARS.push_back(0);
+		for(unsigned int i=0;i<PL_ATOMS.size();i++){PL_AVG_PARS.push_back(PL_ATOMS[i]);};
+		for(unsigned int i=0;i<PL_NET_FLUX.size();i++){PL_AVG_PARS.push_back(PL_NET_FLUX[i]);};
+		for(unsigned int i=0;i<PL_EQ_FLUX.size();i++){PL_AVG_PARS.push_back(PL_EQ_FLUX[i]);};
+		for(unsigned int i=0;i<PL_PROB_ADD.size();i++){PL_AVG_PARS.push_back(PL_PROB_ADD[i]);};
+		for(unsigned int i=0;i<PL_PROB_DEL.size();i++){PL_AVG_PARS.push_back(PL_PROB_DEL[i]);};
+		PL_AVG_PARS.push_back(0);
+		PL_AVG_PARS.push_back(0);
+		control_output<<"plaster() initied"<<endl;
+
+}
+
+plaster :: plaster(const plaster &obj){
+
+		PL_NAME=obj.PL_NAME;
+		PL_REF_TO_SITES=obj.PL_REF_TO_SITES;
+		PL_SITES_TYP=obj.PL_SITES_TYP;
+		PL_TYPES=obj.PL_TYPES;
+		PL_INDEX=obj.PL_INDEX;
+		PL_DIRECTION=obj.PL_DIRECTION;
+		PL_P0=obj.PL_P0;
+		PL_P1=obj.PL_P1;
+		
+		PL_ATOMS=obj.PL_ATOMS;
+		PL_EQ_FLUX=obj.PL_EQ_FLUX;
+		PL_NET_FLUX=obj.PL_NET_FLUX;
+		PL_PROB_ADD=obj.PL_PROB_ADD;
+		PL_PROB_DEL=obj.PL_PROB_DEL;
+
+		PL_JUMPS=obj.PL_JUMPS;
+		PL_JUMPS_EQ=obj.PL_JUMPS_EQ;
+		PL_AVG_PARS=obj.PL_AVG_PARS;
+
+		control_output<<"plaster copied"<<endl;
+}
+
+*/
+ 
 void plaster :: cumulate(){
 	PL_AVG_PARS[0]+=(PL_INDEX);
 	PL_AVG_PARS[1]+=(PL_P0);

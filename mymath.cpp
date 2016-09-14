@@ -58,7 +58,7 @@ double integral_data(std::vector<double> &X, std::vector<double> &Y, double a){
 	double SUM=0;
 	double SUM_F=0;
 	int sign=1;
-	for(int i=1;i<X.size();i++){
+	for(unsigned int i=1;i<X.size();i++){
 		double diff = (X[i]) - (X[i-1]);
 		if( (X[i]-a) < 0  and (X[i-1]-a) < 0 ){diff = diff * (-1); sign=-1;}
 		else if( (X[i]-a) > 0  and (X[i-1]-a) > 0 ){diff = diff * (1);sign=1;}
