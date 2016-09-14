@@ -1285,113 +1285,82 @@ bool opcja :: check_x_belonging_volume(double x){
 	return false;
 }
 
+
+/*
+	int move = 0;
+	int event = -1;
+	for (int i = 1; i < (target.size()); i++){
+		control_output<<" "<<W_left<<" "<<W_right<<" "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<" "<<kB*TEMPERATURE<<endl;
+	
+		if( (target[i-1] <= shot) and (shot < target[i]) ){
+			control_output<<" take event: "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<endl;
+			//break;
+			event=i;
+		}
+	}
+	
+	if(event == 1){move = -1;}
+	else if (event == 2){move = 1;}
+	else{
+		control_output<<"ERROR in opcja::decide_direction(): "<<event<<" "<<p_left<<" "<<p_right<<" "<<shot<<endl; exit(1);
+	} 
+
+	if(node->get_atom() == 0){
+		move = -move;
+	}
+	
+
+ * */
+
+
 int opcja :: decide_direction(site *node){
 
 
-	double x=node->get_position(BIN_DIRECTION);
-	unsigned int bin = node->get_block_index();	
-	double Cb = (BLOKS[bin]).get_stech();
+	double X0=node->get_position(BIN_DIRECTION);
+	unsigned int bin = node->get_hist_index();	
+	double Cb = (HIST[bin]).get_stech();
 //	control_output<<"Decide for: "<<x<<" "<<bin<<" "<<Cb<<" ";node->show_site();
 
-	double minY = -1, minX = -1; vector <int> rez;
-	for( unsigned int REZ = 0; REZ<reservuars.size(); REZ++){
-		double Y = fabs( Cb - (reservuars[REZ]).get_stech());
-		double XL = fabs( x - (reservuars[REZ]).get_st());
-		double XP = fabs( x - (reservuars[REZ]).get_end());
-		double X = min(XL,XP);		
-//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
-		if(minY < 0){
-			rez.push_back(REZ);
-			minY = Y;
-			minX = X;			
-//			control_output<<"	in minY <0: "<<minY<<" "<<minX<<endl;
-		}else{
-			if(Y < minY){
-				rez.clear();
-				rez.push_back(REZ);
-				minY = Y;
-				minX = X;
-//				control_output<<"	in Y < minY: "<<minY<<" "<<minX<<endl;			
-			}else if(Y == minY){
-//				control_output<<"	in Y ==minY: "<<minY<<" "<<minX<<endl;
-				if(X < minX){
-					rez.clear();
-					rez.push_back(REZ);
-					minY = Y;
-					minX = X;
-//					control_output<<"		in X < minX: "<<minY<<" "<<minX<<endl;
-				}else if(X == minY){
-					rez.push_back(REZ);
-//					control_output<<"		in X == minX: "<<minY<<" "<<minX<<endl;
-				}else{
-//					control_output<<"		in X: "<<minY<<" "<<minX<<endl;
-					continue;
-				}
-			}else{
-//				control_output<<"	in Y: "<<minY<<" "<<minX<<endl;
-				continue;
-			}
+	double SUM=0; unsigned int REZ=0;	
+	typedef vector <pair <double,int> > mykey;
+	mykey target;
+
+	for( REZ = 0; REZ<reservuars.size(); REZ++){
+		double Y = 1.0 - fabs( Cb - (reservuars[REZ]).get_stech());
+		target.push_back(make_pair(SUM, REZ));
+		SUM = SUM + Y;
+	
+																		//		double XL = fabs( x - (reservuars[REZ]).get_st());
+																		//		double XP = fabs( x - (reservuars[REZ]).get_end());
+																		//		double X = min(XL,XP);		
+																		//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
+	}
+	target.push_back(make_pair( SUM, REZ ));
+
+	double R=rnd()*SUM; 
+	mykey::iterator event = target.begin();
+	mykey::iterator next_event=target.begin();
+
+	for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
+		double Lvalue = (*event).first;
+		double Rvalue = (*next_event).first;	
+																		//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+		if( R>=Lvalue and R < Rvalue){
+			REZ=(*event).second;										//set rezervour
 		}
 	}
-//	control_output<<"	Print rez: "<<rez.size()<<endl;
-//	for(unsigned int i=0; i<rez.size();i++){
-//		control_output<<"	"<<rez[i];
-//	}
-	control_output<<endl;
-	int REZ = -1;
-	if(rez.size()==1){
-		REZ=rez[0];	
-	}else if(rez.size()>1){												//choose random element from rez
-		int rndIndex = rand() % rez.size();			
-		REZ = rez[rndIndex];
-	}else{
-		control_output<<"ERROR: opcja::decide_direction(): "<<rez.size()<<endl; exit(1);
-	}
-//	control_output<<"	Cal dir for: "<<REZ<<" "<<x<<endl;
-
-	double left = (reservuars[REZ]).get_st() - x;
-	double right = (reservuars[REZ]).get_end() - x;
-	
+																		//set direction to this reservour
+	double left = (reservuars[REZ]).get_st() - X0;
+	double right = (reservuars[REZ]).get_end() - X0;
 	double displace = fabs(left) > fabs(right) ? right : left;
 
 	int dir=0;
-//	control_output<<"		"<<left<<" "<<right<<" "<<displace<<" "<<dir<<endl;
-
 	if(displace > 0){
 		dir= 1;
-//		control_output<<"		displace >0: "<<dir<<endl;
 	}else if(displace < 0 ){
 		dir= -1;
-//		control_output<<"		displace <0: "<<dir<<endl;
 	}else if(displace == 0){
-//		control_output<<"		displace ==0: "<<dir<<endl;
-		//check if reservuar is left or right
-		double X0 = (BIN_ST + BIN_END)/2.0;
-		double left = (reservuars[REZ]).get_st() - X0;
-		double right = (reservuars[REZ]).get_end() - X0;
-		double displace = min(left,right);
-//		control_output<<"			"<<left<<" "<<right<<" "<<displace<<" "<<dir<<" "<<X0<<endl;
-
-		if(displace > 0){
-			dir = 1;
-//			control_output<<"			displace >0: "<<dir<<endl;
-		}else if(displace < 0){
-			dir = -1;
-//						control_output<<"			displace <0: "<<dir<<endl;
-		}else{
-//			control_output<<"			displace ==0: "<<dir<<endl;
-			double displace = max(left,right);
-//			control_output<<"				"<<left<<" "<<right<<" "<<displace<<" "<<dir<<" "<<X0<<endl;
-			if(displace > 0){
-				dir = 1;
-//				control_output<<"				displace >0: "<<dir<<endl;
-			}else if(displace < 0){
-				dir = -1;
-//				control_output<<"				displace >0: "<<dir<<endl;
-			}else{
-				control_output<<"ERROR: opcja: 1358. Not an option. Bad definition of reservours."<<endl;exit(1);				
-			}
-		}
+		dir = 0;
 	}else{
 		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
 	}
@@ -1401,7 +1370,34 @@ int opcja :: decide_direction(site *node){
 	return dir;
 }
 
+
 /*
+int opcja :: decide_direction(site *node){
+	unsigned int x=node->get_position(BIN_DIRECTION);
+	int left = abs(BIN_ST-x);
+	int right = abs(BIN_END-x);
+	int dir=0;
+	if(left>right){
+		dir= 1;
+	}else if(left<right){
+		dir= -1;
+	}else if(left==right){
+		double Q = rnd();
+		if(Q<=0.5){
+			dir= -1;
+		}else{
+			dir= 1;
+		}
+	}else{
+		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
+	}
+
+	control_output<<"Decide for: "<<dir<<" ";node->show_site();
+	return dir;
+	
+}
+
+
 
 int opcja :: decide_direction(site *node){	//do zmiany na kryterium granicy faz			UWAGA UWAGA UWAGA		<----------------------------------------!!!!!!!!!!!!!!!!!!!
 
@@ -1639,14 +1635,22 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 
 	bool MOVE_MIG = false;
 	wektor kierunek;
-	if(DIR==1){ kierunek(1.0,0.0,0.0);}else if(DIR== -1){kierunek(-1.0,0.0,0.0);}
-	else{control_output<<"ERROR in opcja""find_migration_path(). Wrong direction: "<<DIR<<endl;exit(1);}
+	if(DIR==1){ 
+		kierunek(1.0,0.0,0.0);
+	}else if(DIR== -1){
+		kierunek(-1.0,0.0,0.0);
+	}else if(DIR== 0){
+		kierunek(0.0,0.0,0.0);
+	}else{
+		control_output<<"ERROR in opcja""find_migration_path(). Wrong direction: "<<DIR<<endl;exit(1);
+	}
 //	kierunek.show();
-	
+	if(DIR!=0){
 	site* node=first_node;
 	migration_path.push_back( first_node );
 	unsigned int TRY_WALL = 0;
 	bool WALL = false;
+
 	do{		
 		vector <site*> site_bufor;
 		vector <site*> vac_bufor;
@@ -1741,7 +1745,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 	}
 	
 //	control_output<<"End find mig. pth: "<<migration_path.size()<<endl;
-	
+	}
 	return MOVE_MIG;
 }
 
