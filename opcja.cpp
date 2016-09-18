@@ -702,38 +702,62 @@ void opcja :: flux_add(site* VAC, site* ATO, vector<plaster>& layer){
 	if(id_V >=0 and (id_V != id_A)){
 		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V		
 		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
-			for(int ID=id_V; ID>id_A; ){
-				layer[ID].jump_occured();
-				layer[ID].flux_net_delta(0, 1);
-				layer[ID].flux_net_delta(typ, 0);
-				ID--;
+			if(id_V >= id_A){
+				for(int ID=id_V; ID>id_A; ){
+					layer[ID].jump_occured();
+					layer[ID].flux_net_delta(0, 1);
+					layer[ID].flux_net_delta(typ, 0);
+					ID--;
+				}
+			}else{
+				layer[id_V].jump_occured();
+				layer[id_V].flux_net_delta(0, 1);
+				layer[id_V].flux_net_delta(typ, 0);
 			}
 		}
 		if(dir < 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
-			for(int ID=id_V; ID<id_A; ){
-				layer[ID].jump_occured();
-				layer[ID].eq_flux_delta(0, 0);
-				layer[ID].eq_flux_delta(typ, 1);
-				ID++;
+			if(id_V <= id_A){
+				for(int ID=id_V; ID<id_A; ){
+					layer[ID].jump_occured();
+					layer[ID].eq_flux_delta(0, 0);
+					layer[ID].eq_flux_delta(typ, 1);
+					ID++;
+				}
+			}else{
+					layer[id_V].jump_occured();
+					layer[id_V].eq_flux_delta(0, 0);
+					layer[id_V].eq_flux_delta(typ, 1);		
 			}
 		}	
 	}
 	if(id_A >=0 and (id_V != id_A)){
 		//vakancja pojawia sie w plastrze id_V oraz atom znika z plastra id_V
-		if(dir < 0){	//wakancja wplynela z lewej strony; atom wyplyna w lewo
-			for(int ID=id_A ;ID>id_V ;){
-				layer[ID].jump_occured();
-				layer[ID].flux_net_delta(typ, 1);
-				layer[ID].flux_net_delta(0, 0);
-				ID--;
+		if(dir < 0){	//wakancja w lewo strony; atom wyplyna w prawo
+			if(id_A >= id_V){
+				for(int ID=id_A ;ID>id_V ;){
+					layer[ID].jump_occured();
+					layer[ID].flux_net_delta(typ, 1);
+					layer[ID].flux_net_delta(0, 0);
+					ID--;
+				}
+			}else{
+				layer[id_A].jump_occured();
+				layer[id_A].flux_net_delta(typ, 1);
+				layer[id_A].flux_net_delta(0, 0);				
 			}
 		}
-		if(dir > 0){	//wakancja wplynela z prawej strony; atom wyplynal w prawo
-			for(int ID=id_A ;ID<id_V ;){
-				layer[ID].jump_occured();
-				layer[ID].eq_flux_delta(typ, 0);
-				layer[ID].eq_flux_delta(0, 1);
-				ID++;
+		if(dir > 0){	//wakancja wplynela z lewej strony; atom wyplynal w lewo
+			if(id_A <= id_V){
+				for(int ID=id_A ;ID<id_V ;){
+					layer[ID].jump_occured();
+					layer[ID].eq_flux_delta(typ, 0);
+					layer[ID].eq_flux_delta(0, 1);
+					ID++;
+				}
+			}else{
+				layer[id_A].jump_occured();
+				layer[id_A].eq_flux_delta(typ, 0);
+				layer[id_A].eq_flux_delta(0, 1);
 			}
 		}	
 	}
