@@ -40,7 +40,7 @@ double dy;		//liczba skokow w danym kerunku
 double dz;		
 std :: vector <long int> nr_jump; 			// licza wszystkich skokow situ
 std :: vector <site*> site_at_neigh; 		//sasiedzie dla bcc przy liczeniu skokow
-std :: vector<std::vector <site*> > site_en_neigh;		//sasiedzie dla bcc przy liczeniu energii w kolejnych strefach
+std :: vector <std::vector <site*> > site_en_neigh;		//sasiedzie dla bcc przy liczeniu energii w kolejnych strefach
 std :: vector < list <pairjump>::iterator > site_events;
 long int Vindex;
 int hist_index;

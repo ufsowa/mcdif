@@ -36,7 +36,7 @@ int BIN_ATOMS_TYP,BIN_DIRECTION;
 long DIRECT_STEPS;
 vector<long int> ROZMIAR;
 int REZ_TO_MOVE, TYP_TO_MOVE,NEW_PLANE;
-bool MOVE_FRAME,SINGLE;													//true if frame was changed during do_equi()
+bool MOVE_FRAME,SINGLE,EQ_BUILDED;													//true if frame was changed during do_equi()
 wektor del_L_sim, del_R_sim;											//przesuniecie obszaru symulacji -> korzystam w lattice::reinit_sim_area()
 
 lattice *SAMPLE;		
@@ -61,6 +61,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar, set <site*> &vatoms) :
 	
 	TRYB=0;
 	EQ_STEP=0;
+	EQ_BUILDED=false;	
 	BIN_END=0;
 	BIN_SIZE=0;
 	BIN_DIRECTION=0;

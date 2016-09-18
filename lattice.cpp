@@ -1012,73 +1012,58 @@ double lattice :: get_latice_transition(int direction)
 {
 	double a=0.0;
 	
-	
-	if(direction==1)
-	a=boundary_con_at.x;
-	
-	if(direction==2)
-	a=boundary_con_at.y;
-	
-	if(direction==3)
-	a=boundary_con_at.z;
-	
-	
-	return a;
+	if(direction==1){
+		a=boundary_con_at.x;
+	}else if(direction==2){
+		a=boundary_con_at.y;
+	}else if(direction==3){
+		a=boundary_con_at.z;
+	}else{
+		control_output<<"ERROR: lattice::get_latice_transition: wrong direction: "<<direction<<endl;exit(1);
 	}
+		
+	return a;
+}
 
 double lattice :: get_latice_const(int direction, int i)
 {	
 	// i okresla ktora stala sieci z jakiej struktury, kolejnosc jak w structure.in
 	double a=0.0;
 	
-	if(direction==1)
-	a=x_trans[i];	//stala sieci w x pierwsza dodana z pliku structure.in
-	
-	if(direction==2)
-	a=y_trans[i];
-	
-	if(direction==3)
-	a=z_trans[i];
+	if(direction==1){
+		a=x_trans[i];	//stala sieci w x pierwsza dodana z pliku structure.in
+	}else if(direction==2){
+		a=y_trans[i];
+	}else if(direction==3){
+		a=z_trans[i];
+	}else{
+		control_output<<"ERROR: lattice::get_latice_const: wrong direction: "<<direction<<endl;exit(1);
+	}
 	
 	return a;
-	
-	
 }
 
-bool lattice :: check_site_belonging_to_region(site *A)
-		{
-			
-			   
-			double x = (A->get_x());
-			double y = (A->get_y());
-			double z = (A->get_z());  
-			
-			//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
-		//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
-		//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
-		//	control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
-				if((set_prec(x)>=set_prec(st_region.x)) and (set_prec(x)<set_prec(end_region.x)))
-				{
-				if((set_prec(y)>=set_prec(st_region.y)) and (set_prec(y)<set_prec(end_region.y)))
-				{
-				if((set_prec(z)>=set_prec(st_region.z)) and (set_prec(z)<set_prec(end_region.z)))	
-				{
-					
-					return true;
-				}}}
-			
-			return false;
+bool lattice :: check_site_belonging_to_region(site *A){
+	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
+	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
+	double z = (A->get_z());  											//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
+																		//	control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
+	if((set_prec(x)>=set_prec(st_region.x)) and (set_prec(x)<set_prec(end_region.x))){
+		if((set_prec(y)>=set_prec(st_region.y)) and (set_prec(y)<set_prec(end_region.y))){
+			if((set_prec(z)>=set_prec(st_region.z)) and (set_prec(z)<set_prec(end_region.z))){
+				return true;
+			}
 		}
+	}	
+	return false;
+}
 
 bool lattice :: check_site_belonging_to_sim_area(site *A){
-	double x = (A->get_x());
-	double y = (A->get_y());
-	double z = (A->get_z());  
-		
-	//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
-	//control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
-	//control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
-	//control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
+	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
+	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
+	double z = (A->get_z());  											//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
+																		//	control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
+
 	if((set_prec(x)>=set_prec(st_sim_area.x)) and (set_prec(x)<set_prec(end_sim_area.x))){
 		if((set_prec(y)>=set_prec(st_sim_area.y)) and (set_prec(y)<set_prec(end_sim_area.y))){
 			if((set_prec(z)>=set_prec(st_sim_area.z)) and (set_prec(z)<set_prec(end_sim_area.z))){
@@ -2810,9 +2795,16 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 //	kounter++;	
 	X=values[0];Y=values[1];Z=values[2];
 
-	if(values.size() > 3){
+	if(values.size() > 3 ){
 		dx=values[3];dy=values[4];dz=values[5]; 
-		for(unsigned int ni=6;ni<values.size();ni++){jumps[(ni-6)]=values[ni];}
+		if((values.size() -6) <= jumps.size() ){
+		for(unsigned int ni=6;ni<values.size();ni++){
+			jumps[(ni-6)]=values[ni];
+		}}else{
+			control_output<<"ERROR: lattice::read_structure(): wrong sites variable -> no. jumps: "<<values.size();
+			control_output<<" "<<X<<" "<<Y<<" "<<Z<<endl;
+			exit(1);
+		}
 	}
 	
 	if((X>=set_vec.x)&&(Y>=set_vec.y)&&(Z>=set_vec.z))
@@ -2900,6 +2892,25 @@ void lattice :: put_atom(int x, int y, int z, site *Site)
 //	matrix[x][y][z].show_sity();
 	}
   
+double lattice :: move(double x2, double x1, int dir)
+ {
+	double r2x=0.0;														//x2 - polozenie wakancji przed skokiem
+																		//x1 - polozenie atomu przed skokiem
+	double latt_const = get_latice_const(dir,0);
+	double boundary_con = get_latice_transition(dir);
+
+	if((x2-x1)*(x2-x1)<(latt_const+0.5*latt_const)*(latt_const+0.5*latt_const)){	//jesli nie jest na brzegu
+		r2x=(x2-x1);													//+ atom ruszy sie w prawo , a wakncja w lewo
+	}else {  																		//jesli jest na brzegu
+		if((x2-x1)>0){																//i atom ruszy sie w lewo
+			r2x=(x2 - boundary_con - x1);												//		control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;
+		}else{																		//i atom ruszy sie w prawo
+			r2x=(x2 + boundary_con - x1);												//		control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;								
+		}
+	}
+	return r2x;															//dodatnie jesli atom ruszy sie w prawo
+}
+
 
 void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file)
 {

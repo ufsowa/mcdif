@@ -637,12 +637,6 @@ int try_jump(lattice* sample, double T, site* vac_to_jump, site* atom_to_jump){
 
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	
-	double latt_constx = sample->get_latice_const(1,0);
-	double latt_consty = sample->get_latice_const(2,0);
-	double latt_constz = sample->get_latice_const(3,0);
-	double boundary_con_x = sample->get_latice_transition(1);
-	double boundary_con_y = sample->get_latice_transition(2);
-	double boundary_con_z = sample->get_latice_transition(3);	
 	int atom = atom_to_jump->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
 	
 //	site *adressbufor=NULL;	
@@ -651,15 +645,13 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double xjumper=vac_to_jump->get_x();			//xjumper - pozycja na osi x wakancji przed skokiem
 	double yjumper=vac_to_jump->get_y();
 	double zjumper=vac_to_jump->get_z();
-	long int Vindex = vac_to_jump->get_vindex();
-//	control_output<<"Vindex: "<<Vindex<<endl;
 	double xvac=atom_to_jump->get_x();		//xvac - pozycja na osi x wakancji po przeskoku
 	double yvac=atom_to_jump->get_y();
 	double zvac=atom_to_jump->get_z();
 //policz kierunki skoku
-	double xjump = move(xjumper,xvac,latt_constx,boundary_con_x);	//WARUNKI BRZEGOWE 
-	double yjump = move(yjumper,yvac,latt_consty,boundary_con_y);	//UWZGLEDNIONE
-	double zjump = move(zjumper,zvac,latt_constz,boundary_con_z);	//W move {return (xjumper-xvac)}
+	double xjump = sample->move(xjumper,xvac,1);	//WARUNKI BRZEGOWE 
+	double yjump = sample->move(yjumper,yvac,2);	//UWZGLEDNIONE
+	double zjump = sample->move(zjumper,zvac,3);	//W move {return (xjumper-xvac)}
 
 	//wykonaj monitor
 
@@ -681,16 +673,16 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 		//strefa=1;
 		//vac		//total sum
 		Vjp[0] += 1;
-		Vdx += xjump;
-		Vdy += yjump;
-		Vdz += zjump;
+		Vdx -= xjump;
+		Vdy -= yjump;
+		Vdz -= zjump;
 		//NN shel
 		Vjp[1] += 1;
 		//atom
 		Ajp[0] += 1;
-		Adx -= xjump;
-		Ady -= yjump;
-		Adz -= zjump;
+		Adx += xjump;
+		Ady += yjump;
+		Adz += zjump;
 		//NN shel
 		Ajp[1] += 1;
 	}
@@ -698,16 +690,16 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 		//strefa=2;
 		//vac		//total sum
 		Vjp[0] += 1;
-		Vdx += xjump;
-		Vdy += yjump;
-		Vdz += zjump;
+		Vdx -= xjump;
+		Vdy -= yjump;
+		Vdz -= zjump;
 		//NNN shel
 		Vjp[2] += 1;
 		//atoms
 		Ajp[0] += 1;
-		Adx -= xjump;
-		Ady -= yjump;
-		Adz -= zjump;
+		Adx += xjump;
+		Ady += yjump;
+		Adz += zjump;
 		//NNN shel
 		Ajp[2] += 1;
 	}
@@ -728,13 +720,11 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	atom_to_jump->set_dry(Vdy);
 	atom_to_jump->set_drz(Vdz);
 	atom_to_jump->set_jumps(Vjp);
-	atom_to_jump->set_vindex(Vindex);
 	
 	V_LIST.erase(vac_to_jump);
 	V_LIST.insert(atom_to_jump);		
 	
 	//collect flux data
-
 	opt_equi.call_flux(atom_to_jump,vac_to_jump);	
 	
 }
@@ -761,14 +751,6 @@ double residence_time_energy(lattice *sample,long number_of_steps,double T, int 
 	//ofstream barriers_all(file_name1.c_str(),ios :: app);
 	ofstream barriers_jump(file_name2.c_str(),ios :: app);
 	ofstream energy_jump(file_name3.c_str(),ios :: app);
-	//wczytaj parametry sieci krystalicznej
-	double latt_constx = sample->get_latice_const(1,0);
-	double latt_consty = sample->get_latice_const(2,0);
-	double latt_constz = sample->get_latice_const(3,0);
-	
-	double boundary_con_x = sample->get_latice_transition(1);
-	double boundary_con_y = sample->get_latice_transition(2);
-	double boundary_con_z = sample->get_latice_transition(3);	
 	
 	//definicja zmiennych
 	
@@ -1027,9 +1009,9 @@ double residence_time_energy(lattice *sample,long number_of_steps,double T, int 
 				double zvac=atom_to_jump->get_z();
 
 //policz kierunki skoku
-				double xjump = move(xjumper,xvac,latt_constx,boundary_con_x);	//WARUNKI BRZEGOWE 
-				double yjump = move(yjumper,yvac,latt_consty,boundary_con_y);	//UWZGLEDNIONE
-				double zjump = move(zjumper,zvac,latt_constz,boundary_con_z);	//W move {return (xjumper-xvac)}
+				double xjump = sample->move(xjumper,xvac,1);	//WARUNKI BRZEGOWE 
+				double yjump = sample->move(yjumper,yvac,2);	//UWZGLEDNIONE
+				double zjump = sample->move(zjumper,zvac,3);	//W move {return (xjumper-xvac)}
 //buforowanie
 				vector <long int> Vjp;
 				double Vdx=vac_to_jump->get_drx();
@@ -1281,15 +1263,6 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 
 double RTA_random_alloy(lattice *sample,long number_of_steps,double T, double w1, double w2)
 {
-//int piec;
-		
-		double latt_constx = sample->get_latice_const(1,0);
-		double latt_consty = sample->get_latice_const(2,0);
-		double latt_constz = sample->get_latice_const(3,0);
-		
-		double boundary_con_x = sample->get_latice_transition(1);
-		double boundary_con_y = sample->get_latice_transition(2);
-		double boundary_con_z = sample->get_latice_transition(3);
 
 //double beta=1.0/(kB*T);
 double *target = new double[8*Vatoms.size()+10];
@@ -1581,9 +1554,9 @@ for(long n=0;n<number_of_steps;n++)
 			//r2y=(y-y0va)*(y-y0va);
 			//r2z=(z-z0va)*(z-z0va);
 			//r2vac=Vatoms[vac_nr]->get_r2()+r2x+r2y+r2z;
-			double xjump = move(xjumper,xvac,latt_constx,boundary_con_x);
-			double yjump = move(yjumper,yvac,latt_consty,boundary_con_y);
-			double zjump = move(zjumper,zvac,latt_constz,boundary_con_z);
+			double xjump = sample->move(xjumper,xvac,1);
+			double yjump = sample->move(yjumper,yvac,2);
+			double zjump = sample->move(zjumper,zvac,3);
 			// funkcja site::move: oblicza kierunek skoku atomu do vakancji
 			//atom_to_jump[m]->r2(_r2,atom_to_jump[m],Vatoms[vac_nr]);		//ZROBIC ZEBY OBLICZAL DYSTANS R^2
 			//cout<<"Atom->vacancy: x "<<moves[0]<<" y "<<moves[1]<<" z "<<moves[2]<<endl;
@@ -1660,39 +1633,6 @@ out_data2<<(T+(time/100.0))<<" "<<generator[0]<<" "<<generator[1]<<" "<<generato
 delete(target);
 return time/100.0;
 }
-
-
-
-	
-double move(double x2, double x1, double latt_const,double boundary_con)
- {
-	 //x2 - polozenie wakancji
-	 //x1 - polozenie atomu
-	 double r2x=0.0;
-
-	if((x2-x1)*(x2-x1)<(latt_const+0.5*latt_const)*(latt_const+0.5*latt_const))	//jesli nie jest na brzegu
-	{
-		r2x=(x2-x1);	//+ atom ruszyl w prawo , a wakncja w lewo
-	}
-	else   //jesli jest na brzegu
-	{
-		if((x2-x1)>0)	//i atom ruszyl w prawo
-		{r2x=(x2 - boundary_con -x1);
-	//	control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;
-		//int o;
-		//cin>>o;
-		}
-		else
-		{
-		r2x=(x2 + boundary_con - x1);
-	//	control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;
-		//int o;
-		//cin>>o;
-	}
-	}
-	return r2x;//dodatnie jesli atom ruszyl w prawo
-	
-	}
 
 /*-----------------------------------------------------------*/
 

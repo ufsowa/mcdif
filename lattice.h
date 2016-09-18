@@ -137,6 +137,7 @@ void get_sites(plaster &tmp);
 site* get_site(long pozition);
 int get_atom_type(int typ);
 int get_atom_type(string name);
+double move(double x2, double x1, int dir);
 
 //reading lattice parameters
 int get_size(int typ);

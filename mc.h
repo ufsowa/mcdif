@@ -54,7 +54,6 @@ void init_events( lattice* sample, list <pairjump> &tablica_skokow , double beta
 void update_site_events(lattice *sample, list <pairjump> &EVENTS,site* sajt);	
 void update_events(lattice *sample, list <pairjump> &EVENTS, site* sajt);
 void create_events_index(lattice *sample, site* siteA, vector <pairjump> &events);
-double move(double x2, double x1, double lat_cons,double boundary_con);
 int try_jump(lattice* sample,double T,site* vac_to_jump, site* atom_to_jump);
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump);
 

@@ -680,11 +680,12 @@ void opcja :: flux_add(site* VAC, site* ATO, vector<plaster>& layer){
 	if(SAVE_BUILDED){
 	int id_A=-2,id_V=-2;				
 	unsigned int DIR = (layer[0]).get_direction();
-	double pos_V = VAC->get_position(DIR);
-	double pos_A = ATO->get_position(DIR);
-	double dir = pos_V - pos_A;											//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
+	double pos_V = VAC->get_position(DIR);								//vacancy after jump
+	double pos_A = ATO->get_position(DIR);								//atom after jump
+	double dir = SAMPLE->move(pos_V,pos_A,DIR);							// + if vac moved to right
+	//move takes position of vac before jump and position of atom before jump
+	//if dir > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
 
-	//znajdz index bin dla x_A oraz x_V
 	id_V=VAC->get_hist_index();
 	id_A=ATO->get_hist_index();
 
@@ -745,7 +746,7 @@ void opcja :: flux_add_dislocation(site* VAC, site* ATO, vector<plaster>& layer)
 	unsigned int DIR = (layer[0]).get_direction();
 	double pos_V = VAC->get_position(DIR);
 	double pos_A = ATO->get_position(DIR);
-	double dir = pos_V - pos_A;											//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
+	double dir = SAMPLE->move(pos_V,pos_A,DIR);											//if > 0 - wakancja skoczyla z lewej strony na prawa. Strumien dla wakancji jest +
 
 	//znajdz index bin dla x_A oraz x_V
 	id_V=VAC->get_hist_index();
@@ -834,18 +835,22 @@ void opcja :: find_interface(){
 
 void opcja :: call_flux(site* vac_after_jump,site* atom_after_jump){
 
-	double x_A = atom_after_jump->get_position(BIN_DIRECTION);
-	double x_V = vac_after_jump->get_position(BIN_DIRECTION);
-	int typ=atom_after_jump->get_atom();
-	flux_net_add(x_V,x_A,typ,BLOKS);
-	flux_net_add(x_V,x_A,typ,reservuars);
-	flux_add(vac_after_jump,atom_after_jump,HIST);
-	
-	MOVE_FRAME=check_rez_dN();
-	if(MOVE_FRAME){
-		move_frame();
-		
-	}	
+	if(SAVE_BUILDED){
+		flux_add(vac_after_jump,atom_after_jump,HIST);
+	}
+
+	if(EQ_BUILDED){	
+		double x_A = atom_after_jump->get_position(BIN_DIRECTION);
+		double x_V = vac_after_jump->get_position(BIN_DIRECTION);
+		int typ=atom_after_jump->get_atom();
+		flux_net_add(x_V,x_A,typ,BLOKS);
+		flux_net_add(x_V,x_A,typ,reservuars);
+
+		MOVE_FRAME=check_rez_dN();
+		if(MOVE_FRAME){
+			move_frame();	
+		}	
+	}
 }
 
 void opcja :: call_flux_dislocation(site* vac_after_jump,site* atom_after_jump){
@@ -910,7 +915,9 @@ void opcja :: init_EQ(vector <double> &parameters ){
 		string file_name="stech_curve.in";
 		read_file(file_name);
 		}
-	}	
+	}
+	
+	EQ_BUILDED=true;	
 }
 
 
@@ -1284,33 +1291,6 @@ bool opcja :: check_x_belonging_volume(double x){
 	}		
 	return false;
 }
-
-
-/*
-	int move = 0;
-	int event = -1;
-	for (int i = 1; i < (target.size()); i++){
-		control_output<<" "<<W_left<<" "<<W_right<<" "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<" "<<kB*TEMPERATURE<<endl;
-	
-		if( (target[i-1] <= shot) and (shot < target[i]) ){
-			control_output<<" take event: "<<i<<" "<<target[i-1]<<" "<<target[i]<<" "<<shot<<endl;
-			//break;
-			event=i;
-		}
-	}
-	
-	if(event == 1){move = -1;}
-	else if (event == 2){move = 1;}
-	else{
-		control_output<<"ERROR in opcja::decide_direction(): "<<event<<" "<<p_left<<" "<<p_right<<" "<<shot<<endl; exit(1);
-	} 
-
-	if(node->get_atom() == 0){
-		move = -move;
-	}
-	
-
- * */
 
 
 int opcja :: decide_direction(site *node){

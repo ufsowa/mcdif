@@ -17,13 +17,18 @@ site :: site ()
 	dx=0;
 	dy=0;
 	dz=0;
-	nr_jump.reserve(3);
-	for (int i=0;i<3;i++){nr_jump.push_back(0);}
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
 	rez_index=-1;
 	sub_latt_name=-1;
+	
+	site_events.reserve(500);
+	site_at_neigh.reserve(500);
+	site_en_neigh.reserve(20);
+	nr_jump.reserve(5);
+	for (int i=0;i<3;i++){nr_jump.push_back(0);}
+
 };
 
 site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name)
@@ -37,12 +42,17 @@ site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name)
 	dx=0;
 	dy=0;
 	dz=0;
-	nr_jump.reserve(3);
-	for (int i=0;i<3;i++){nr_jump.push_back(0);}
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
 	rez_index=-1;
+
+	site_events.reserve(500);
+	site_at_neigh.reserve(500);
+	site_en_neigh.reserve(20);
+	nr_jump.reserve(5);
+	for (int i=0;i<3;i++){nr_jump.push_back(0);}
+
 }
 
 site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name, int latt_num)
@@ -56,12 +66,17 @@ site :: site(double _x,double _y,double _z,int _atom, int sub_lat_name, int latt
 	dx=0;
 	dy=0;
 	dz=0;
-	nr_jump.reserve(3);
-	for (int i=0;i<3;i++){nr_jump.push_back(0);}
 	Vindex=-1;
 	hist_index=-1;
 	block_index=-1;
 	rez_index=-1;
+
+	site_events.reserve(500);
+	site_at_neigh.reserve(500);
+	site_en_neigh.reserve(20);
+	nr_jump.reserve(5);
+	for (int i=0;i<3;i++){nr_jump.push_back(0);}
+
 }  
 
 site :: site(site* Site)	//przesylam adres komorki
@@ -69,7 +84,10 @@ site :: site(site* Site)	//przesylam adres komorki
 	dx=0;
 	dy=0;
 	dz=0;
-	nr_jump.reserve(3);
+	site_events.reserve(500);
+	site_at_neigh.reserve(500);
+	site_en_neigh.reserve(20);
+	nr_jump.reserve(5);
 	x=Site->get_x();
 	y=Site->get_y();
 	z=Site->get_z();
@@ -91,7 +109,10 @@ site :: site(const site &Site)
 	dx=0;
 	dy=0;
 	dz=0;
-	nr_jump.reserve(3);
+	site_events.reserve(500);
+	site_at_neigh.reserve(500);
+	site_en_neigh.reserve(20);
+	nr_jump.reserve(5);
 	x=Site.x;
 	y=Site.y;
 	z=Site.z;
