@@ -113,8 +113,7 @@ bool check_rez_dN();
 bool check_rezervuars(int i, int typ);
 bool check_rezervuars(site* node, site* &next_node);
 bool check_x_belonging_volume(double x);
-void create_vac(int i, int vac, bool &FLAG);
-void create_vac_new(int i, int vac, bool &FLAG);	
+void source_sink_act(int i, int vac, bool &FLAG);	
 void do_equi_vac();
 void do_equi_rez();
 void equilibrate();
@@ -131,8 +130,6 @@ void move_frame();
 void reinit_reservuars(int nr, int typ);
 void reinit_bloks();
 void refresh(int on = 0);
-void remove_vac(int i, int vac, bool &FLAG);
-void remove_vac_new(int i, int vac, bool &FLAG);
 void refresh_simarea();
 void refresh_vac_list();
 	
@@ -147,7 +144,8 @@ void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
 
 void find_interface();
-int decide_direction(site *node);
+void dislocation_move_init(int nr, int TYP, int &rez, int &dir);	
+site* get_node(int nr_rez, int nr_bin, int TYP, long int &nr_site);
 bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);
 void cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);

@@ -273,149 +273,6 @@ bool opcja :: check_rezervuars(int i, int TYP){
 	return do_move;
 }
 
-void opcja :: create_vac(int nr, int ile, bool &FLAG){
-
-	if(MOVE_FRAME or SINGLE){control_output<<" c: "<< ile;}
-	bool MOVE = false;
-	int rez = -1, j = -1;
-	
-	for( int i=0; i<(ile);i++){
-//		for( int j=1;j<3;j++){		//MOZNA ZROBIC W ZALEZNOSCI OD TYPOW
-			long N1,N2;
-			site* rnd_vac=0;
-			site* rnd_at=0;
-			j=choose_typ(BLOKS[nr]);	//losuje typ atomu do wymiany z wakancja
-	//		control_output<<"rozmiar typow "<<0<<" w bloku "<<bloks[nr].size(0);
-	//		control_output<<" rozmiar typow "<<j<<" w bloku "<<bloks[nr].size(j);
-			if(BLOKS[nr].size(j) <= 0){
-				control_output<<endl;
-				control_output<<"ERROR: in opcja::create_vac -> you want to remove \
-element "<<j<<" that does not exist in blok\n	\
-Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-				cout<<endl;
-				cout<<"ERROR: in opcja::create_vac -> you want to remove \
-element "<<j<<" that does not exist in blok\n	\
-Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(0);
-			}
-			
-			while(1){
-			N1=(long)(rnd()*(BLOKS[nr].size(j)));
-			rnd_at=BLOKS[nr].get_site(j,N1);
-			control_output<<" ctyp: "<<rnd_at->get_atom()<<endl;
-			
-			double d = 0.0, distanceL = 0.0, distanceR = 0.0;
-			
-
-			if(BIN_DIRECTION==1)
-			{
-				d=rnd_at->get_x();
-			}
-			else if(BIN_DIRECTION==2)
-			{
-				d=rnd_at->get_y();
-			}
-			else if(BIN_DIRECTION==3)
-			{
-				d=rnd_at->get_z();
-			}
-			else
-			{
-				cout<<"Wrong direction number in opcja::convert() "<<d<<endl;
-				exit(1);
-			}
-			
-			distanceL = abs(d - BIN_ST);
-			distanceR = abs(d - BIN_END);
-		//	cout<<"Absloute value of distance L/R: "<<distanceL<<"/"<<distanceR<<endl;
-			
-			if(distanceL > distanceR){
-				rez = 1;
-			}
-			else if(distanceL < distanceR){
-				rez = 0;
-			}
-			else if(distanceL == distanceR){
-				double Q = rnd();
-				if(Q<=0.5){rez = 0;}else{rez = 1;}
-			}
-			else{
-				cout<<"Wrong direction number in opcja::convert() "<<distanceL<<"/"<<distanceR<<endl;
-				exit(1);
-			}
-			
-			MOVE = check_rezervuars(rez,0);	//sprawdz rezerwuwar pod katem dostepnych wakancji
-			
-			if (!MOVE){
-			
-			N2=(long)(rnd()*(reservuars[rez].size(0)));
-			rnd_vac = reservuars[rez].get_site(0,N2);
-
-//			rnd_vac - pointer to site in reservuar(vac)
-//			rnd_at - pointer to site in blok (atom)
-
-
-//			double old_E=POT.get_energy(rnd_at) + POT.get_energy(rnd_vac);
-		//	double old_E=POT.get_energy(rnd_vac);
-
-			rnd_vac->set_atom(j);
-				
-//
-
-//			double new_E=POT.get_energy(rnd_at) + POT.get_energy(rnd_vac);
-		//	double new_E=POT.get_energy(rnd_vac);
-
-		//	double beta=1.0/(kB*T);
-		//	double mi=0.0;
-		 //   double P1=exp(beta*(mi-(new_E-old_E)));
-		//	control_output<<" n: "<<new_E<<" o: "<<old_E<<" "<<(new_E-old_E)<<" "<<beta<<" P: "<<P1<<endl;
-		//zmien z powrotem na old_typ jesli zdarzenie to nie zostalo trafione rnd()
-		//	if(P1<rnd())
-		//	{
-		//	rnd_vac->set_atom(0);	
-//			rnd_at->set_atom(j);
-		//	}
-		//	else{
-			rnd_at->set_atom(0);
-			rnd_vac->reset_site();
-			rnd_at->reset_site();
-															//kasujemy z listy typow atom z bloku
-			BLOKS[nr].delete_site(j,N1);
-			BLOKS[nr].add_site(0,rnd_at);
-	
-												//lista wakancji nie zawiera wakancji -> wymaga odswiezenia 
-			reservuars[rez].delete_site(0,N2);
-			reservuars[rez].add_site(j,rnd_vac);
-			
-			Vtoadd.insert(rnd_at);		// w obszarze symulacji pojawila sie nowa wakancja
-			
-			break;
-		//	}
-			
-		}else{		//if(MOVE)
-								// Jak tak to do_move.
-			break;	//wyjdz z petli while
-		}
-			
-		}	//koniec while
-//			a co gdy obszar symulacji obejmuje rezerwuary?
-	//policz prawdopodobienstwo
-//	E1=pot.get_energy(Vatoms[i])+pot.get_energy(vac_neighbour[k])-pot.get_energy(Vatoms[i],vac_neighbour[k]);
-//	E2=pot.get_energy(Vatoms[i],atom)+pot.get_energy(vac_neighbour[k],0)-pot.get_energy(Vatoms[i],0,vac_neighbour[k],0)-pot.get_energy(Vatoms[i],atom,vac_neighbour[k],atom) + pot.get_energy(Vatoms[i],atom,vac_neighbour[k],0);
-	if(MOVE){control_output<<" c: "<< ile;}
-//	if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[nr].size(j)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
-	if(MOVE){break;}	//wyjdz z petli for
-//	}//for(i=1,2)
-//	if(MOVE){break;}	//wyjdz z petli for
-	}//for(j=delta)
-	
-	if(MOVE_FRAME or SINGLE){control_output<<endl;}
-	if(MOVE){
-		FLAG = true;		//set local FLAG in do_equi_vac
-		do_equi_vac();		//rekurencja. Na poczatku sprawdza czy MOVE_FRAME set to TRUE.
-	}
-}
-
-
 void opcja :: do_equi_rez(){
 	
 	//direct exchange dla rezerwuarow	//DODAC PARALLEL
@@ -462,89 +319,208 @@ void opcja :: do_equi_rez(){
 	}		
 }
 
-void opcja :: create_vac_new(int nr, int ile_at, bool &FLAG){
-
-	if(ile_at<0){ile_at=ile_at*-1;}
-	unsigned int ile=ile_at;
-	if(MOVE_FRAME or SINGLE){control_output<<" c: "<< ile;}
-	bool MOVE = false;
-	int rez = -1, j = -1;
-
-	for(unsigned int i=0; i<ile;i++){
-//		for( int j=1;j<3;j++){		//MOZNA ZROBIC W ZALEZNOSCI OD TYPOW
-			long N1,N2;
-			site* rnd_vac=0;
-			site* rnd_at=0;
-			j=choose_typ(BLOKS[nr]);
+site* opcja :: get_node(int nr_rez, int nr_bin, int TYP, long int &nr_site){
+	site* node=0; int j=-1;
+	if(TYP==0){
+		j=0;
+	}else{
+		j=choose_typ(reservuars[nr_rez]);
+	}
 	//		j=wybrane_typy[i];	//losuje typ atomu do wymiany z wakancja
 	//		control_output<<"rozmiar typow "<<0<<" w bloku "<<bloks[nr].size(0);
 	//		control_output<<" rozmiar typow "<<j<<" w bloku "<<bloks[nr].size(j);
-			if(BLOKS[nr].size(j) <= 0){
-				control_output<<endl;
-				control_output<<"ERROR: in opcja::create_vac -> you want to remove \
-				element "<<j<<" that does not exist in blok\n	\
-				Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-				cout<<endl;
-				cout<<"ERROR: in opcja::create_vac -> you want to remove \
-				element "<<j<<" that does not exist in blok\n	\
-				Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(1);
-			}
+	if(BLOKS[nr_bin].size(j) <= 0){
+		control_output<<endl;
+		control_output<<"ERROR: in opcja::create_vac -> you want to remove \
+		element "<<j<<" that does not exist in blok\n	\
+		Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
+		cout<<endl;
+		cout<<"ERROR: in opcja::create_vac -> you want to remove \
+		element "<<j<<" that does not exist in blok\n	\
+		Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(1);
+	}
+	nr_site=(long)(rnd()*(BLOKS[nr_bin].size(j)));
+	node=BLOKS[nr_bin].get_site(j,nr_site);
 			
-			N1=(long)(rnd()*(BLOKS[nr].size(j)));
-			rnd_at=BLOKS[nr].get_site(j,N1);
-	//		control_output<<" ctyp: "<<rnd_at->get_atom()<<" "<<nr<<endl;
-			
-			if(TRYB==2){
-				int DIR = decide_direction(rnd_at);	//	-1 left;	+1 right
-				vector <site*> migration_path; migration_path.reserve(2000);
-				MOVE = find_migration_path(rnd_at,DIR,migration_path);	
-				if(!MOVE){
-					dislocation_walk(migration_path);
-					MOVE=check_rez_dN();
-					if(MOVE){
-						break;
-					}
-				}else{
+	//		control_output<<" ctyp: "<<rnd_at->get_atom()<<" "<<nr<<endl;	
+return node;	
+}
+
+/*
+ 
+void opcja :: remove_vac_new(int nr, int ile_vac, bool &FLAG){
+	
+	if(ile_vac<0){ile_vac=ile_vac*-1;}
+	unsigned int vac = ile_vac;
+	if(MOVE_FRAME or SINGLE){control_output<<" r: "<< vac;}
+	bool MOVE = false;
+	for(unsigned int i=0; i<vac;i++){
+		int rez = -1, dir = 0;
+		site* rnd_at=0;
+		site* rnd_vac=0;
+		long N1=-1,N2=-1;
+		
+		dislocation_move_init(nr,0,rez,dir);		
+		rnd_at=get_node(rez,nr,0,N1);		
+		
+		if(TRYB==2){
+			vector <site*> migration_path; migration_path.reserve(2000);
+			MOVE = find_migration_path(rnd_at,dir,migration_path);	
+			if(!MOVE){
+				dislocation_walk(migration_path);
+				MOVE=check_rez_dN();
+				if(MOVE){
 					break;
 				}
+			}else{
+				break;
 			}
-			if(TRYB==1){ //swap
-				rez=choose_reservuar(rnd_at);
-				MOVE = check_rezervuars(rez,0);	//sprawdz rezerwuwar pod katem dostepnych wakancji
-		//		control_output<<"MOVE: "<<MOVE<<" rez: "<<rez<<endl;
-				if (!MOVE){
-					N2=(long)(rnd()*(reservuars[rez].size(0)));
-					rnd_vac = reservuars[rez].get_site(0,N2);
-					rnd_vac->set_atom(j);			
-					reset_site(rnd_vac);
-					reservuars[rez].delete_site(0,N2);
-					reservuars[rez].add_site(j,rnd_vac);
-					
-					rnd_at->set_atom(0);
-					reset_site(rnd_at);
-					BLOKS[nr].delete_site(j,N1);
-					BLOKS[nr].add_site(0,rnd_at);
-					BLOKS[nr].prob_update(j,1);
-					Vtoadd.insert(rnd_at);	
-				}else{
-					//	if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[nr].size(j)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
-					break;
-				}
-					
-			}else if(TRYB==0){//convert
+		}else if(TRYB==1){ //swap
+			//rez=choose_reservuar(rnd_vac);
+			int j = choose_typ(reservuars[rez],false);
+			if(j<0){j=j*-1;}
+			MOVE = check_rezervuars(rez,j);	//sprawdz rezerwuwar pod katem dostepnych atomow
+		//			control_output<<"MOVE: "<<MOVE<<" rez: "<<rez<<endl;
+			if (!MOVE){
+				N2=(long)(rnd()*(reservuars[rez].size(j)));
+				rnd_at = reservuars[rez].get_site(j,N2);
+		//			control_output<<" rtyp: "<<rnd_at->get_atom()<<" "<<b<<endl;
 				rnd_at->set_atom(0);
 				reset_site(rnd_at);
-				BLOKS[nr].delete_site(j,N1);
-				BLOKS[nr].add_site(0,rnd_at);
-				BLOKS[nr].prob_update(j,1);
-				Vtoadd.insert(rnd_at);	
+				reservuars[rez].delete_site(j,N2);
+				reservuars[rez].add_site(0,rnd_at);
+				reservuars[rez].prob_update(j,0);
+
+				rnd_vac->set_atom(j);
+				reset_site(rnd_vac);	
+				BLOKS[nr].delete_site(0,N1);
+				BLOKS[nr].add_site(j,rnd_vac);
+				BLOKS[nr].prob_update(j,0);
+			}else{
+				//control_output<<" r: "<< vac;
+				//		if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[b].size(0)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
+				break;
 			}
-	}//for(j=delta)
+		}
+		else if(TRYB==0){
+			int j = choose_typ(BLOKS[nr]);
+			rnd_vac->set_atom(j);
+			reset_site(rnd_vac);	
+			BLOKS[nr].delete_site(0,N1);
+			BLOKS[nr].add_site(j,rnd_vac);
+			BLOKS[nr].prob_update(j,0);
+		}
+		else{
+			control_output<<"ERROR in opcja::remove_vac_new(). Wrong TRYB: "<<TRYB<<endl;
+			exit(1);
+		}
+	}//end of for j
+	if(MOVE_FRAME or SINGLE){control_output<<endl;}
+
+	if(MOVE){		
+		FLAG = true;		//set local FLAG in do_equi_vac
+		do_equi_vac();		//rekurencja. Na poczatku sprawdza czy MOVE_FRAME set to TRUE.
+	}
+}
+
+ */
+
+void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
+
+	if(MOVE_FRAME or SINGLE){control_output<<" c: "<< ile_at;}
+	bool MOVE = false, CREATE=true;
+
+	if(ile_at < 0){
+		CREATE=true;
+		ile_at=abs(ile_at);
+	}else if (ile_at > 0){
+		CREATE=false;
+		ile_at=abs(ile_at);
+	}else{
+		return ;
+	}
+
+	for(int i=0; i<ile_at;i++){
+		int from_rez = -1, in_dir = 0, for_typ=-1, to_typ=-1;
+		site* AT1=0; site* AT2=0;
+		long N1,N2;
+		
+
+		if(TRYB==2){													//dislocation move
+			if(CREATE){
+				dislocation_move_init(in_bin,1,from_rez,in_dir);		
+				AT1=get_node(from_rez,in_bin,1,N1);
+			}else{
+				dislocation_move_init(in_bin,0,from_rez,in_dir);		
+				AT1=get_node(from_rez,in_bin,0, N1);
+			}
+			for_typ=AT1->get_atom();		
+
+			vector <site*> migration_path; migration_path.reserve(2000);
+			MOVE = find_migration_path(AT1,in_dir,migration_path);	
+			if(!MOVE){
+				dislocation_walk(migration_path);
+				MOVE=check_rez_dN();
+				if(MOVE){
+					break;
+				}
+			}else{
+				break;
+			}
+		}else if(TRYB==1){ 												//swap
+			if(CREATE){
+				dislocation_move_init(in_bin,1,from_rez,in_dir);		
+				AT1=get_node(from_rez,in_bin,1,N1);
+			}else{
+				dislocation_move_init(in_bin,0,from_rez,in_dir);		
+				AT1=get_node(from_rez,in_bin,0, N1);
+			}
+			for_typ=AT1->get_atom();		
+
+			if(CREATE){
+				to_typ=0;
+			}else{
+				to_typ = choose_typ(reservuars[from_rez],false);
+			}
+			MOVE = check_rezervuars(from_rez,to_typ);
+			if (!MOVE){
+				N2=(long)(rnd()*(reservuars[from_rez].size(to_typ)));
+				AT2 = (reservuars[from_rez]).get_site(to_typ,N2);
+
+				AT2->set_atom(for_typ);			
+				reset_site(AT2);
+				reservuars[from_rez].delete_site(to_typ,N2);
+				reservuars[from_rez].add_site(for_typ,AT1);
+				
+				AT1->set_atom(to_typ);
+				reset_site(AT1);
+				BLOKS[in_bin].delete_site(for_typ,N1);
+				BLOKS[in_bin].add_site(to_typ,AT1);
+				BLOKS[in_bin].prob_update(for_typ,1);
+				Vtoadd.insert(AT1);	
+			}else{
+				//	if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[nr].size(j)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
+				break;
+			}
+		}else if(TRYB==0){												//convert
+			if(CREATE){
+				to_typ=0;
+			}else{
+				to_typ = choose_typ(BLOKS[in_bin],false);
+			}
+			AT1->set_atom(to_typ);
+			reset_site(AT1);
+			BLOKS[in_bin].delete_site(for_typ,N1);
+			BLOKS[in_bin].add_site(to_typ,AT1);
+			BLOKS[in_bin].prob_update(for_typ,1);
+			Vtoadd.insert(AT1);	
+		}
+	}																	// end for(j=delta)
 	
 	if(MOVE_FRAME or SINGLE){control_output<<endl;}
 	if(MOVE){
-		FLAG = true;		//set local FLAG in do_equi_vac
-		do_equi_vac();		//rekurencja. Na poczatku sprawdza czy MOVE_FRAME set to TRUE.
+		FLAG = true;													//set local FLAG in do_equi_vac
+		do_equi_vac();													//recurency. At the beginnig check if MOVE_FRAME is set to TRUE.
 	}
 }
 
@@ -604,7 +580,7 @@ void opcja :: do_equi_vac(){
 //lokalna zmienna MOVE zeby ominuac pozostale bloki
 		
 		if(delta_vac < -1){
-			remove_vac_new(i,-delta_vac, LOCAL_MOVE);
+			source_sink_act(i, delta_vac, LOCAL_MOVE);
 		}
 		else if (-1 <= delta_vac and delta_vac <= 1)
 		{
@@ -613,7 +589,7 @@ void opcja :: do_equi_vac(){
 		}
 		else if ( delta_vac > 1 )
 		{
-			create_vac_new(i,delta_vac, LOCAL_MOVE);
+			source_sink_act(i,delta_vac, LOCAL_MOVE);
 		}
 		else{
 			cout<<"Error with equilibrate vacancy opcja::do_equi_vac()"<<endl;
@@ -1140,9 +1116,7 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	wektor a(s[0],s[1],s[2]);
 	wektor b(e[0],e[1],e[2]);
 	del_L_sim += a;
-	del_R_sim += b;
-
-			
+	del_R_sim += b;			
 }
 
 void opcja :: reinit_bloks(){
@@ -1156,158 +1130,6 @@ void opcja :: reinit_bloks(){
 	//show();
 }
 
-void opcja :: remove_vac(int b, int vac, bool &FLAG){
-	
-	if(MOVE_FRAME or SINGLE)
-	{control_output<<" r: "<< vac;}
-	
-	bool MOVE = false;
-	int rez = -1, j=-1;
-	
-	
-	for( int i=0; i<(vac);i++){
-//		for( int j=1;j<3;j++){		//MOZNA ZROBIC W ZALEZNOSCI OD TYPOW
-			long N1,N2;
-			site* rnd_vac=0;
-			site* rnd_at=0;
-			j = choose_typ(BLOKS[b]);	//losuje typ atomu do wymiany z wakancja z blokow
-
-			if(BLOKS[b].size(0) <= 0){
-				control_output<<endl;
-				control_output<<"ERROR: in opcja::remove_vac -> you want to remove \
-element "<<0<<" that does not exist in blok\n	\
-Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-				cout<<endl;
-				cout<<"ERROR: in opcja::remove_vac -> you want to remove \
-element "<<0<<" that does not exist in blok\n	\
-Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(0);
-			}			
-			
-			while(1){
-			N1=(long)(rnd()*(BLOKS[b].size(0)));
-			
-			rnd_vac=BLOKS[b].get_site(0,N1);
-
-	//		control_output<<" jej adres: "<<rnd_vac;//<<" "<<N2<<" "<<rnd_vac2;
-
-
-			double d = 0.0, distanceL = 0.0, distanceR = 0.0;
-			rez = 0;
-
-			if(BIN_DIRECTION==1)
-			{
-				d=rnd_vac->get_x();
-			}
-			else if(BIN_DIRECTION==2)
-			{
-				d=rnd_vac->get_y();
-			}
-			else if(BIN_DIRECTION==3)
-			{
-				d=rnd_vac->get_z();
-			}
-			else
-			{
-				cout<<"Wrong direction number in opcja::convert() "<<d<<endl;
-				exit(1);
-			}
-			
-			distanceL = abs(d - BIN_ST);
-			distanceR = abs(d - BIN_END);
-	//		cout<<"Absloute value of distance L/R: "<<distanceL<<"/"<<distanceR<<endl;
-
-//PENTLA FOR PO REZERWUARACH - funkcja czyta pozycje plastra			
-			if(distanceL > distanceR){
-				rez = 1;
-			}
-			else if(distanceL < distanceR){
-				rez = 0;
-			}
-			else if(distanceL == distanceR){
-				double Q = rnd();
-				if(Q<=0.5){rez = 0;}else{rez = 1;}
-			}
-			else{
-				cout<<"Wrong direction number in opcja::convert() "<<distanceL<<"/"<<distanceR<<endl;
-				exit(1);
-			}
-			
-			MOVE = check_rezervuars(rez,j);	//sprawdz rezerwuwar
-			
-			if (!MOVE){
-
-			
-			N2=(long)(ran01()*(reservuars[rez].size(j)));
-//			control_output<<" nr wylosowanego situ z listy "<<N2;
-			rnd_at = reservuars[rez].get_site(j,N2);
-
-
-	//		double old_E=POT.get_energy(rnd_at);
-
-//			rnd_at->set_atom(0);
-				
-//			double new_E=POT.get_energy(rnd_at) + POT.get_energy(rnd_vac);
-	//		double new_E=POT.get_energy(rnd_vac);
-
-	//		double beta=1.0/(kB*T);
-	//		double mi=0.0;
-	//	    double P1=exp(beta*(mi-(new_E-old_E)));
-	//		control_output<<" n: "<<new_E<<" o: "<<old_E<<" "<<(new_E-old_E)<<" "<<beta<<" P: "<<P1<<endl;
-	//	//zmien z powrotem na old_typ jesli zdarzenie to nie zostalo trafione rnd()
-	//		if(P1<rnd())
-	//		{
-	//		rnd_at->set_atom(j);	
-//			rnd_at->set_atom(j);
-	//		}
-	//		else{
-	
-			rnd_at->set_atom(0);
-			rnd_vac->set_atom(j);
-	
-			rnd_vac->reset_site();	
-			rnd_at->reset_site();
-												//kasujemy z listy typow vakancje w bloku
-			BLOKS[b].delete_site(0,N1);
-			BLOKS[b].add_site(j,rnd_vac);
-	
-												//lista wakancji zawiera atomy -> wymaga odswiezenia 
-			reservuars[rez].delete_site(j,N2);
-			reservuars[rez].add_site(0,rnd_at);
-			
-	//		Vtoadd.push_back(rnd_at);		// po za obszarem symulacji pojawila sie nowa wakancja
-//			a co gdy obszar symulacji obejmuje rezerwuary?	!!!!!	NIE MA TAKIEJ OPCJI !!!!!!!
-//			na wszelki wypadek dodam wszystkie nowe wakancje
-// 			w refresh Vatoms sprawdze ktora wakancji z Vtoadd nalezy do obszaru symulacji
-//			i te dodam do listy
-
-//			a co z wakancjami ktore zostaly zastapion atomami?
-//			nic, w f. refresh Vatoms sprawdze ktore sity to atomy i je usune z listy
-			
-//			control_output<<" adres situ "<<rnd_at<<endl;
-			break;
-		//	}
-		}else{
-			break;	//wyjdz z petli while
-			}
-		}	//koniec while
-	//policz prawdopodobienstwo
-//	E1=pot.get_energy(Vatoms[i])+pot.get_energy(vac_neighbour[k])-pot.get_energy(Vatoms[i],vac_neighbour[k]);
-//	E2=pot.get_energy(Vatoms[i],atom)+pot.get_energy(vac_neighbour[k],0)-pot.get_energy(Vatoms[i],0,vac_neighbour[k],0)-pot.get_energy(Vatoms[i],atom,vac_neighbour[k],atom) + pot.get_energy(Vatoms[i],atom,vac_neighbour[k],0);
-
-//		if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[b].size(0)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
-		
-		if(MOVE){break;}	
-	//	}
-	//	if(MOVE){break;}	
-	}//wyszedlem z wszystkich pentli
-	if(MOVE_FRAME or SINGLE){control_output<<endl;}
-	if(MOVE){
-		
-		FLAG = true;		//set local FLAG in do_equi_vac
-		do_equi_vac();		//rekurencja. Na poczatku sprawdza czy MOVE_FRAME set to TRUE.
-	}
-}
-
 bool opcja :: check_x_belonging_volume(double x){
 				   
 	if( (set_prec(x) >= set_prec(get_start_volume()) ) and ( set_prec(x) < set_prec(get_end_volume()) ) ){
@@ -1317,11 +1139,11 @@ bool opcja :: check_x_belonging_volume(double x){
 }
 
 
-int opcja :: decide_direction(site *node){
+void opcja :: dislocation_move_init(int NR, int TYP, int &rez, int &DIR){
 
 
-	double X0=node->get_position(BIN_DIRECTION);
-	unsigned int bin = node->get_hist_index();	
+	double X0=(BLOKS[NR]).get_st();
+	unsigned int bin = NR;	
 	double Cb = (HIST[bin]).get_stech();
 //	control_output<<"Decide for: "<<x<<" "<<bin<<" "<<Cb<<" ";node->show_site();
 
@@ -1332,8 +1154,7 @@ int opcja :: decide_direction(site *node){
 	for( REZ = 0; REZ<reservuars.size(); REZ++){
 		double Y = 1.0 - fabs( Cb - (reservuars[REZ]).get_stech());
 		target.push_back(make_pair(SUM, REZ));
-		SUM = SUM + Y;
-	
+		SUM = SUM + Y;	
 																		//		double XL = fabs( x - (reservuars[REZ]).get_st());
 																		//		double XP = fabs( x - (reservuars[REZ]).get_end());
 																		//		double X = min(XL,XP);		
@@ -1368,10 +1189,9 @@ int opcja :: decide_direction(site *node){
 	}else{
 		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
 	}
+	DIR=dir;
+//	control_output<<"Decide for: "<<dir<<" ";node->show_site();
 
-	control_output<<"Decide for: "<<dir<<" ";node->show_site();
-
-	return dir;
 }
 
 
@@ -1840,106 +1660,6 @@ void opcja :: update_opcja( site* node, bool status){
 	if(ID_R >=0){														// is added to flux of particles. 	
 //		control_output<<"in rez ";
 		reservuars[ID_R].update_plaster(node,status);
-	}
-}
-
-void opcja :: remove_vac_new(int b, int ile_vac, bool &FLAG){
-	
-	if(ile_vac<0){ile_vac=ile_vac*-1;}
-	unsigned int vac = ile_vac;
-	if(MOVE_FRAME or SINGLE){control_output<<" r: "<< vac;}
-	bool MOVE = false;
-	int rez = -1;
-//	control_output<<"TRYB: "<<TRYB<<endl;
-	vector <int> wybrane_typy; wybrane_typy.reserve(20);
-
-
-//	control_output<<"r: "<<b<<" "<<vac<<": ";
-//	for(int i=0;i<wybrane_typy.size();i++){
-//		control_output<<wybrane_typy[i];
-//	}
-//	control_output<<endl;
-
-	for(unsigned int i=0; i<vac;i++){
-	//		for( int j=1;j<3;j++){		//MOZNA ZROBIC W ZALEZNOSCI OD TYPOW
-			long N1,N2;
-			site* rnd_vac=0;
-			site* rnd_at=0;
-//			j = wybrane_typy[i];	//losuje typ atomu do wymiany z wakancja z blokow
-
-			if(BLOKS[b].size(0) <= 0){
-				control_output<<endl;
-				control_output<<"ERROR: in opcja::remove_vac -> you want to remove \
-				element "<<0<<" that does not exist in blok\n	\
-				Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-				cout<<endl;
-				cout<<"ERROR: in opcja::remove_vac -> you want to remove \
-				element "<<0<<" that does not exist in blok\n	\
-				Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(0);
-			}			
-			
-			N1=(long)(rnd()*(BLOKS[b].size(0)));	
-			rnd_vac=BLOKS[b].get_site(0,N1);
-						
-			if(TRYB==2){
-				int DIR = decide_direction(rnd_vac);	//	-1 left;	+1 right
-				vector <site*> migration_path; migration_path.reserve(2000);
-				MOVE = find_migration_path(rnd_vac,DIR,migration_path);	
-				if(!MOVE){
-					dislocation_walk(migration_path);
-					MOVE=check_rez_dN();
-					if(MOVE){
-						break;
-					}
-				}else{
-					break;
-				}
-			}
-			else if(TRYB==1){ //swap
-				rez=choose_reservuar(rnd_vac);
-				int j = choose_typ(reservuars[rez],false);
-				if(j<0){j=j*-1;}
-				MOVE = check_rezervuars(rez,j);	//sprawdz rezerwuwar pod katem dostepnych atomow
-		//			control_output<<"MOVE: "<<MOVE<<" rez: "<<rez<<endl;
-				if (!MOVE){
-					N2=(long)(rnd()*(reservuars[rez].size(j)));
-					rnd_at = reservuars[rez].get_site(j,N2);
-		//			control_output<<" rtyp: "<<rnd_at->get_atom()<<" "<<b<<endl;
-					rnd_at->set_atom(0);
-					reset_site(rnd_at);
-					reservuars[rez].delete_site(j,N2);
-					reservuars[rez].add_site(0,rnd_at);
-					reservuars[rez].prob_update(j,0);
-
-					rnd_vac->set_atom(j);
-					reset_site(rnd_vac);	
-					BLOKS[b].delete_site(0,N1);
-					BLOKS[b].add_site(j,rnd_vac);
-					BLOKS[b].prob_update(j,0);
-				}else{
-					//control_output<<" r: "<< vac;
-					//		if(MOVE_FRAME or SINGLE){control_output<<"||"<<BLOKS[b].size(0)<<"|"<<reservuars[rez].size(0)<<"|"<<reservuars[rez].size(j)<<"|"<<Vtoadd.size()<<">|";}
-					break;
-				}
-			}
-			else if(TRYB==0){
-				int j = choose_typ(BLOKS[b]);
-				rnd_vac->set_atom(j);
-				reset_site(rnd_vac);	
-				BLOKS[b].delete_site(0,N1);
-				BLOKS[b].add_site(j,rnd_vac);
-				BLOKS[b].prob_update(j,0);
-			}
-			else{
-				control_output<<"ERROR in opcja::remove_vac_new(). Wrong TRYB: "<<TRYB<<endl;
-				exit(1);
-			}
-	}//end of for j
-	if(MOVE_FRAME or SINGLE){control_output<<endl;}
-
-	if(MOVE){		
-		FLAG = true;		//set local FLAG in do_equi_vac
-		do_equi_vac();		//rekurencja. Na poczatku sprawdza czy MOVE_FRAME set to TRUE.
 	}
 }
 
