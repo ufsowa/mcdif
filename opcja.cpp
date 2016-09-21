@@ -319,17 +319,17 @@ void opcja :: do_equi_rez(){
 	}		
 }
 
-site* opcja :: get_node(int nr_rez, int nr_bin, int TYP, long int &nr_site){
+site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site){
 	site* node=0; int j=-1;
-	if(TYP==0){
+	if(create){
 		j=0;
 	}else{
-		j=choose_typ(reservuars[nr_rez]);
+		j=choose_typ(reservuars[for_rez]);
 	}
 	//		j=wybrane_typy[i];	//losuje typ atomu do wymiany z wakancja
 	//		control_output<<"rozmiar typow "<<0<<" w bloku "<<bloks[nr].size(0);
 	//		control_output<<" rozmiar typow "<<j<<" w bloku "<<bloks[nr].size(j);
-	if(BLOKS[nr_bin].size(j) <= 0){
+	if(BLOKS[in_bin].size(j) <= 0){
 		control_output<<endl;
 		control_output<<"ERROR: in opcja::create_vac -> you want to remove \
 		element "<<j<<" that does not exist in blok\n	\
@@ -339,11 +339,97 @@ site* opcja :: get_node(int nr_rez, int nr_bin, int TYP, long int &nr_site){
 		element "<<j<<" that does not exist in blok\n	\
 		Probably error in opcja::init or opcja::reinit_bloks"<<endl;exit(1);
 	}
-	nr_site=(long)(rnd()*(BLOKS[nr_bin].size(j)));
-	node=BLOKS[nr_bin].get_site(j,nr_site);
+	nr_site=(long)(rnd()*(BLOKS[in_bin].size(j)));
+	node=BLOKS[in_bin].get_site(j,nr_site);
 			
 	//		control_output<<" ctyp: "<<rnd_at->get_atom()<<" "<<nr<<endl;	
 return node;	
+}
+
+site* opcja :: source_sink_localize(int in_bin, bool create, int from_rez, long int &nr_site, int &in_dir){
+	site* node=0;
+
+
+	double X0=( (BLOKS[in_bin]).get_st() + (BLOKS[in_bin]).get_end() )/2.0;
+	double C = (BLOKS[in_bin]).get_stech();
+//	control_output<<"Decide for: "<<X0<<" "<<bin<<" "<<C<<" ";
+
+	double SUM=0,maxY=0; unsigned int REZ=0;	
+	typedef vector <pair <double,int> > mykey;
+	mykey target;
+
+	for( unsigned rez = 0; rez < reservuars.size(); rez++){
+		double Y = 1.0 - fabs( C - (reservuars[rez]).get_stech());
+		if(Y>maxY){
+			maxY=Y;
+			REZ=rez;
+		}else if(Y==maxY){
+			//add to list
+		}else
+		{
+			//ignore
+		}
+																		//		double XL = fabs( x - (reservuars[REZ]).get_st());
+																		//		double XP = fabs( x - (reservuars[REZ]).get_end());
+																		//		double X = min(XL,XP);		
+																		//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
+	}
+//if list.size==1 -> take this rez -> cal direction
+
+//if list.size()>1{ use flux criteria}
+	//call total Flux -> for HIST get_flux(0) -> Ft
+	//if Ft < 0 take direction < 0 otherwise direction > 0
+	//for reservuars call distance and direction 
+		//if distance is < 0, take te smallest one
+	//if Ft==0 then random choose from rezerwuars if create		
+			//wybrane zostanir raz lewy rez a raz prawy. Typ i tak jest losowany na podstawie rezerwuaru!
+			//to pdziala w przypadku create -> atomy usuwane sa z fazy wskazanej przez rezerwuar - OK.
+			//w przypadky remove -> vakancja moze przejsc interface
+		//else chosse vacancy -> 	node=get_node(in_bin,create,from_rez,nr_site);
+		//for vacancy chech neigbourhoods composition Cn
+			//for rez cal Y1=Cn-C(rez) -> take maximum
+			//if(equal) -> than random choose from rez.
+			
+			//biny budowac co jedna plaszczyzne nakladajac sie
+
+	target.push_back(make_pair( SUM, REZ ));
+
+	double R=rnd()*SUM; 
+	mykey::iterator event = target.begin();
+	mykey::iterator next_event=target.begin();
+
+	for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
+		double Lvalue = (*event).first;
+		double Rvalue = (*next_event).first;	
+																		//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+		if( R>=Lvalue and R < Rvalue){
+			REZ=(*event).second;										//set rezervour
+		}
+	}
+
+																		//set direction to this reservour
+	double left = (reservuars[REZ]).get_st() - X0;
+	double right = (reservuars[REZ]).get_end() - X0;
+	double displace = fabs(left) > fabs(right) ? right : left;
+
+	int dir=0;
+	if(displace > 0){
+		dir= 1;
+	}else if(displace < 0 ){
+		dir= -1;
+	}else if(displace == 0){
+		dir = 0;
+	}else{
+		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
+	}
+	DIR=dir;
+//	control_output<<"Decide for: "<<dir<<" ";node->show_site();
+
+
+
+
+
+	return node;
 }
 
 /*
@@ -447,12 +533,12 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		
 
 		if(TRYB==2){													//dislocation move
-			if(CREATE){
-				dislocation_move_init(in_bin,1,from_rez,in_dir);		
-				AT1=get_node(from_rez,in_bin,1,N1);
+			if(CREATE){				
+				dislocation_move_init(in_bin,true,from_rez,in_dir);		
+				AT1=get_node(in_bin,true,from_rez,N1);
 			}else{
-				dislocation_move_init(in_bin,0,from_rez,in_dir);		
-				AT1=get_node(from_rez,in_bin,0, N1);
+				dislocation_move_init(in_bin,false,from_rez,in_dir);		
+				AT1=get_node(in_bin,false,from_rez,N1);
 			}
 			for_typ=AT1->get_atom();		
 
@@ -468,12 +554,12 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 				break;
 			}
 		}else if(TRYB==1){ 												//swap
-			if(CREATE){
+			if(CREATE){				
 				dislocation_move_init(in_bin,1,from_rez,in_dir);		
-				AT1=get_node(from_rez,in_bin,1,N1);
+				AT1=get_node(in_bin,1,from_rez,N1);
 			}else{
-				dislocation_move_init(in_bin,0,from_rez,in_dir);		
-				AT1=get_node(from_rez,in_bin,0, N1);
+				dislocation_move_init(in_bin,true,from_rez,in_dir);		
+				AT1=get_node(in_bin,false,from_rez,N1);
 			}
 			for_typ=AT1->get_atom();		
 
@@ -505,8 +591,14 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		}else if(TRYB==0){												//convert
 			if(CREATE){
 				to_typ=0;
+				for_typ = choose_typ(BLOKS[in_bin],false);
+				N1=(long)(rnd()*(BLOKS[in_bin].size(for_typ)));
+				AT1 = (BLOKS[in_bin]).get_site(for_typ,N1);
 			}else{
+				for_typ=0;
 				to_typ = choose_typ(BLOKS[in_bin],false);
+				N1=(long)(rnd()*(BLOKS[in_bin].size(for_typ)));
+				AT1 = (BLOKS[in_bin]).get_site(for_typ,N1);
 			}
 			AT1->set_atom(to_typ);
 			reset_site(AT1);
@@ -1139,27 +1231,44 @@ bool opcja :: check_x_belonging_volume(double x){
 }
 
 
-void opcja :: dislocation_move_init(int NR, int TYP, int &rez, int &DIR){
+void opcja :: dislocation_move_init(int in_bin, bool create, int &rez, int &DIR){
 
+	double X0=( (BLOKS[in_bin]).get_st() + (BLOKS[in_bin]).get_end() )/2.0;
+	double C = (BLOKS[in_bin]).get_stech();
+//	control_output<<"Decide for: "<<X0<<" "<<bin<<" "<<C<<" ";
 
-	double X0=(BLOKS[NR]).get_st();
-	unsigned int bin = NR;	
-	double Cb = (HIST[bin]).get_stech();
-//	control_output<<"Decide for: "<<x<<" "<<bin<<" "<<Cb<<" ";node->show_site();
-
-	double SUM=0; unsigned int REZ=0;	
+	double SUM=0,maxY=0; unsigned int REZ=0;	
 	typedef vector <pair <double,int> > mykey;
 	mykey target;
 
-	for( REZ = 0; REZ<reservuars.size(); REZ++){
-		double Y = 1.0 - fabs( Cb - (reservuars[REZ]).get_stech());
-		target.push_back(make_pair(SUM, REZ));
-		SUM = SUM + Y;	
+	for( unsigned rez = 0; rez < reservuars.size(); rez++){
+		double Y = 1.0 - fabs( C - (reservuars[rez]).get_stech());
+		if(Y>maxY){
+			maxY=Y;
+			REZ=rez;
+		}else if(Y==maxY){
+			//add to list
+		}else
+		{
+			//ignore
+		}
 																		//		double XL = fabs( x - (reservuars[REZ]).get_st());
 																		//		double XP = fabs( x - (reservuars[REZ]).get_end());
 																		//		double X = min(XL,XP);		
 																		//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
 	}
+//if list.size==1 -> take this rez -> cal direction
+
+//if list.size()>1{ use flux criteria}
+	//call total Flux -> for HIST get_flux(0) -> Ft
+	//if Ft < 0 take direction < 0 otherwise direction > 0
+	//for reservuars call distance and direction 
+		//if distance is < 0, take te smallest one
+	//if Ft==0 then random choose from rezerwuars		
+			//wybrane zostanir raz lewy rez a raz prawy. Typ i tak jest losowany na podstawie rezerwuaru!
+			//to pdziala w przypadku create -> atomy usuwane sa z fazy wskazanej przez rezerwuar - OK.
+			//w przypadky remove -> vakancja moze przejsc interface
+
 	target.push_back(make_pair( SUM, REZ ));
 
 	double R=rnd()*SUM; 
@@ -1174,6 +1283,7 @@ void opcja :: dislocation_move_init(int NR, int TYP, int &rez, int &DIR){
 			REZ=(*event).second;										//set rezervour
 		}
 	}
+
 																		//set direction to this reservour
 	double left = (reservuars[REZ]).get_st() - X0;
 	double right = (reservuars[REZ]).get_end() - X0;

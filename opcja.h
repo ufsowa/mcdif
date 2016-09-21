@@ -113,7 +113,6 @@ bool check_rez_dN();
 bool check_rezervuars(int i, int typ);
 bool check_rezervuars(site* node, site* &next_node);
 bool check_x_belonging_volume(double x);
-void source_sink_act(int i, int vac, bool &FLAG);	
 void do_equi_vac();
 void do_equi_rez();
 void equilibrate();
@@ -144,8 +143,10 @@ void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
 
 void find_interface();
-void dislocation_move_init(int nr, int TYP, int &rez, int &dir);	
-site* get_node(int nr_rez, int nr_bin, int TYP, long int &nr_site);
+void source_sink_act(int i, int vac, bool &FLAG);	
+site* source_sink_localize(int in_bin, bool create, int for_rez, long int &nr_site, int &dir);
+void dislocation_move_init(int in_bin, bool create, int &rez, int &dir);	
+site* get_node( int in_bin, bool create, int for_rez,long int &nr_site);
 bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);
 void cal_angles(site *node, wektor &main, vector <site*> &wynik_at, vector <site*> &wynik_vac);
