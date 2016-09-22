@@ -13,6 +13,11 @@
 #include <vector>
 #endif
 
+#ifndef MAP
+#define MAP
+#include <map>
+#endif
+
 #ifndef STDLIB
 #define STDLIB
 #include <stdlib.h>
@@ -101,6 +106,7 @@ void reset_vindex();
 int events_size();
 
 //site operations
+double cal_stech(int typ1);
 void reset_site ();
 void refresh_site();
 void read_site_neighbours(std :: vector <site*> &vac_neighbour, int typ, int zone = 0);

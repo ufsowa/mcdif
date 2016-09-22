@@ -105,6 +105,7 @@ void reset_site(site *node);
 void read_file(string filename);
 void call_flux(site* atom_to_jump,site* vac_to_jump);	
 void call_flux_dislocation(site* atom_to_jump,site* vac_to_jump);	
+long call_total_flux();
 double Ceq_vac(double stech);
 int choose_typ(plaster& bin, bool sig = true);
 int choose_reservuar(site* atom);

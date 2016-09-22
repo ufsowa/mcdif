@@ -346,72 +346,136 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 return node;	
 }
 
+long opcja :: call_total_flux(){
+	
+	long SUM=0;
+	for(vector <plaster>::iterator P=HIST.begin(); P!=HIST.end(); ++P){
+		SUM += P->net_flux_get(0);
+	}
+	
+	return SUM;
+}
+
 site* opcja :: source_sink_localize(int in_bin, bool create, int from_rez, long int &nr_site, int &in_dir){
-	site* node=0;
 
 
 	double X0=( (BLOKS[in_bin]).get_st() + (BLOKS[in_bin]).get_end() )/2.0;
 	double C = (BLOKS[in_bin]).get_stech();
 //	control_output<<"Decide for: "<<X0<<" "<<bin<<" "<<C<<" ";
 
-	double SUM=0,maxY=0; unsigned int REZ=0;	
-	typedef vector <pair <double,int> > mykey;
-	mykey target;
+	double maxY=0; unsigned int REZ=-1;
+	long N=-1;
+	site* node =0;
+	vector <unsigned int> mykey; mykey.reserve(10);
 
 	for( unsigned rez = 0; rez < reservuars.size(); rez++){
 		double Y = 1.0 - fabs( C - (reservuars[rez]).get_stech());
 		if(Y>maxY){
 			maxY=Y;
-			REZ=rez;
+			mykey.clear();
+			mykey.push_back(rez);
 		}else if(Y==maxY){
-			//add to list
+			mykey.push_back(rez);			
 		}else
 		{
-			//ignore
+			continue;
 		}
-																		//		double XL = fabs( x - (reservuars[REZ]).get_st());
-																		//		double XP = fabs( x - (reservuars[REZ]).get_end());
-																		//		double X = min(XL,XP);		
-																		//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
-	}
-//if list.size==1 -> take this rez -> cal direction
-
-//if list.size()>1{ use flux criteria}
-	//call total Flux -> for HIST get_flux(0) -> Ft
-	//if Ft < 0 take direction < 0 otherwise direction > 0
-	//for reservuars call distance and direction 
-		//if distance is < 0, take te smallest one
-	//if Ft==0 then random choose from rezerwuars if create		
-			//wybrane zostanir raz lewy rez a raz prawy. Typ i tak jest losowany na podstawie rezerwuaru!
-			//to pdziala w przypadku create -> atomy usuwane sa z fazy wskazanej przez rezerwuar - OK.
-			//w przypadky remove -> vakancja moze przejsc interface
-		//else chosse vacancy -> 	node=get_node(in_bin,create,from_rez,nr_site);
-		//for vacancy chech neigbourhoods composition Cn
-			//for rez cal Y1=Cn-C(rez) -> take maximum
-			//if(equal) -> than random choose from rez.
+	}																	//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
+	
+	double displace = 0;
+	if(mykey.size() == 1){
+		REZ=mykey[0];
+		double left = (reservuars[REZ]).get_st() - X0;
+		double right = (reservuars[REZ]).get_end() - X0;
+		displace = fabs(left) > fabs(right) ? right : left;
+	}else if(mykey.size() > 1){		
+		long Ft = call_total_flux();									//change to temporary flux
+		if(Ft < 0){
+			double Ymax=0;
+			for(unsigned int i=0; i<mykey.size();i++){
+				unsigned int tmp_rez=mykey[i];
+				double left = (reservuars[tmp_rez]).get_st() - X0;
+				double right = (reservuars[tmp_rez]).get_end() - X0;
+				displace = fabs(left) > fabs(right) ? right : left;
+				
+				if(displace < 0){
+					if(Ymax==0){Ymax=displace;}
+					if(fabs(displace) < Ymax){
+						REZ=i;
+						Ymax=displace;
+					}
+				}
+			}
+		displace=Ymax;
+		}else if(Ft > 0){
+			double Ymax=0;
+			for(unsigned int i=0; i<mykey.size();i++){
+				unsigned int tmp_rez=mykey[i];
+				double left = (reservuars[tmp_rez]).get_st() - X0;
+				double right = (reservuars[tmp_rez]).get_end() - X0;
+				displace = fabs(left) > fabs(right) ? right : left;
+				if(displace > 0){
+					if(Ymax==0){Ymax=displace;}
+					if(fabs(displace) < Ymax){
+						REZ=i;
+						Ymax=displace;
+					}
+				}
+			}
+		displace=Ymax;
+		}else{
+			if(create){
+				int rndIndex = rand() % mykey.size();					//if Ft==0 then random choose from rezerwuars if create		
+				REZ = mykey[rndIndex];									//wybrane zostanir raz lewy rez a raz prawy. Typ i tak jest losowany na podstawie rezerwuaru!
+				double left = (reservuars[REZ]).get_st() - X0;			//to pdziala w przypadku create -> atomy usuwane sa z fazy wskazanej przez rezerwuar - OK.
+				double right = (reservuars[REZ]).get_end() - X0;		//w przypadky remove -> vakancja moze przejsc interface
+				displace = fabs(left) > fabs(right) ? right : left;
+			}else{														//else chosse vacancy -> 	node=get_node(in_bin,create,from_rez,nr_site);
+				node=get_node(in_bin,create,-1,N);
+				vector <unsigned int> new_mykey; new_mykey.reserve(10);
+				double C=node->cal_stech(1);
+				double new_maxY=0; 
 			
-			//biny budowac co jedna plaszczyzne nakladajac sie
-
-	target.push_back(make_pair( SUM, REZ ));
-
-	double R=rnd()*SUM; 
-	mykey::iterator event = target.begin();
-	mykey::iterator next_event=target.begin();
-
-	for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
-		double Lvalue = (*event).first;
-		double Rvalue = (*next_event).first;	
-																		//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-		if( R>=Lvalue and R < Rvalue){
-			REZ=(*event).second;										//set rezervour
+				for( unsigned i = 0; i < mykey.size(); i++){
+					unsigned int tmp_rez=mykey[i];
+					double Y = 1.0 - fabs( C - (reservuars[tmp_rez]).get_stech());												
+					if(Y>new_maxY){
+						new_maxY=Y;
+						new_mykey.clear();
+						new_mykey.push_back(tmp_rez);
+					}else if(Y==new_maxY){
+						new_mykey.push_back(tmp_rez);			
+					}else{
+						continue;
+					}																	//for vacancy chech neigbourhoods composition Cn
+				}													//for rez cal Y1=Cn-C(rez) -> take maximum
+			
+			if(new_mykey.size() == 1){
+				REZ=new_mykey[0];
+				double left = (reservuars[REZ]).get_st() - X0;
+				double right = (reservuars[REZ]).get_end() - X0;
+				displace = fabs(left) > fabs(right) ? right : left;
+			}else if(mykey.size() > 1){																//if(equal) -> than random choose from rez.
+				int rndIndex = rand() % new_mykey.size();					
+				REZ = new_mykey[rndIndex];	
+				double left = (reservuars[REZ]).get_st() - X0;
+				double right = (reservuars[REZ]).get_end() - X0;
+				displace = fabs(left) > fabs(right) ? right : left;
+			}}
+		}			
+	}else{
+		control_output<<"ERROR: opcja::source_sink_localize:469"<<endl;exit(1);
+	}
+																		//set direction to this reservour
+	if(create){
+		if(REZ>=0 and N >=0){
+			node=get_node(in_bin,create,REZ,N);
+		}else{
+			control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);
 		}
 	}
-
-																		//set direction to this reservour
-	double left = (reservuars[REZ]).get_st() - X0;
-	double right = (reservuars[REZ]).get_end() - X0;
-	double displace = fabs(left) > fabs(right) ? right : left;
-
+	
+	
 	int dir=0;
 	if(displace > 0){
 		dir= 1;
@@ -422,13 +486,13 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int from_rez, long 
 	}else{
 		control_output<<"ERROR: opcja: 1294"<<endl;exit(1);
 	}
-	DIR=dir;
-//	control_output<<"Decide for: "<<dir<<" ";node->show_site();
-
-
-
-
-
+	if(!create){														//vacancy is going to be removed -> first node is a vacant site
+		dir = -dir;
+	}
+																		//	control_output<<"Decide for: "<<dir<<" ";node->show_site();	
+	from_rez=REZ;
+	nr_site=N;
+	in_dir=dir;
 	return node;
 }
 

@@ -244,6 +244,56 @@ void site :: show_neigh(int typ)
 		
 }
 
+double site :: cal_stech(int typ1){
+	double x=-1.0;
+	
+	map <int,int> TYPY;
+
+	for(unsigned int i=0;i<site_at_neigh.size();i++){
+		int typ =(site_at_neigh[i])->get_atom();
+		
+		if(TYPY.count(typ)){
+			TYPY[typ]++;
+		}else{
+			pair< map<int,int>::iterator,bool> ret;
+			ret = TYPY.insert(pair<int,int>(typ,1));
+			if (ret.second==false) {
+				control_output << "ERROR: site::cal_stech. Element "<<typ<<" already existed";
+				control_output << " with a value of " << ret.first->second << '\n';exit(1);
+			}
+		}
+	}	
+	
+	int licz = TYPY[typ1];
+	int SUM = 0;
+	
+	for(auto it = TYPY.begin(); it != TYPY.end(); ++it){
+		if( (it->first > 0) ){
+			SUM += it->second;
+		}
+	}
+	
+	if(SUM > 0){
+		x = static_cast<double> (licz) / static_cast<double> (SUM);
+		return x;
+	}else{
+		return 0;
+	}
+}
+
+void site :: change_to(const site &A){
+	
+	atom=A.atom;
+	dx=A.dx;
+	dy=A.dy;
+	dz=A.dz;
+	nr_jump=A.nr_jump; 		
+	Vindex=A.Vindex;	
+
+}
+
+
+
 void site :: clear_neighbours(int neigh_typ)
 {
 	if(neigh_typ)
@@ -422,16 +472,5 @@ site& site :: operator= (const site &A)
 	block_index=A.block_index;
 
 	return *this;
-}
-
-void site :: change_to(const site &A){
-	
-	atom=A.atom;
-	dx=A.dx;
-	dy=A.dy;
-	dz=A.dz;
-	nr_jump=A.nr_jump; 		
-	Vindex=A.Vindex;	
-
 }
 
