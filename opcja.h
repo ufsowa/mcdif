@@ -145,8 +145,7 @@ void set_temperature(double T){TEMPERATURE=T;}
 
 void find_interface();
 void source_sink_act(int i, int vac, bool &FLAG);	
-site* source_sink_localize(int in_bin, bool create, int for_rez, long int &nr_site, int &dir);
-void dislocation_move_init(int in_bin, bool create, int &rez, int &dir);	
+site* source_sink_localize(int in_bin, bool create, int &for_rez, long int &nr_site, int &dir);	
 site* get_node( int in_bin, bool create, int for_rez,long int &nr_site);
 bool find_migration_path(site *node,int DIR, vector <site*> &migration_path);	
 void dislocation_walk(vector <site*> &migration_path);
