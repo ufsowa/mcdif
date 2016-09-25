@@ -420,9 +420,9 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 				displace = fabs(left) > fabs(right) ? right : left;
 				
 				if(displace < 0){
-					if(Ymax==0){Ymax=displace;}
+					if(Ymax==0){Ymax=displace; REZ=tmp_rez;}
 					if(fabs(displace) < Ymax){
-						REZ=i;
+						REZ=tmp_rez;
 						Ymax=displace;
 					}
 				}
@@ -437,9 +437,9 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 				double right = (reservuars[tmp_rez]).get_end() - X0;
 				displace = fabs(left) > fabs(right) ? right : left;
 				if(displace > 0){
-					if(Ymax==0){Ymax=displace;}
+					if(Ymax==0){Ymax=displace;REZ=tmp_rez;}
 					if(fabs(displace) < Ymax){
-						REZ=i;
+						REZ=tmp_rez;
 						Ymax=displace;
 					}
 				}
@@ -759,15 +759,15 @@ void opcja :: do_equi_vac(){
 		int delta_vac = check_stech(stech,vac,size);	//zwracac ile wakancji remove/create
 	control_output<<"do_equi "<<i<<" "<<stech<<" "<<vac<<" "<<size<<" "<<delta_vac<<" "<<endl;
 		
-		if(delta_vac < -1){
+		if(delta_vac < 0){
 			source_sink_act(i, delta_vac, LOCAL_MOVE);
 		}
-		else if (-1 <= delta_vac and delta_vac <= 1)
+		else if (delta_vac == 0)
 		{
 			if(MOVE_FRAME or SINGLE){	
 			control_output<<" do nothing"<<endl;}
 		}
-		else if ( delta_vac > 1 )
+		else if ( delta_vac > 0 )
 		{
 			source_sink_act(i,delta_vac, LOCAL_MOVE);
 		}
@@ -1564,7 +1564,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 				control_output<<"ERROR in opcja::find_migration_path(). \
 				Wrong atom type: "<<typ<<endl;exit(1);
 			}
-		}else if(site_bufor.size() == 0 and vac_bufor.size() == 0){			//Jesli path doszla do sciany?? Nie ma ani atomu ani wakancji do skoku. TO odbij wektor kierunek.
+		}else if(site_bufor.size() == 0 and vac_bufor.size() == 0){			//Jesli path doszla do sciany?? Nie ma ani atomu ani wakancji do skoku. TO wylosuj site z rezerwuara. Jesli nie ma to przesun sample.
 			control_output<<"WARRNING in opcja::find_migration_path(). ";
 			control_output<<"Path reached a wall. No atoms or vacancy available to contiune path: "<<endl;		
 
