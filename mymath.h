@@ -20,7 +20,7 @@
 
 #define PI 3.14159265
 
-const double kB = 8.61707e-5;
+const double kB = 8.617332478e-5;
 const int liczba=500;
 //std::string name_of_control_file="control_file.dat";
 extern std::ofstream control_output;	//(name_of_control_file.c_str(),std::ios :: app);
@@ -30,6 +30,7 @@ int myRound( double fValue);
 double set_prec(double x, double prec = 4);
 
 const int control_atom=99; //must be set to 0 if want see sth
+const bool DEBUG = false;
 
 double integral_data(std::vector<double> &X, std::vector<double> &Y, double a);
 float CalculateTrapezoidArea(float sideA, float sideB, float height);

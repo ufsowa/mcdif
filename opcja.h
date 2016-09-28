@@ -118,7 +118,7 @@ void do_equi_vac();
 void do_equi_rez();
 void equilibrate();
 double errCeq_vac(double stech);
-void flux_net_add(double pos_V, double pos_A, int typ, vector<plaster>& layer_new);
+void flux_net_add(double pos_V, double pos_A, int typV, int typA, vector<plaster>& layer_new);
 void flux_add(site* V, site* A,vector<plaster>& layer_new);
 void flux_add_dislocation(site* V, site* A, vector<plaster>& layer_new);
 bool get_save_flag(){return SAVE_AVG;};

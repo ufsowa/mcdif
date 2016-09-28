@@ -128,6 +128,16 @@ bool operator ==(const wektor &A){
 	return false;
 };
 
+bool lower(const wektor &B){
+
+	bool x =( (B.x) > (this->x) );
+	bool y =( (B.y) > (this->y) );
+	bool z =( (B.z) > (this->z) );
+	//control_output<<x<<" "<<y<<" "<<z<<" "<<(x && y && z)<<endl;
+	return (x && y && z);
+};
+
+
 wektor operator >(const wektor &A){
 	wektor wynik;
 	wynik.x = int ( fabs(this->x) > fabs(A.x) );

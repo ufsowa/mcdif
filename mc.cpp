@@ -531,13 +531,48 @@ void widom_rnd(lattice *sample,long next, long steps, double T)
 }
 
 void exchange_mechanism(lattice *sample,long steps,double T){
-	
+
+	double beta=1.0/(kB*T);	
+	long Nsize=sample->get_sim_atom_number();
+	for (long i=0; i<steps; i++){
+		long N1=(long)(rnd()*Nsize);
+		site* site1=0;	
+		site1=sample->get_site(N1);
+
+		vector <site*> neighs; neighs.reserve(500);
+		site1->read_site_neighbours(neighs,1);
+		long nsize=neighs.size();
+		long N2=(long)(rnd()*nsize);
+		site* site2=neighs[N2];
+		
+		int typ1 = site1->get_atom();
+		int typ2 = site2->get_atom();
+
+		double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+		site1->set_atom(typ2);
+		site2->set_atom(typ1);
+		double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+		double dE=E2-E1;
+		site1->set_atom(typ1);
+		site2->set_atom(typ2);
+
+		if(dE > 0 ){
+			double p = exp(-beta*dE);
+			double R = rnd();
+			if(R >= p){
+				make_jump(sample, site1, site2);
+			}
+		}else{
+			make_jump(sample, site1, site2);
+		}
+	}
 }
 
 void direct_exchange(lattice *sample,long steps,double T)
 {
 	double beta=1.0/(kB*T);	
 	long Nsize=sample->get_sim_atom_number();
+
 	for (long i=0; i<steps; i++){
 		long N1=(long)(rnd()*Nsize);
 		long N2=(long)(rnd()*Nsize);		
@@ -547,11 +582,13 @@ void direct_exchange(lattice *sample,long steps,double T)
 		site2=sample->get_site(N2);
 		int typ1 = site1->get_atom();
 		int typ2 = site2->get_atom();
+
 		double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
 		site1->set_atom(typ2);
 		site2->set_atom(typ1);
 		double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
 		double dE=E2-E1;
+
 		if(dE > 0 ){
 			double p = exp(-beta*dE);
 			double R = rnd();
@@ -640,6 +677,7 @@ int try_jump(lattice* sample, double T, site* vac_to_jump, site* atom_to_jump){
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	
 	int atom = atom_to_jump->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
+	int vac = vac_to_jump->get_atom();		//wczytaj typ wakancji
 	
 //	site *adressbufor=NULL;	
 //	adressbufor=vac_to_jump;
@@ -717,15 +755,16 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 
 	//w tym momencie kontener Vatoms przechowuje adres do atomu (symulacja gubi wakancje)
 	//zamieniamy atom na wakacje
-	atom_to_jump->set_atom(0);
+	atom_to_jump->set_atom(vac);
 	atom_to_jump->set_drx(Vdx);
 	atom_to_jump->set_dry(Vdy);
 	atom_to_jump->set_drz(Vdz);
 	atom_to_jump->set_jumps(Vjp);
 	
 	V_LIST.erase(vac_to_jump);
-	V_LIST.insert(atom_to_jump);		
-	
+	if(vac==0){
+		V_LIST.insert(atom_to_jump);		
+	}
 	//collect flux data
 	opt_equi.call_flux(atom_to_jump,vac_to_jump);	
 	
@@ -1803,6 +1842,19 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 			save_results(sample,savings,"dir",sub_step,i);			
 		}
 	}	
+	if(name=="EXCHANGE_MECH")
+	{
+		initialize();
+		initialize_seed();
+		long step=parameters[0];
+		long sub_step=parameters[1];
+		double T = parameters[2];
+		for (long i=1; i<=step;i++){
+			exchange_mechanism(sample, sub_step, T);
+			save_results(sample,savings,"exm",sub_step,i);			
+		}
+		control_output<<"EXCHANGE_MECH finished"<<endl;
+	}	
 	
 	if(name=="WIDOM_RND")
 	{
@@ -2706,6 +2758,9 @@ int main(int arg, char *argc[])
 	//	_sample->check_atoms();
 	sample.set_alg_objects(EVENTS,simple_bars,pot);
 	opt_equi.set_opcja_lattice(_sample);
+
+	//wczytuje do zmiennych w lattice obszar symulacji oraz ustawieienie warunkow brzegowych dla atomow i energii
+	_sample->simulation_initialize(rmin,rmax,st_sim_area,end_sim_area,boundary_con_at,boundary_con_en,max_zone, st_region, end_region);
 		
 	//wczytuje strukture poczatkowa
 	if(load_strucrure_flag){
@@ -2719,10 +2774,6 @@ int main(int arg, char *argc[])
 	//Wczytuje potencjaly
 	pot.init(_sample->get_atom_typ_numbers());
 	
-
-	//wczytuje do zmiennych w lattice obszar symulacji oraz ustawieienie warunkow brzegowych dla atomow i energii
-	_sample->simulation_initialize(rmin,rmax,st_sim_area,end_sim_area,boundary_con_at,boundary_con_en,max_zone, st_region, end_region);
-
 	//wczytuje sasiadow w I strefie zgodnie z podanymi ustawieniami
 	_sample->jumps_shell_init();
 	_sample->interaction_shell_init();

@@ -2743,9 +2743,19 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 	wektor set_vec=set_st;
 	wektor st_vec=start;
 	wektor end_vec=end;
-	//set_vec.show_wektor();
-	//st_vec.show_wektor();
-	//end_vec.show_wektor();
+
+
+	if( st_vec.lower(st_region) or end_region.lower(end_vec) ){
+		control_output<<"ERROR: in conf.in. Try to load structure bigger than defined region"<<endl; 
+		set_vec.show();
+		st_vec.show();
+		end_vec.show();
+		st_region.show();
+		end_region.show();
+		exit(1);
+
+	}
+
 	wektor delta= (end_vec-st_vec);
 	//delta.show_wektor();
 	wektor size = (set_vec+delta);
