@@ -530,7 +530,9 @@ void widom_rnd(lattice *sample,long next, long steps, double T)
 	
 }
 
-
+void exchange_mechanism(lattice *sample,long steps,double T){
+	
+}
 
 void direct_exchange(lattice *sample,long steps,double T)
 {

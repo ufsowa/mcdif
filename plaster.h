@@ -106,33 +106,40 @@ class plaster {
 	};
 	
 	void	delete_site(unsigned int typ, unsigned long numer){
-		int st_size=PL_SITES_TYP[typ].size();
+		unsigned int st_size=PL_SITES_TYP[typ].size();
 		list<site*>::iterator item = PL_SITES_TYP[typ].begin();
 		if( !(PL_SITES_TYP[typ].empty()) ){
 			advance(item, numer);
 			unsigned int atyp = (*item)->get_atom();
 			if(atyp != typ){
-				control_output<<"ERROR: plaster::delete_site():109: "<<typ<<" "<<atyp<<endl;exit(1);
+				control_output<<"ERROR: plaster::delete_site():109: "<<typ<<" "<<atyp<<endl;show();exit(1);
+				
 			}
 			PL_SITES_TYP[typ].erase(item);
 			eq_flux_delta(typ,0);
 		}else{
 			control_output<<"ERROR: plaster::delete_site(). Type list empty: "<<typ<<endl;
+			show();
 			exit(1);
 		}
-		if( abs(st_size - PL_SITES_TYP[typ].size()) != 1){
+		if( (st_size - PL_SITES_TYP[typ].size()) != 1){
 			control_output<<"ERROR: plaster::delete_site(). site not removed "<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			show();
 			exit(1);		
 		}
 
 	};
 	
 	void	add_site(int typ, site* new_site){
-		int st_size=PL_SITES_TYP[typ].size();
+		unsigned int st_size=PL_SITES_TYP[typ].size();
 		PL_SITES_TYP[typ].push_back(new_site);
 		eq_flux_delta(typ,1);
-		if( abs(st_size - PL_SITES_TYP[typ].size()) != 1){
+		
+		if( ( PL_SITES_TYP[typ].size() - st_size ) != 1){
 			control_output<<"ERROR: plaster::add_site(). site not added "<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<( PL_SITES_TYP[typ].size() - st_size )<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			show();
 			exit(1);		
 		}
 
@@ -141,17 +148,20 @@ class plaster {
 
 	void	plaster_delete_site(site* node){
 		unsigned int typ = node->get_atom();
-		int st_size=PL_SITES_TYP[typ].size();
+		unsigned int st_size=PL_SITES_TYP[typ].size();
 		if( PL_SITES_TYP[typ].empty() ){
 			control_output<<"ERROR: plaster::plaster_delete_site(). Type list empty: "<<typ<<endl;
+			show();
 			exit(1);
 		}																//		control_output<<" del site in plaster "<<node<<" ";
 																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
 		eq_flux_delta(typ,0);
 		prob_update(typ,0);
-		if( abs(st_size - PL_SITES_TYP[typ].size()) != 1){
+		if( (st_size - PL_SITES_TYP[typ].size()) != 1){
 			control_output<<"ERROR: plaster::plaster_delete_site(). site not removed "<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			show();
 			exit(1);		
 		}
 																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
@@ -160,15 +170,17 @@ class plaster {
 	void	plaster_add_site(site* node){
 //		control_output<<" add site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
-		int st_size=PL_SITES_TYP[typ].size();
+		unsigned int st_size=PL_SITES_TYP[typ].size();
 
 //		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].push_back(node);
 		eq_flux_delta(typ,1);
 		prob_update(typ,1);
 //		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
-		if( abs(st_size - PL_SITES_TYP[typ].size()) != 1){
-			control_output<<"ERROR: plaster::plaster_delete_site(). site not added "<<typ<<endl;
+		if( (PL_SITES_TYP[typ].size() - st_size ) != 1){
+			control_output<<"ERROR: plaster::plaster_add_site(). site not added ";
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(PL_SITES_TYP[typ].size() - st_size)<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			show();
 			exit(1);		
 		}
 	};
