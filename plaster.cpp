@@ -158,6 +158,10 @@ void plaster :: copy_fluxes(plaster &source){
 site* plaster :: choose_atom(unsigned int typ){
 	unsigned long N1=(long)(rnd()*(size(typ)));
 	site* node = get_site(typ,N1);
+	int atyp = node->get_atom();
+	if(typ != typ){
+		control_output<<"ERROR:plaster::choose_atom:problem with types: "<<typ<<" "<<atyp<<endl;exit(1);
+	}
 	return node;
 }
 
@@ -211,6 +215,7 @@ void plaster :: set_atoms_list(list <site*> &kontener, int typ)
 		}
 		
 	}
+
 	
 //	control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
 	
@@ -225,6 +230,49 @@ void plaster :: set_atoms_list(list <site*> &kontener, int typ)
 	
 }	
 
+void plaster :: show(){
+	
+	control_output<<PL_NAME<<" "<<PL_TYPES<<" "<<PL_DIRECTION<<" "<<PL_INDEX<<" "<<PL_P0<<" "<<PL_P1<<" ";
+	control_output<<PL_REF_TO_SITES.size()<<" "<<PL_SITES_TYP.size()<<" "<<PL_ATOMS.size()<<endl;
+	
+	for(unsigned int i=0; i<PL_SITES_TYP.size(); i++){
+		control_output<<i<<" "<<PL_SITES_TYP[i].size()<<" ";
+	}
+	control_output<<endl;
+	
+	for(unsigned int i=0; i<PL_ATOMS.size(); i++){
+		control_output<<i<<" "<<PL_ATOMS[i]<<" ";
+	}
+	control_output<<endl;
+	
+	check_types();
+//	vector <long> PL_EQ_FLUX;
+//	vector <long> PL_NET_FLUX;
+//	vector <long> PL_PROB_ADD;
+//	vector <long> PL_PROB_DEL;
+//	vector<double> PL_AVG_PARS;	//p0,p1,A,B,V,flux_A,...,eq_fluxA,..., counter;
+//	unsigned long PL_JUMPS;
+//	unsigned long PL_JUMPS_EQ;
+	
+}
+
+bool plaster :: check_types(){
+
+	for(unsigned int i=0; i<PL_SITES_TYP.size(); i++){
+		list<site*>::iterator item = PL_SITES_TYP[i].begin();
+		int counter=0;
+		for(; item != PL_SITES_TYP[i].end(); ++item,counter++){
+			unsigned int typ = (*item)->get_atom();
+			if(typ != i){
+				control_output<<"ERROR:plaster::check_types: "<<i<<" "<<counter<<" "<<typ<<endl;
+				(*item)->show_site();
+				exit(1);
+			}
+		}
+	}
+	
+	return true;
+}
 
 //UWAGA: sprawdzic -> zaokraglanie, dzielenie przez 0 -> dodac warunki
 void plaster :: init_calc(int FLAG){

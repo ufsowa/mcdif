@@ -354,6 +354,19 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 
 	control_output<<"get node end "<< in_bin<<" "<<for_rez<<" "<<nr_site<<" "<<create<<" ";
 	control_output<<node<<" "<<j<<" "; node->show_site();
+	int for_typ=node->get_atom();
+	if( for_typ==0 and create){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac type: "<<for_typ<<endl; 
+		control_output<<create<<" "<<j<<" "<<nr_site<<" ";node->show_site();
+		(reservuars[for_rez]).show();
+		(BLOKS[in_bin]).show();
+		exit(1);}
+	if( for_typ>0 and !create){control_output<<"ERROR:opcja::source_sink_act:636: remove  vac, but remove atom type: "<<for_typ<<endl; 
+		control_output<<create<<" "<<j<<" "<<nr_site<<endl;
+		(reservuars[for_rez]).show();
+		(BLOKS[in_bin]).show();
+		exit(1);}
+
+
 			
 return node;	
 }
@@ -633,6 +646,8 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		if(TRYB==2){													//dislocation move
 			AT1=source_sink_localize(in_bin, CREATE, from_rez, N1, in_dir);		
 			for_typ=AT1->get_atom();	
+			if(for_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac from system type: "<<for_typ<<endl; exit(1);}
+			if(for_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:637: remove  vac, but move atom from sysstem type: "<<for_typ<<endl; exit(1);}
 			control_output<<"sink act "<<i<<" "<<from_rez<<" "<<in_dir<<" "<<for_typ<<" "<<to_typ<<" "<<AT1<<" "<<AT2<<" ";
 			control_output<<N1<<" "<<N2<<" "<<CREATE<<endl;
 			
