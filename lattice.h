@@ -89,7 +89,8 @@ lattice(int _sizex,int _sizey,int _sizez);
 ~lattice();
 
 //initialization of lattice
-void simulation_initialize(double _r_min, double _r_max,wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f);
+void simulation_set(double _r_min, double _r_max,wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f);
+void simulation_initialize();
 void init_sim_boundary(vector <double> &parameters);
 void atoms_list_init();
 void sim_atoms_list_init();

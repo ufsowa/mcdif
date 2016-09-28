@@ -2760,7 +2760,7 @@ int main(int arg, char *argc[])
 	opt_equi.set_opcja_lattice(_sample);
 
 	//wczytuje do zmiennych w lattice obszar symulacji oraz ustawieienie warunkow brzegowych dla atomow i energii
-	_sample->simulation_initialize(rmin,rmax,st_sim_area,end_sim_area,boundary_con_at,boundary_con_en,max_zone, st_region, end_region);
+	_sample->simulation_set(rmin,rmax,st_sim_area,end_sim_area,boundary_con_at,boundary_con_en,max_zone, st_region, end_region);
 		
 	//wczytuje strukture poczatkowa
 	if(load_strucrure_flag){
@@ -2770,6 +2770,8 @@ int main(int arg, char *argc[])
 		}
 		control_output<<"Zbudowano!"<<endl;
 	}
+	_sample->simulation_initialize();
+
 		
 	//Wczytuje potencjaly
 	pot.init(_sample->get_atom_typ_numbers());

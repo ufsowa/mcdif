@@ -341,20 +341,22 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 	//		control_output<<"rozmiar typow "<<0<<" w bloku "<<bloks[nr].size(0);
 	//		control_output<<" rozmiar typow "<<j<<" w bloku "<<bloks[nr].size(j);
 	if(BLOKS[in_bin].size(j) <= 0){
+		if(j>0){
+			//take another schoot exlusivly
+			j=choose_typ(reservuars[for_rez],j);	
+			if(BLOKS[in_bin].size(j) <= 0){
+				j=choose_typ(BLOKS[in_bin]);	
+			}
+		}else{
 		control_output<<endl;
 		control_output<<"ERROR: in opcja::create_vac -> you want to remove \
 		element "<<j<<" that does not exist in blok\n	\
 		Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-		cout<<endl;
-		cout<<"ERROR: in opcja::create_vac -> you want to remove \
-		element "<<j<<" that does not exist in blok\n	\
-		Probably error in opcja::init or opcja::reinit_bloks"<<endl;
 		control_output<<create<<" "<<j;
 		(reservuars[for_rez]).show();
 		(BLOKS[in_bin]).show();
-
-		
-		exit(1);
+			exit(1);
+		}
 	}
 	nr_site=(long)(rnd()*(BLOKS[in_bin].size(j)));
 	node=BLOKS[in_bin].get_site(j,nr_site);
@@ -662,6 +664,10 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 			
 			vector <site*> migration_path; migration_path.reserve(2000);
 			MOVE = find_migration_path(AT1,in_dir,migration_path);	
+
+			int tmp_typ=(migration_path.front())->get_atom();	
+			if(tmp_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac from system type: "<<tmp_typ<<endl; exit(1);}
+			if(tmp_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:637: remove  vac, but move atom from sysstem type: "<<tmp_typ<<endl; exit(1);}
 
 			if(!MOVE){
 				dislocation_walk(migration_path);
@@ -1642,10 +1648,12 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 void opcja :: dislocation_walk(vector <site*> &path){
 	
 	if(path.size()>0){
-	if(DEBUG){	control_output<<"Path size: "<<path.size()<<endl;}
+	if(DEBUG){	control_output<<"Path size... "<<path.size()<<endl;}
 	site* first = path.front();
 	site* last = path.back();
-
+	int typ1 = first->get_atom();
+	int typ2 = last->get_atom();
+	
 	if(path.size()==1){
 		control_output<<"ERROR in opcja::dislocation_walk(): 1619"<<endl; exit(1);
 	}
@@ -1654,7 +1662,7 @@ void opcja :: dislocation_walk(vector <site*> &path){
 	//last->show_site();
 
 	//sciezka ma na poczatku wakancje (na koncu atom) -> remove wakancja
-	if( first->get_atom() == 0 ){	//forrward vacancy out
+	if( typ1 == 0 and typ2 > 0){	//forrward vacancy out
 		vector<site*>::iterator i = path.begin(); ++i;
 		for ( ; i != path.end(); ++i ){
 			vector<site*>::iterator prev = i; --prev;
@@ -1665,8 +1673,7 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		reset_site( *(--i) );
 		Vtoadd.insert( *i );	
 //		(*i)->show_site();
-
-	}else if( last->get_atom()== 0 ){	//backward vacancy in
+	}else if( typ2 == 0 and typ1 > 0){	//backward vacancy in
 		vector<site*>::reverse_iterator i = path.rbegin(); ++i;
 		for ( ; i != path.rend(); ++i ){
 			vector<site*>::reverse_iterator prev = i; --prev;
@@ -1678,7 +1685,10 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		Vtoadd.insert( *i );	
 //		(*i)->show_site();
 	}else{
-		control_output<<"ERROR in opcja::dislocation_walk()"<<endl; exit(1);
+		control_output<<"ERROR in opcja::dislocation_walk(): "<<typ1<<" "<<typ2<<endl; 
+		first->show_site();
+		last->show_site();
+		exit(1);
 	}
 	}
 }
@@ -1686,9 +1696,8 @@ void opcja :: dislocation_walk(vector <site*> &path){
 void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 
 	//one direction exchange of sites. Virtual jump of vac to atom.
-//	control_output<<"Przed:"<<endl;
-//	VAC->show_site();
-//	ATOM->show_site();
+//	control_output<<"Przed: "; VAC->show_site(); 
+	//control_output<<"Przed: "; ATOM->show_site();
 	if(VAC->get_atom() != 0){control_output<<"ERROR in opcja::virtual_jump(). Type of vacancy not 0: "<<VAC->get_atom()<<endl;exit(1);}
 	if(ATOM->get_atom() <= 0){control_output<<"ERROR in opcja::virtual_jump(). Type of atom not >0: "<<ATOM->get_atom()<<endl;exit(1);}
 
@@ -1704,9 +1713,8 @@ void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
 	update_opcja(ATOM,1);
 
 	call_flux_dislocation(ATOM,VAC);
-//	control_output<<"Po:"<<endl;
-//	VAC->show_site();
-//	ATOM->show_site();	
+//	control_output<<"Po: ";	VAC->show_site();	
+//	control_output<<"Po: ";	ATOM->show_site();	
 }
 
 void opcja :: update_opcja( site* node, bool status){

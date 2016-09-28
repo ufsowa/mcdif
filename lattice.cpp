@@ -2521,7 +2521,7 @@ lattice :: ~lattice()
 	
 /*------------------------------------------------------*/
 
-void lattice::simulation_initialize(double _r_min, double _r_max, wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f)
+void lattice::simulation_set(double _r_min, double _r_max, wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f)
 {
 	control_output<<"Initialize boundary conditions... "<<endl;
 	st_sim_area=a;
@@ -2557,6 +2557,10 @@ void lattice::simulation_initialize(double _r_min, double _r_max, wektor a,wekto
 	
 }
 
+void lattice::simulation_initialize(){
+	atoms_list_init();
+	sim_atoms_list_init();
+}
 
 bool lattice :: check_boundary_conditions(wektor *wsk)
 {
