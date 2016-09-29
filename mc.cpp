@@ -1218,72 +1218,68 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		{
 		//	control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
 			opt_equi.equilibrate();
-			if(EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+			if( (warrinig_jump_event <= 40) and EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
 				control_output<<" in step: "<<RTA_energy_executions<<endl;
 				EVENTS_size=EVENTS.size();
 			}
 		}}
 
-	double SUM=0;	
-	typedef vector <pair <double,pairjump> > mykey;
-	mykey target;
-	if(!EVENTS.empty()){
-		target.push_back(make_pair(SUM, EVENTS.front()));
-		double bar= EVENTS.front().get_barier();
-		SUM = SUM + exp(-beta*(bar));
-	}
-	
-	if(!EVENTS.empty()){
-		list<pairjump>::iterator it = EVENTS.begin(); ++it;
-		for(; it != EVENTS.end(); ++it){	
-			target.push_back(make_pair( SUM, (*it) ));
-			double bar= (*it).get_barier();
+		double SUM=0;	
+		typedef vector <pair <double,pairjump> > mykey;
+		mykey target;
+		if(!EVENTS.empty()){
+			target.push_back(make_pair(SUM, EVENTS.front()));
+			double bar= EVENTS.front().get_barier();
 			SUM = SUM + exp(-beta*(bar));
-		}
-		target.push_back(make_pair( SUM, EVENTS.back() ));
-	}
-
-	mykey::iterator event;
-//	control_output<<"Print target: "<<target.size()<<endl;
-//	int counter=0;
-//	for(event=target.begin(); event != target.end(); ++event){
-//		control_output<<counter<<" p: ";
-//		control_output<<(*event).first<<endl;
-//		(*event).second.show();
-//		counter++;
-//	}	
-	
-	site* vac_to_jump=0;
-	site* atom_to_jump=0;
-	double R=rnd()*SUM; 
-	mykey::iterator next_event=target.begin();
-	event = target.begin();
-
-//	control_output<<"Schoot target at: "<<R<<endl;
-//	control_output<<"Searching event: "<<target.size()<<endl;
-	
-	if(!target.empty()){	
-		for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
-			double Lvalue = (*event).first;
-			double Rvalue = (*next_event).first;	
-//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-			if( R>=Lvalue and R < Rvalue){
-//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-//	(*event).second.show();
-				vac_to_jump=(*event).second.get_vac_to_jump();
-				atom_to_jump=(*event).second.get_atom_to_jump();
-				make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
-				sample->update_events(vac_to_jump);	
-				sample->update_events(atom_to_jump);
-				if( (warrinig_jump_event <= 4) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after jump from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-					control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
-					EVENTS_size=EVENTS.size();
-					(*event).second.show();
-					warrinig_jump_event++;
-				}
-				break;
+			list<pairjump>::iterator it = EVENTS.begin(); ++it;
+			for(; it != EVENTS.end(); ++it){	
+				target.push_back(make_pair( SUM, (*it) ));
+				double bar= (*it).get_barier();
+				SUM = SUM + exp(-beta*(bar));
 			}
-		}																//znalazlem event-> zamienilem atomy miejscami -> policzylem monitory-> uaktualnilem liste eventow
+			target.push_back(make_pair( SUM, EVENTS.back() ));
+	
+			mykey::iterator event;
+			//	control_output<<"Print target: "<<target.size()<<endl;
+			//	int counter=0;
+			//	for(event=target.begin(); event != target.end(); ++event){
+			//		control_output<<counter<<" p: ";
+			//		control_output<<(*event).first<<endl;
+			//		(*event).second.show();
+			//		counter++;
+			//	}	
+	
+			site* vac_to_jump=0;
+			site* atom_to_jump=0;
+			double R=rnd()*SUM; 
+			mykey::iterator next_event=target.begin();
+			event = target.begin();
+
+			//	control_output<<"Schoot target at: "<<R<<endl;
+			//	control_output<<"Searching event: "<<target.size()<<endl;
+	
+			for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
+				double Lvalue = (*event).first;
+				double Rvalue = (*next_event).first;	
+				//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+				if( R>=Lvalue and R < Rvalue){
+							//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+							//	(*event).second.show();
+					vac_to_jump=(*event).second.get_vac_to_jump();
+					atom_to_jump=(*event).second.get_atom_to_jump();
+					make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
+					sample->update_events(vac_to_jump);	
+					sample->update_events(atom_to_jump);
+					if( (warrinig_jump_event <= 40) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after jump from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+						control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
+						EVENTS_size=EVENTS.size();
+						(*event).second.show();
+						warrinig_jump_event++;
+					}
+					break;
+				}
+			}												//znalazlem event-> zamienilem atomy miejscami -> policzylem monitory-> uaktualnilem liste eventow
+
 		if( event==target.end() ){
 			control_output<<"ERROR in mc::resident(). Problem with event list. Probably inf or nan in calculation of probability. No event was choosen: "<<endl;
 			control_output<<"Find event: "<<(*event).first<<" "<<R<<" "<<(*next_event).first<<endl;
@@ -1293,9 +1289,8 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		double dt =time_increment(SUM);									//increment time
 		time += dt;
 		opt_equi.add_MCtime(dt);
-	}
+		}													//end of if !events				
 	}																	// koniec petli for sub step
-
 	return time;
 }
 

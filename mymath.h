@@ -40,3 +40,11 @@ double degree2rad(double kat_in);
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+template<class InputIterator, class T> bool inlist (InputIterator first, InputIterator last, const T& val){
+	while (first!=last) {
+		if (*first==val) return true;
+		++first;
+	}
+	return false;
+}

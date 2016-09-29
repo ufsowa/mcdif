@@ -107,7 +107,6 @@ void call_flux(site* atom_to_jump,site* vac_to_jump);
 void call_flux_dislocation(site* atom_to_jump,site* vac_to_jump);	
 long call_total_flux();
 double Ceq_vac(double stech);
-int choose_typ(plaster& bin, bool sig = true);
 int choose_reservuar(site* atom);
 int check_stech(double stech, double vac, double size);
 bool check_rez_dN();

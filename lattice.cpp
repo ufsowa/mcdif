@@ -6,8 +6,7 @@ using namespace std;
 
 
 
-lattice :: lattice(int _xsize,int _ysize,int _zsize )
-{ 
+lattice :: lattice(int _xsize,int _ysize,int _zsize ){ 
 	//init global lattice variable
 	MOVE_SIM_REGION = false;
 	TRANSPARENT = false;
@@ -118,10 +117,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize )
 		x_trans.push_back(x_translation);		
 		y_trans.push_back(y_translation);
 		z_trans.push_back(z_translation);
-		
-		
-		
-		
+				
 		// tablica vecorow do przechowywania sitow. Pelni role sitow/boxow w ktorych siedza atomy o double cord: 1<=1.44 <2
 		//wypelnione -3. atom <0 means that site is not used in simulation
 		
@@ -211,51 +207,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize )
 					  
 						
 					}
-					//site *_new_site=&new_site;
-					//site *_old_site=&new_site;
-					
-					//cout<<"adres sita przed: "<<_old_site<<endl;
-					//_old_site=search_site(_new_site);
-					//cout<<"adres sita po: "<<_old_site<<endl;
-					
-					//search_site(new_site);  skanuje aktualna lista sitow i porownuje new_site z sitami
-					//nadpisac zawartosc komorki-zeby adresu nie zmieniac
-					
-					
-							 
-					 //wpisuje atom do boxa		
-					
-					
-					
-					/*
-					if(_old_site)
-					{	cout<<endl;
-						cout<<"You are traing overwrite existing site! \n To continue press 1 To end program press 0"<<endl;
-						cin>>o;
-						if(o==0)
-						{exit(0);}
-						//_old_site->show_site();
-						_old_site->set_atom(ATOM);
-						//cout<<"Nadpisano sita"<<endl;
-						//_old_site->show_site();
-						
-						}
-					else
-						{
-					//		cout<<"Dodaj sita"<<endl;
-							atom_list.push_back(new_site); 
-							
-																//klasa vector tworzy obiekt typu vector dla typow X
-					//		cout<<"Sit dodano"<<endl;			//biorac adres danego obiektu typu X 
-																//i tworzy nowy obiekt typu X korzystajac z adresu ob. typu X.
-						}										//i ten nowy utworzony obiekt dodaje do vectora
-					*/											//innymi slowy, korzysta z konstruktora site(cons site &obiekt)
-					
-				}
-
-				
-		//		control_output<<atom_list.size()<<endl;
-				
+				}				
 			}
 		}
 		}
@@ -498,22 +450,19 @@ void lattice :: add_atom_type(int _atom, string name)
 
 	}
 				// jesli juz cos jest dodane to dodaje kolejny
-	for(I=atoms_type.begin();I!=atoms_type.end();I++)
-		{
-			int old_atom = int(*I);		// wczytuje typ bedacy w liscie
+	for(I=atoms_type.begin();I!=atoms_type.end();I++){
+		int old_atom = int(*I);		// wczytuje typ bedacy w liscie
 		//	control_output<<"in add at. old typ: "<< old_atom<<" "<<atoms_name[iter]<<endl;
-			iter++;
-			if(old_atom == new_atom)	// sprawdza czy typ jest juz w lisice
-				{
-				add_new_type = 0;	
-				}
+		iter++;
+		if(old_atom == new_atom){										// sprawdza czy typ jest juz w lisice
+			add_new_type = 0;	
 		}
+	}
 	
-	
-	if(add_new_type)
-	{atoms_type.push_back(new_atom);
-	atoms_name.push_back(name);
-	//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;	
+	if(add_new_type){
+		atoms_type.push_back(new_atom);
+		atoms_name.push_back(name);
+				//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;	
 	}
 	
 	control_output<<"size: |typ "<<atoms_type.size()<<" |name: "<<atoms_name.size()<<endl;
@@ -540,11 +489,9 @@ int lattice :: get_atom_type(int typ)
 int lattice :: get_atom_type(string name)
 {
 	int pozycja=0;
-	for(unsigned int i=0;i<atoms_name.size();i++)
-	{
+	for(unsigned int i=0;i<atoms_name.size();i++){
 		if(name == atoms_name[i])
 			break;
-			
 		pozycja++;
 	}
 	

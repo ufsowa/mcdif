@@ -165,6 +165,51 @@ site* plaster :: choose_atom(unsigned int typ){
 	return node;
 }
 
+int plaster :: choose_typ(const vector <int> &exclude){	
+	
+	unsigned int SUM = 0; unsigned int i=1; 	int TYP = -1;
+	typedef vector <pair <unsigned int,int> > mykey;
+	mykey target;
+	for(; i<PL_SITES_TYP.size(); i++ ){
+		if( ! inlist(exclude.begin(),exclude.end(),i) ){
+			unsigned int s = size(i);
+			target.push_back(make_pair(SUM, i));
+			SUM = SUM + s;	
+		}
+	}
+	target.push_back(make_pair( SUM, i ));
+	
+	mykey::iterator event = target.begin();
+	mykey::iterator next_event = target.begin();
+
+	if(SUM==0){
+		control_output<<"Print target: "<<target.size()<<endl;
+		int counter=0;
+		for(event=target.begin(); event != target.end(); ++event){
+			control_output<<counter<<" p: ";
+			control_output<<(*event).first<<" "<<(*event).second<<endl;
+			counter++;
+		}
+		control_output<<"WARRNING:plaster::choose_typ:no type available"<<endl;
+	}else{
+		unsigned int R = rnd()*SUM; 
+		event = target.begin();
+		next_event = target.begin();
+		for( ++next_event ; next_event != target.end(); ++event, ++next_event){	
+			unsigned int Lvalue = (*event).first;
+			unsigned int Rvalue = (*next_event).first;	
+			//		control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+			if( R>=Lvalue and R < Rvalue){
+				TYP = (*event).second;
+			//			control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<" "<<(*event).second<<" "<<TYP<<endl;
+				}
+		}
+	}
+
+	return TYP;			//TYP < 0 means that there is no atoms in the bin
+}
+
+
 void plaster :: set_atoms_list(vector <site *> &kontener, int typ)
 {
 	site *pointer=0;

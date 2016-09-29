@@ -52,10 +52,12 @@ vector <vector<double> > V;
 vector <vector<vector<box> > > matrix;		//dziala, ale jest nie uzywana UWAGA
 vector <site*> atom_list;
 vector <site*> sim_atom_list;
-vector <int> atoms_type;			//zawiera typy atomow 0 is reserved for vacancy
 vector <wektor> sublatt_typ;		//przechowuje kombinacje sublattice i atomow na sublattice
-vector <string> atoms_name;
 vector <vector<site> > cells;
+
+vector <int> atoms_type;			//zawiera typy atomow 0 is reserved for vacancy
+vector <string> atoms_name;			//ZAMIENIC NA KEY MAP
+
 
 unsigned int x_size;			// obszar wykorzystany na zbudowanie siatki w pamieci
 unsigned int y_size;

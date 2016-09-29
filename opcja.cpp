@@ -16,33 +16,6 @@ void opcja :: execute(string name, vector<double>&parameters){
 
 }
 
-
-int opcja :: choose_typ(plaster& bin, bool sig){
-	
-	int A =  bin.size(1);
-	int B =  bin.size(2);
-	int SIZE = A + B;
-	int TYP = -1;
-			
-//	control_output<<" rozmiar typow 1/2 "<<A<<"/"<<B<<" "<<SIZE<<" ";
-	long N=(long)(rnd()*(SIZE))+1;
-	if((A > 0) and (0 < N) and (N <= (A+1))){
-		TYP=1;
-//		control_output<<" nr wylosowanego situ A: "<<N<<" "<<TYP;
-	}
-	else if((B > 0) and ((A+1) <= N) and (N <= (SIZE+1))){
-//		N-=A;
-		TYP=2;
-//		control_output<<" nr wylosowanego situ B: "<<N<<" "<<TYP;
-	}
-	else if(sig){control_output<<"Error in opcja::choose_typ: "<<N<<" "<<A<<" "<<B<<" "<<SIZE<<endl;
-		control_output<<"Try to remove atom witch does not exist "<<endl;exit(1);}
-
-//	control_output<<N<<" "<<TYP<<endl;
-	return TYP;			//TYP < 0 means that there is no atoms in the bin
-}
-
-
 int opcja :: check_stech(double _stech, double _vac, double _size){
 	
 //	control_output<<"check_stech..."<<endl;
@@ -168,7 +141,7 @@ bool opcja :: check_rezervuars(site* first, site* &last){
 	}
 
 	if(TYP==0){
-		int at_typ = choose_typ(reservuars[nr_rez],0);
+		int at_typ = (reservuars[nr_rez]).choose_typ();
 		if(at_typ <= 0){
 			control_output<<"warrning in opcja::check_reservuars -> try remove typ which dose not exist in reservuar "<<at_typ<<endl;
 			TYP_TO_MOVE=1;
@@ -323,12 +296,13 @@ void opcja :: do_equi_rez(){
 	if(DEBUG){	control_output<<"->do_equi_rez end"<<endl;}
 
 }
-
+  
 site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site){
 	
 	site* node=0; int j=-1;
+	vector <int> exclude;exclude.reserve(10);
 	if(create){
-		j=choose_typ(reservuars[for_rez]);
+		j=(reservuars[for_rez]).choose_typ();
 	}else{
 		j=0;
 	}
@@ -337,47 +311,43 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 		control_output<<node<<" "<<j<<endl;
 	}
 	
-	//		j=wybrane_typy[i];	//losuje typ atomu do wymiany z wakancja
-	//		control_output<<"rozmiar typow "<<0<<" w bloku "<<bloks[nr].size(0);
-	//		control_output<<" rozmiar typow "<<j<<" w bloku "<<bloks[nr].size(j);
-	if(BLOKS[in_bin].size(j) <= 0){
-		if(j>0){
-			//take another schoot exlusivly
-			j=choose_typ(reservuars[for_rez],j);	
-			if(BLOKS[in_bin].size(j) <= 0){
-				j=choose_typ(BLOKS[in_bin]);	
+	bool avail =  ( (BLOKS[in_bin]).size(j) > 0);
+	while(!avail){
+		if(j>0){																	//take another schoot exlusivly
+			exclude.push_back(j);
+			j=(reservuars[for_rez]).choose_typ(exclude);	
+			if(j<=0){
+				control_output<<"WARRNING: in opcja::get_node: types in rez "<<for_rez<<" do not match types in bin "<<in_bin<<endl;
+				control_output<<"Type choosen proportional to bin."<<endl;
+				j=(BLOKS[in_bin]).choose_typ();	
 			}
+			avail = (BLOKS[in_bin].size(j) > 0);
 		}else{
-		control_output<<endl;
-		control_output<<"ERROR: in opcja::create_vac -> you want to remove \
-		element "<<j<<" that does not exist in blok\n	\
-		Probably error in opcja::init or opcja::reinit_bloks"<<endl; 
-		control_output<<create<<" "<<j;
-		(reservuars[for_rez]).show();
-		(BLOKS[in_bin]).show();
+			control_output<<"ERROR: in opcja::get_node -> you want to remove type that does not exist in blok\n"<<endl;
+			control_output<<create<<" "<<j<<" "<<avail<<" "<< (BLOKS[in_bin]).size(j)<<endl;
+			(reservuars[for_rez]).show();
+			(BLOKS[in_bin]).show();
 			exit(1);
 		}
 	}
-	nr_site=(long)(rnd()*(BLOKS[in_bin].size(j)));
-	node=BLOKS[in_bin].get_site(j,nr_site);
+
+	node = (BLOKS[in_bin]).choose_atom(j);
 	
 	if(DEBUG){
 		control_output<<"get node end "<< in_bin<<" "<<for_rez<<" "<<nr_site<<" "<<create<<" ";
 		control_output<<node<<" "<<j<<" "; node->show_site();
 	}
 	int for_typ=node->get_atom();
-	if( for_typ==0 and create){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac type: "<<for_typ<<endl; 
+	if( for_typ==0 and create){control_output<<"ERROR:opcja::get_node:641: create  vac, but trying remove vac from system: "<<for_typ<<endl; 
 		control_output<<create<<" "<<j<<" "<<nr_site<<" ";node->show_site();
 		(reservuars[for_rez]).show();
 		(BLOKS[in_bin]).show();
 		exit(1);}
-	if( for_typ>0 and !create){control_output<<"ERROR:opcja::source_sink_act:636: remove  vac, but remove atom type: "<<for_typ<<endl; 
+	if( for_typ>0 and !create){control_output<<"ERROR:opcja::get_node:346: remove  vac, but trying remove atom from system: "<<for_typ<<endl; 
 		control_output<<create<<" "<<j<<" "<<nr_site<<endl;
 		(reservuars[for_rez]).show();
 		(BLOKS[in_bin]).show();
 		exit(1);}
-
-
 			
 return node;	
 }
@@ -657,8 +627,8 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		if(TRYB==2){													//dislocation move
 			AT1=source_sink_localize(in_bin, CREATE, from_rez, N1, in_dir);		
 			for_typ=AT1->get_atom();	
-			if(for_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac from system type: "<<for_typ<<endl; exit(1);}
-			if(for_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:637: remove  vac, but move atom from sysstem type: "<<for_typ<<endl; exit(1);}
+			if(for_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:630: create  vac, but remove vac from system type: "<<for_typ<<endl; exit(1);}
+			if(for_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:631: remove  vac, but move atom from sysstem type: "<<for_typ<<endl; exit(1);}
 			if(DEBUG){	control_output<<"sink act "<<i<<" "<<from_rez<<" "<<in_dir<<" "<<for_typ<<" "<<to_typ<<" "<<AT1<<" "<<AT2<<" ";
 			control_output<<N1<<" "<<N2<<" "<<CREATE<<endl;}
 			
@@ -666,8 +636,8 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 			MOVE = find_migration_path(AT1,in_dir,migration_path);	
 
 			int tmp_typ=(migration_path.front())->get_atom();	
-			if(tmp_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:636: create  vac, but remove vac from system type: "<<tmp_typ<<endl; exit(1);}
-			if(tmp_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:637: remove  vac, but move atom from sysstem type: "<<tmp_typ<<endl; exit(1);}
+			if(tmp_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:639: create  vac, but remove vac from system type: "<<tmp_typ<<endl; exit(1);}
+			if(tmp_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:640: remove  vac, but move atom from sysstem type: "<<tmp_typ<<endl; exit(1);}
 
 			if(!MOVE){
 				dislocation_walk(migration_path);
@@ -685,7 +655,7 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 			if(CREATE){
 				to_typ=0;
 			}else{
-				to_typ = choose_typ(reservuars[from_rez],false);
+				to_typ = (reservuars[from_rez]).choose_typ();
 			}
 			MOVE = check_rezervuars(from_rez,to_typ);
 			if (!MOVE){
@@ -710,12 +680,12 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		}else if(TRYB==0){												//convert
 			if(CREATE){
 				to_typ=0;
-				for_typ = choose_typ(BLOKS[in_bin],false);
+				for_typ = (BLOKS[in_bin]).choose_typ();
 				N1=(long)(rnd()*(BLOKS[in_bin].size(for_typ)));
 				AT1 = (BLOKS[in_bin]).get_site(for_typ,N1);
 			}else{
 				for_typ=0;
-				to_typ = choose_typ(BLOKS[in_bin],false);
+				to_typ = (BLOKS[in_bin]).choose_typ();
 				N1=(long)(rnd()*(BLOKS[in_bin].size(for_typ)));
 				AT1 = (BLOKS[in_bin]).get_site(for_typ,N1);
 			}
@@ -1588,8 +1558,8 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 					migration_path[i]->show_site();
 				}
 				control_output<<"Vac from cluster "; node->show_site();
-				}
 				node->show_neigh(1);
+				}
 				node=vac_bufor[rndIndex];	
 				
 				break;

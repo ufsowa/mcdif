@@ -70,6 +70,7 @@ class plaster {
 	void init_calc(int FLAG=0);
 	bool check(unsigned int typ_min, unsigned int typ_max, int delta);
 	site* choose_atom(unsigned int typ);
+	int choose_typ( const vector <int> &exclude= vector<int>());
 	int	get_direction(){return PL_DIRECTION;};
 	double	get_st(){return PL_P0;};
 	double	get_end(){return PL_P1;};
