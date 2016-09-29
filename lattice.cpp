@@ -96,7 +96,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	
 	cells.reserve(5);	
 	cells.clear();
-	atoms_type.reserve(8);
+
 	atoms_type.clear();
 	//liczba struktur do wczytania
 	unit_cell>>text>>nr_struct;
@@ -390,10 +390,9 @@ void lattice :: set_atoms_list(set <site *> &kontener, int typ)
 	}
 }	
 
-void lattice :: add_sublatt_typ(int sublatt, int atom_typ)
-	{
-		wektor typ_sublat(atom_typ,sublatt,0);
-		
+void lattice :: add_sublatt_typ(int sublatt, int atom_typ){
+
+		wektor typ_sublat(atom_typ,sublatt,0);		
 		vector <wektor> :: iterator I;
 		wektor new_sublatt= typ_sublat;
 		int add_new_type = 1;
@@ -436,36 +435,21 @@ void lattice :: add_sublatt_typ(int sublatt, int atom_typ)
 	
 void lattice :: add_atom_type(int _atom, string name)
 {
-	int iter=0;
-	int new_atom = _atom;
-	int add_new_type = 1;
-	vector <int> :: iterator I;
-	//control_output<<"type size: "<<atoms_type.size()<<endl;
-	
-	if(atoms_type.size() < 1)	//zawsze na poczatek dodaje wakancje do pustej listy
-	{
-		atoms_type.push_back(0);
-		atoms_name.push_back("Fe");
-	//	control_output<<"in add at. new typ: "<< 0 <<" "<<"Fe"<<endl;	
-
-	}
-				// jesli juz cos jest dodane to dodaje kolejny
-	for(I=atoms_type.begin();I!=atoms_type.end();I++){
-		int old_atom = int(*I);		// wczytuje typ bedacy w liscie
-		//	control_output<<"in add at. old typ: "<< old_atom<<" "<<atoms_name[iter]<<endl;
-		iter++;
-		if(old_atom == new_atom){										// sprawdza czy typ jest juz w lisice
-			add_new_type = 0;	
+	pair<map<int,string>::iterator,bool> ret;
+  
+	if(atoms_type.size() < 1)	{
+		ret = atoms_type.insert(pair<int,string>(0,"Fe"));
+		if( ret.second ){
+			types_int.push_back(_atom);
 		}
+	//control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
 	}
-	
-	if(add_new_type){
-		atoms_type.push_back(new_atom);
-		atoms_name.push_back(name);
-				//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;	
+	ret = atoms_type.insert(pair<int,string>(_atom,name));
+	if( ret.second ){
+		types_int.push_back(_atom);
 	}
-	
-	control_output<<"size: |typ "<<atoms_type.size()<<" |name: "<<atoms_name.size()<<endl;
+	//control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
+	control_output<<"size: typ/int "<<atoms_type.size()<<" / "<<types_int.size()<<endl;
 }
 
 int lattice :: get_size(int typ){
@@ -481,21 +465,32 @@ unsigned int lattice :: get_atom_typ_numbers()
 	return vec_size;
 }
 
-int lattice :: get_atom_type(int typ)
+string lattice :: get_atom_type(int typ)
 {
-	return atoms_type[typ];
+	map <int,string>::iterator it = atoms_type.find(typ);
+	
+	if( it==atoms_type.end()){
+		control_output<<"ERROR:lattice::get_atom_type:480 no such type like: "<<typ<<endl;
+	}
+	return ((*it).second);
 }
 
 int lattice :: get_atom_type(string name)
 {
-	int pozycja=0;
-	for(unsigned int i=0;i<atoms_name.size();i++){
-		if(name == atoms_name[i])
+	int typ = -1;
+	map <int,string> :: iterator I=atoms_type.begin();
+	for(;I!=atoms_type.end();++I){
+		string type_name = I->second;
+		//control_output<<name<<" "<<" "<<I->first<<" "<<type_name<<endl;
+		if(name == type_name){
+			typ = I->first;
 			break;
-		pozycja++;
+		}
+	}	
+	if (typ == -1){
+		control_output<<"ERROR:lattice::get_atom_type:500 no such type like: "<<typ<<endl;
 	}
-	
-	return atoms_type[pozycja];
+	return typ;
 }
 
 int lattice :: get_vec_lattice_typ_size()
@@ -1041,6 +1036,12 @@ bool lattice :: check_site_mobile(site* node){
 	return is_mobile;
 }
 
+int lattice :: choose_atom_typ(){
+	
+	int rndN = rand() % types_int.size();
+	return ( types_int.at(rndN) );
+		
+}
 
 void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*> &tmp_atom_list)
 	{
@@ -2954,7 +2955,7 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 		{
 			if(atom>-1)
 			{	
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;	
+			file<<get_atom_type(atom)<<" "<<i<<" "<<j<<" "<<k<<endl;	
 			atoms++;
 			}
 		}	
@@ -3086,7 +3087,7 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 		{
 			if(atom>-1)
 			{	
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;	
+			file<<get_atom_type(atom)<<" "<<i<<" "<<j<<" "<<k<<endl;	
 			atoms++;
 			}
 		}	
@@ -3190,7 +3191,7 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 		{
 			if(atom>-1)
 			{	
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<" "<<dx<<" "<<dy<<" "<<dz;
+			file<<get_atom_type(atom)<<" "<<i<<" "<<j<<" "<<k<<" "<<dx<<" "<<dy<<" "<<dz;
 			for (unsigned int nj=0; nj<jumps.size();nj++){file<<" "<<jumps[nj];}
 			file<<endl;	
 			atoms++;
@@ -3392,18 +3393,15 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 	}
 	
 	
+	for(map <int,string>::iterator i = atoms_type.upper_bound(0);i!=atoms_type.end();++i){		
+	stringstream dir;													//wylaczylem wakancje. W lattice w vectore atoms_type 
+	dir<<direction;														//wakancje maja pozycje 0 i nazwe Fe
 	
-	
-	for(unsigned int i=1;i<atoms_type.size();i++)		//wylaczylem wakancje. W lattice w vectore atoms_type wakancje maja pozycje 0 i nazwe Fe
-	{
-	stringstream dir;
-	dir<<direction;
-	
-	string name_of_file=file_name+atoms_name[i]+dir.str()+".dat";
+	string name_of_file=file_name + ((*i).second) + dir.str()+".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
-	for(unsigned int j=0;j<hist[i].size();j++)
+	for(unsigned int j=0;j<hist[((*i).first)].size();j++)
 	{
-		out_data<<Time<<" "<<(j*size_bin+st_bin)<<" "<<hist[i][j]<<endl;
+		out_data<<Time<<" "<<(j*size_bin+st_bin)<<" "<<hist[((*i).first)][j]<<endl;
 	}
 	out_data<<endl;	
 	}
@@ -3741,6 +3739,8 @@ void lattice :: save_dR(double Time, long Step, string name)
 	
 	int size=atoms_type.size();
 	
+	map <int,double> results_0;
+	map <int,wektor> results_1;
 	vector <wektor> results1(size,wektor());
 	vector <wektor> results3(size,wektor());
 	vector <double> results2_0(size,0.0);

@@ -37,6 +37,16 @@
 #include <set>
 #endif
 
+#ifndef MAP
+#define MAP
+#include <map>
+#endif
+
+#ifndef UTILITY
+#define UTILITY
+#include <utility>
+#endif
+
 using namespace std;
 
 class lattice
@@ -49,15 +59,14 @@ vector < vector <double> > *BARIERY;
 list <pairjump> *EVENTY;
 
 vector <vector<double> > V;
-vector <vector<vector<box> > > matrix;		//dziala, ale jest nie uzywana UWAGA
+vector <vector<vector<box> > > matrix;									//main container for structure
 vector <site*> atom_list;
 vector <site*> sim_atom_list;
-vector <wektor> sublatt_typ;		//przechowuje kombinacje sublattice i atomow na sublattice
+vector <wektor> sublatt_typ;											//przechowuje kombinacje sublattice i atomow na sublattice
 vector <vector<site> > cells;
 
-vector <int> atoms_type;			//zawiera typy atomow 0 is reserved for vacancy
-vector <string> atoms_name;			//ZAMIENIC NA KEY MAP
-
+map <int, string> atoms_type;
+vector <int> types_int;													//keeps int values from atoms_type
 
 unsigned int x_size;			// obszar wykorzystany na zbudowanie siatki w pamieci
 unsigned int y_size;
@@ -138,8 +147,9 @@ void exchange_sites( site* A, site* B);
 void get_sites(vector <plaster> &tmp);
 void get_sites(plaster &tmp);
 site* get_site(long pozition);
-int get_atom_type(int typ);
+string get_atom_type(int typ);
 int get_atom_type(string name);
+int choose_atom_typ();
 double move(double x2, double x1, int dir);
 
 //reading lattice parameters
@@ -180,3 +190,4 @@ void create_events_trans(site* siteA, vector <pairjump> &events);
 
 };
 
+//http://stackoverflow.com/questions/35617844/mapint-int-counter-counternumsi

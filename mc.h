@@ -23,8 +23,11 @@
 #endif
 
 #include <typeinfo>
-#include <utility>
 
+#ifndef UTILITY
+#define UTILITY
+#include <utility>
+#endif
 
 
 std::string name_of_control_file="control_file.dat";

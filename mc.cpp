@@ -273,7 +273,6 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 	//	cout<<chem[i]<<" ";
 	//}
 	long Nsize=sample->get_sim_atom_number();//sample->get_size();
-	int Ntyp = sample->get_atom_typ_numbers();
 	//cout<<"atoms: "<<Nsize<<" types: "<<Ntyp<<endl;
 	
 	for(long m=0;m<number_of_steps;m++)
@@ -285,56 +284,27 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 		site *rnd_site=0;
 		rnd_site=sample->get_site(N);
 		int old_typ = rnd_site->get_atom();
-		//cout<<"Adres rnd_sita: "<<&rnd_site<<" Adres trzymany w rnd_site: "<<rnd_site<<endl;
-		//rnd_site->show_site();
-		
-//losuj typ atomu z listy typow atomow
-		int typ=(int)(rnd()*Ntyp);
-		int new_typ=0;
-		new_typ=sample->get_atom_type(typ);
-		//cout<<typ<<" "<<rnd_typ<<" ";
-		if(new_typ != old_typ)					//warunek wyklucza podstawienie identyczne
-		{
-//policz energie przed podmiana
-			double old_E=pot.get_energy(rnd_site);
-//zamien typ
-			rnd_site->set_atom(new_typ);
-//policz energie po podmianie
-			double new_E=pot.get_energy(rnd_site);
-//ustal potencial chemiczny
-
-										//vector chem /vector pot_list istnieje lokalnie w execute_task/
-										//po zakonczeniu SGCMC jest kasowany 
-										//chem_list.size() - ile wierszy jest w pliku (punktow do symulacji)
-										//chem_list[i].size() - ile typow atomow (pot. chem) jest zadeklarowanych
-			//cout<<endl;
-			//pozycja pot.chemicznego w vectorze chem odpowiada typowi atomu
-			//bierze sie to z tad jak w kolumnach zapisane sa pot.chem w pliku chem.in
-			// uAV uBV ...
-
-			double old_chem=chem[old_typ];
-			double new_chem=chem[new_typ];
-			double mi=new_chem-old_chem;
-			
-			//cout<<"Zamiana: "<<old_typ<<" "<<new_typ<<endl;
-			//cout<<old_chem<<" - "<<new_chem<<" = "<<mi<<endl;
-
-//licz prawdopodobienstwo: exp(-dE/kT) -> dE=E2-E1 -> E = U-u
-		    double P1=exp(beta*(mi-(new_E-old_E)));
-
-		//zmien z powrotem na old_typ jesli zdarzenie to nie zostalo trafione rnd()
-			if(P1<rnd())
-			{
-			rnd_site->set_atom(old_typ);
+			//cout<<"Adres rnd_sita: "<<&rnd_site<<" Adres trzymany w rnd_site: "<<rnd_site<<endl;rnd_site->show_site();
+		int new_typ=sample->choose_atom_typ();							//losuj typ atomu z listy typow atomow
+			//cout<<typ<<" "<<rnd_typ<<" ";
+		if(new_typ != old_typ){											//warunek wyklucza podstawienie identyczne
+			double old_E=pot.get_energy(rnd_site);						//policz energie przed podmiana
+			rnd_site->set_atom(new_typ);								//zamien typ
+			double new_E=pot.get_energy(rnd_site);						//policz energie po podmianie
+																		//ustal potencial chemiczny
+			double old_chem=chem[old_typ];								//vector chem /vector pot_list istnieje lokalnie w execute_task/
+			double new_chem=chem[new_typ];								//po zakonczeniu SGCMC jest kasowany 
+			double mi=new_chem-old_chem;								//chem_list.size() - ile wierszy jest w pliku (punktow do symulacji)
+																		//chem_list[i].size() - ile typow atomow (pot. chem) jest zadeklarowanych
+			//cout<<"Zamiana: "<<old_typ<<" "<<new_typ<<endl;			//cout<<endl;
+			//cout<<old_chem<<" - "<<new_chem<<" = "<<mi<<endl;			//pozycja pot.chemicznego w vectorze chem odpowiada typowi atomu
+																		//bierze sie to z tad jak w kolumnach zapisane sa pot.chem w pliku chem.in
+																		// uAV uBV ...
+		    double P1=exp(beta*(mi-(new_E-old_E)));						//licz prawdopodobienstwo: exp(-dE/kT) -> dE=E2-E1 -> E = U-u
+			if(P1<rnd()){												//zmien z powrotem na old_typ jesli zdarzenie to nie zostalo trafione rnd()
+				rnd_site->set_atom(old_typ);
 			}
-		
-		} 
-//		else
-//		{
-		//	cout<<"te same typy"<<endl;
-			//m--;
-			
-//		}		
+		} 	
 	}
 //	cout<<"Sub-run completed..."<<endl;
 }
@@ -430,20 +400,15 @@ void widom_rnd(lattice *sample,long next, long steps, double T)
 	vector <double> Eadd((Ntyp-1),0.0);
 	vector <double> Ermv((Ntyp-1),0.0);
 	
-
-
 	direct_exchange(sample,steps,T);
 
-	vector <site *> Aatoms;
-	vector <site *> Batoms;
-	vector <site *> Vatoms;
+	vector < site* > Aatoms;
+	vector < site* > Batoms;
+	vector < site* > Vatoms;
 	sample->set_atoms_list(Vatoms,0);
 	sample->set_atoms_list(Aatoms,1);
 	sample->set_atoms_list(Batoms,2);
 
-    
-
-	
 	{
 	long N=(long)(rnd()*Aatoms.size());
 	double E1=pot.get_energy(Aatoms[N]);
