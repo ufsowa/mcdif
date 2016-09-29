@@ -440,16 +440,18 @@ void lattice :: add_atom_type(int _atom, string name)
 	if(atoms_type.size() < 1)	{
 		ret = atoms_type.insert(pair<int,string>(0,"Fe"));
 		if( ret.second ){
-			types_int.push_back(_atom);
+			types_int.push_back(0);
 		}
-	//control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
+//	control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
 	}
 	ret = atoms_type.insert(pair<int,string>(_atom,name));
 	if( ret.second ){
 		types_int.push_back(_atom);
 	}
-	//control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
+//	control_output<<(ret.first)->first<<" "<<(ret.first)->second<<" "<<types_int.back()<<endl;
 	control_output<<"size: typ/int "<<atoms_type.size()<<" / "<<types_int.size()<<endl;
+
+//	for(unsigned int i = 0; i < types_int.size(); i++){control_output<<types_int[i]<<" ";}control_output<<endl;
 }
 
 int lattice :: get_size(int typ){
@@ -1039,6 +1041,12 @@ bool lattice :: check_site_mobile(site* node){
 int lattice :: choose_atom_typ(){
 	
 	int rndN = rand() % types_int.size();
+	
+	for(unsigned int i = 0; i < types_int.size(); i++){
+		control_output<<types_int[i]<<" ";
+	}
+	
+	control_output<<rndN<<" "<<types_int.at(rndN)<<endl;
 	return ( types_int.at(rndN) );
 		
 }

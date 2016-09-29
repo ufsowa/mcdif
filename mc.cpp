@@ -286,7 +286,7 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 		int old_typ = rnd_site->get_atom();
 			//cout<<"Adres rnd_sita: "<<&rnd_site<<" Adres trzymany w rnd_site: "<<rnd_site<<endl;rnd_site->show_site();
 		int new_typ=sample->choose_atom_typ();							//losuj typ atomu z listy typow atomow
-			//cout<<typ<<" "<<rnd_typ<<" ";
+			//cout<<new_typ<<" ";
 		if(new_typ != old_typ){											//warunek wyklucza podstawienie identyczne
 			double old_E=pot.get_energy(rnd_site);						//policz energie przed podmiana
 			rnd_site->set_atom(new_typ);								//zamien typ

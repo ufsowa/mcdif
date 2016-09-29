@@ -282,3 +282,7 @@ class plaster {
 
 };
 
+//http://stackoverflow.com/questions/8192570/use-of-list-inside-map-c
+//http://stackoverflow.com/questions/10450477/iterate-through-a-map-of-lists
+//http://stackoverflow.com/questions/10720359/iterating-over-c-mapint-listint
+//http://stackoverflow.com/questions/34526710/how-to-insert-value-in-c-map-stdmapstring-liststring-in-c
