@@ -176,7 +176,8 @@ bool opcja :: check_rez_dN(){
 	
 	bool do_move=false;
 	long int V=0, Z=0;
-	
+	if(DEBUG or DEBUG_SMALL){control_output<<"check_rez_dN:->";}
+
 //	if( (i<0) and (i>=reservuars.size()) ){
 //		control_output<<"ERROR: opcja::check_rez(): 209. Wrong rez: "<<i<<endl;
 //		exit(1);}
@@ -201,6 +202,9 @@ bool opcja :: check_rez_dN(){
 			break;
 		}
 	}
+
+	if(DEBUG or DEBUG_SMALL){control_output<<"|->check_rez_dN";}
+
 	return do_move;
 }
 
@@ -249,7 +253,7 @@ bool opcja :: check_rezervuars(int i, int TYP){
 }
 
 void opcja :: do_equi_rez(){
-	if(DEBUG){	control_output<<"do_equi_rez st ";}
+	if(DEBUG or DEBUG_SMALL){	control_output<<"do_equi_rez:->";}
 
 	//direct exchange dla rezerwuarow	//DODAC PARALLEL
 	double beta=1.0/(kB*TEMPERATURE);
@@ -293,7 +297,7 @@ void opcja :: do_equi_rez(){
 	//	dir_file<<i<<" "<<iter<<" "<<E1<<"|-"<<E2<<"|="<<dE<<"|"<<p<<"<?"<<R<<endl;
 		}
 	}		
-	if(DEBUG){	control_output<<"->do_equi_rez end"<<endl;}
+	if(DEBUG or DEBUG_SMALL){	control_output<<"|->do_equi_rez"<<endl;}
 
 }
   
@@ -306,6 +310,8 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 	}else{
 		j=0;
 	}
+	if(DEBUG_SMALL){control_output<<"get_node:->";}
+
 	if(DEBUG){
 		control_output<<"get node "<< in_bin<<" "<<for_rez<<" "<<nr_site<<" "<<create<<" ";
 		control_output<<node<<" "<<j<<endl;
@@ -348,17 +354,22 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 		(reservuars[for_rez]).show();
 		(BLOKS[in_bin]).show();
 		exit(1);}
+	
+	if(DEBUG_SMALL){control_output<<"|->get_node";}
+
 			
 return node;	
 }
 
 long opcja :: call_total_flux(){
-	
+
+	if(DEBUG_SMALL){control_output<<"call_tot_flux:->";}
+
 	long SUM=0;
 	for(vector <plaster>::iterator P=HIST.begin(); P!=HIST.end(); ++P){
 		SUM += P->net_flux_get(0);
 	}
-	
+	if(DEBUG_SMALL){control_output<<"|->call_tot_flux";}	
 	return SUM;
 }
 
@@ -374,7 +385,8 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	long N=-1;
 	site* node =0;
 	vector <unsigned int> mykey; mykey.reserve(10);
-
+	
+	if(DEBUG_SMALL){control_output<<"sink_loc:->";}
 	if(DEBUG){	control_output<<"sink loc "<< in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" "<<N<<" "<<create<<" ";
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
 
@@ -516,6 +528,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	in_dir=dir;
 	if(DEBUG){	control_output<<"sink loc end "<< in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" "<<N<<" "<<create<<" ";
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
+	if(DEBUG_SMALL){control_output<<"|->sink_loc";}
 
 	return node;
 }
@@ -603,6 +616,7 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 
 	if(MOVE_FRAME or SINGLE){control_output<<" c: "<< ile_at;}
 	bool MOVE = false, CREATE=true;
+	if(DEBUG_SMALL){control_output<<"sink_act:->";}
 	if(DEBUG){control_output<<"sink act "<<in_bin<<" "<<ile_at<<" "<<FLAG<<" "<<MOVE<<" "<<CREATE<<endl;}
 
 	if(ile_at < 0){
@@ -703,7 +717,7 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		FLAG = true;													//set local FLAG in do_equi_vac
 		do_equi_vac();													//recurency. At the beginnig check if MOVE_FRAME is set to TRUE.
 	}
-	if(DEBUG){	control_output<<"->sink end"<<endl;}
+	if(DEBUG or DEBUG_SMALL){	control_output<<"|->sink_act"<<endl;}
 
 
 }
@@ -736,7 +750,7 @@ int opcja :: choose_reservuar(site* atom){
 
 void opcja :: do_equi_vac(){
 
-	if(DEBUG){control_output<<"do_equi st "<<endl;}
+	if(DEBUG or DEBUG_SMALL){control_output<<"do_equi:->"<<endl;}
 
 	bool LOCAL_MOVE = false;
 	if(MOVE_FRAME or SINGLE){	
@@ -790,7 +804,7 @@ void opcja :: do_equi_vac(){
 			if(MOVE_FRAME or SINGLE){
 			control_output<<" po: all|"<<LOCAL_MOVE<<"|"<<MOVE_FRAME<<endl;}}
 	//uaktulanic liste wakancji w  resident !!!!!!!!!!!! UWAGA !!!!!!!!!	
-	if(DEBUG){	control_output<<"->do_equi end"<<endl;}
+	if(DEBUG or DEBUG_SMALL){	control_output<<"|->do_equi"<<endl;}
 
 
 }
@@ -1201,7 +1215,7 @@ void opcja :: move_frame(){
 
 void opcja :: refresh(int on){
 
-	if(DEBUG){control_output<<"refresh st ";}
+	if(DEBUG or DEBUG_SMALL){control_output<<"refresh st ";}
 	//przeliczam stech i vac dla plasterkow
 	for (unsigned int i=0; i < BLOKS.size(); i++){
 				BLOKS[i].init_calc(on);
@@ -1216,7 +1230,7 @@ void opcja :: refresh(int on){
 			HIST[i].init_calc(on);
 
 	}
-	if(DEBUG){control_output<<"->refresh end"<<endl;}
+	if(DEBUG or DEBUG_SMALL){control_output<<"->refresh end"<<endl;}
 	
 }
 
@@ -1499,7 +1513,7 @@ void opcja :: cal_angles_strong(site *node, wektor &main, vector <site*> &wynik_
 
 bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migration_path){
 
-	if(DEBUG){control_output<<"find mig. pth st: "<<migration_path.size()<<endl;}
+	if(DEBUG or DEBUG_SMALL){control_output<<"find_mig:->";}
 
 	bool MOVE_MIG = false;
 	wektor kierunek;
@@ -1609,14 +1623,16 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			migration_path.clear();										//do nothing. Allow cluster of vacancies in sim area exists.
 		}
 	}
-	
-	if(DEBUG){control_output<<"Find mig. pth end: "<<migration_path.size()<<endl;}
+
+	if(DEBUG or DEBUG_SMALL){control_output<<"|->find_mig";}
 	}
 	return MOVE_MIG;
 }
 
 void opcja :: dislocation_walk(vector <site*> &path){
 	
+	if(DEBUG or DEBUG_SMALL){control_output<<"dis_walk:->";}
+
 	if(path.size()>0){
 	if(DEBUG){	control_output<<"Path size... "<<path.size()<<endl;}
 	site* first = path.front();
@@ -1661,6 +1677,8 @@ void opcja :: dislocation_walk(vector <site*> &path){
 		exit(1);
 	}
 	}
+	if(DEBUG or DEBUG_SMALL){control_output<<"|->dis_walk";}
+
 }
 
 void opcja :: virtual_jump_vac_atom( site* VAC, site* ATOM){
@@ -1709,14 +1727,14 @@ void opcja :: update_opcja( site* node, bool status){
 
 void opcja :: refresh_vac_list(){
 
-	if(DEBUG){	control_output<<"refresh vac st ";}
+	if(DEBUG  or DEBUG_SMALL){control_output<<"refresh_vac:->";}
 	if(!MOVE_FRAME){
 		if(SINGLE){
 			if(DEBUG){	control_output<<"refresh_vac_vector "<<VAC_LIST.size()<<endl;}}
 		SAMPLE->update_vac_list(Vtoadd, VAC_LIST);
 		if(SINGLE){	if(DEBUG){control_output<<"|= "<<VAC_LIST.size()<<endl;}}
 	}
-	if(DEBUG){	control_output<<"->refresh vac end"<<endl;}
+	if(DEBUG  or DEBUG_SMALL){control_output<<"|->refresh_vac"<<endl;}
 
 }
 
@@ -1780,14 +1798,13 @@ void opcja :: swap(plaster &source, plaster &destination, int FLAG){
 		//		if(FLAG){control_output<<size(0)<<" "<<N<<endl;}
 				rnd_vac=destination.get_site(0,N);
 
-				source[i]->set_atom(0);
-				rnd_vac->set_atom(typ);
-
 				count++;
 		//		if(FLAG){control_output<<"delete"<<endl;}
 				destination.delete_site(0,N);
+				rnd_vac->set_atom(typ);
 				destination.add_site(typ,rnd_vac);	
-			//	source.delete_site(typ,i);								//no need because later destroyed
+				source.plaster_delete_site( (source[i]) );							//no need because later destroyed
+				source[i]->set_atom(0);
 				source.add_site(0,source[i]);		
 				
 				SAMPLE->update_events(rnd_vac);
@@ -1795,10 +1812,17 @@ void opcja :: swap(plaster &source, plaster &destination, int FLAG){
 			}
 		}
 	}
-	if(FLAG){control_output<<source.size()<<" "<<destination.size()<<" "<<count;
-		control_output<<" t:"<<source.size(0)<<"|"<<source.size(1)<<"|"<<source.size(2)<<" "<<destination.size(0);
-		control_output<<"|"<<destination.size(1)<<"|"<<destination.size(2)<<endl;
-		}
+	if(FLAG){
+		source.show();
+		destination.show();
+	}
+
+	if(source.size(0) != source.size()){
+		control_output<<"ERROR:opcja::swap():no all atoms moved to new rez"<<endl;
+		source.show();
+		destination.show();
+		exit(1);
+	}
 }
 
 void opcja :: read_file(string filename){
