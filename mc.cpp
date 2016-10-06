@@ -495,11 +495,13 @@ void widom_rnd(lattice *sample,long next, long steps, double T)
 	
 }
 
-void exchange_mechanism(lattice *sample,long steps,double T){
+double exchange_mechanism(lattice *sample, long steps, double T){
 
-	double beta=1.0/(kB*T);	
+	double time = 0.0;	
 	long Nsize=sample->get_sim_atom_number();
+
 	for (long i=0; i<steps; i++){
+
 		long N1=(long)(rnd()*Nsize);
 		site* site1=0;	
 		site1=sample->get_site(N1);
@@ -510,27 +512,33 @@ void exchange_mechanism(lattice *sample,long steps,double T){
 		long N2=(long)(rnd()*nsize);
 		site* site2=neighs[N2];
 		
-		int typ1 = site1->get_atom();
-		int typ2 = site2->get_atom();
 
-		double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
-		site1->set_atom(typ2);
-		site2->set_atom(typ1);
-		double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
-		double dE=E2-E1;
-		site1->set_atom(typ1);
-		site2->set_atom(typ2);
+		double p = pot.get_barier(site1, site2);
+		
+	//beta=1.0/(kB*T),
+	//	int typ1 = site1->get_atom();
+	//	int typ2 = site2->get_atom();
+	//	double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+	//	site1->set_atom(typ2);
+	//	site2->set_atom(typ1);
+	//	double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+	//	double bariera=(E1+E2)/2+bar-E1;
 
-		if(dE > 0 ){
-			double p = exp(-beta*dE);
-			double R = rnd();
-			if(R >= p){
+	//	double dE=E2-E1;
+	//	site1->set_atom(typ1);
+	//	site2->set_atom(typ2);
+	//	cout<<i<<" "<<p<<endl;
+		if(p >= 0.0 and p <= 1.0){
+			double R = rnd();												// R=<0,1)
+			if(R <= p){
 				make_jump(sample, site1, site2);
 			}
+			time += 1.0;		//double dt =time_increment( (Nsize*nsize) );		
 		}else{
-			make_jump(sample, site1, site2);
+			i--;
 		}
 	}
+	return time;
 }
 
 void direct_exchange(lattice *sample,long steps,double T)
@@ -671,45 +679,20 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double Ady=atom_to_jump->get_dry();
 	double Adz=atom_to_jump->get_drz();				
 	atom_to_jump->get_jumps(Ajp);//liczba skokow tej wakancji			
+	Vdx -= xjump;
+	Vdy -= yjump;
+	Vdz -= zjump;
+	Adx += xjump;
+	Ady += yjump;
+	Adz += zjump;
+	Vjp[0] += 1;
+	Ajp[0] += 1;
 //identyfikacja rodzaju skoku na podstawie r^2
-	double r2=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
-//	int strefa=-1;			
-	if(r2 < 1.8){		//skoki NN typu 1,1,1 -> sqrt((latt_constx/2.0)^2 + ...) UWAGA - > ustawione na sztywno dla tego przypadku
-		//strefa=1;
-		//vac		//total sum
-		Vjp[0] += 1;
-		Vdx -= xjump;
-		Vdy -= yjump;
-		Vdz -= zjump;
-		//NN shel
-		Vjp[1] += 1;
-		//atom
-		Ajp[0] += 1;
-		Adx += xjump;
-		Ady += yjump;
-		Adz += zjump;
-		//NN shel
-		Ajp[1] += 1;
-	}
-	else if (r2 > 1.8 and r2 < 2.1 ){	//skoki NNN typu 2,0,0
-		//strefa=2;
-		//vac		//total sum
-		Vjp[0] += 1;
-		Vdx -= xjump;
-		Vdy -= yjump;
-		Vdz -= zjump;
-		//NNN shel
-		Vjp[2] += 1;
-		//atoms
-		Ajp[0] += 1;
-		Adx += xjump;
-		Ady += yjump;
-		Adz += zjump;
-		//NNN shel
-		Ajp[2] += 1;
-	}
-	else{control_output<<"ERROR: mc::resident_time_energy -> no possible jumps occurs -> problem with coordinates "<<endl; exit(0);
-	}
+	double r=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
+	unsigned int zone = pot.get_zone(r);	
+	Vjp[(zone+1)] += 1;
+	Ajp[(zone+1)] += 1;
+
 //mam cale wektory skokow vac i atomu zmienione, teraz trzeba je podmienic				//zamieniamy wakancje na atom
 	vac_to_jump->set_atom(atom);//do adresu gdzie jest wakancja nadpisac typ na atom 
 	vac_to_jump->set_drx(Adx);	//nadpisac liczbe skokow w kierunku x
@@ -1804,6 +1787,8 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 	}	
 	if(name=="EXCHANGE_MECH")
 	{
+		pot.read_bars("barriers.in");
+		
 		initialize();
 		initialize_seed();
 		long step=parameters[0];
@@ -1811,7 +1796,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 		double T = parameters[2];
 		for (long i=1; i<=step;i++){
 			exchange_mechanism(sample, sub_step, T);
-			save_results(sample,savings,"exm",sub_step,i);			
+			save_results(sample,savings,"exm_",sub_step,i);			
 		}
 		control_output<<"EXCHANGE_MECH finished"<<endl;
 	}	
