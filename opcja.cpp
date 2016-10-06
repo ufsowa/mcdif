@@ -1527,7 +1527,7 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 		control_output<<"ERROR in opcja""find_migration_path(). Wrong direction: "<<DIR<<endl;exit(1);
 	}
 //	kierunek.show();
-	if(DIR!=0){
+	if(DIR != 0){
 	site* node=first_node;
 	migration_path.push_back( first_node );
 	bool WALL = false;
@@ -1623,9 +1623,8 @@ bool opcja :: find_migration_path(site *first_node,int DIR, vector <site*> &migr
 			migration_path.clear();										//do nothing. Allow cluster of vacancies in sim area exists.
 		}
 	}
-
-	if(DEBUG or DEBUG_SMALL){control_output<<"|->find_mig";}
 	}
+	if(DEBUG or DEBUG_SMALL){control_output<<"|->find_mig";}
 	return MOVE_MIG;
 }
 
