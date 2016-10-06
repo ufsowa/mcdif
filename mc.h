@@ -39,7 +39,7 @@ int save_results(lattice *sample, vector <task> &savings, string name, double a=
 void widom(lattice *sample, long step, long number_of_steps, double T);
 void widom_rnd(lattice *sample, long step, long number_of_steps, double T);
 void sgcmc(lattice *sample,long number_of_steps,double T,vector <double> &chem);
-void exchange_mechanism(lattice *sample,long steps,double T);
+double exchange_mechanism(lattice *sample,long steps,double T);
 void direct_exchange(lattice *sample,long number_of_steps,double T);
 double residence_time(lattice *sample,long number_of_steps,double T, double _barr1, double _barr2);
 double residence_time_energy(lattice *sample,long number_of_steps,double T, int numer_plik);

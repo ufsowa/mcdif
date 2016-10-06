@@ -530,11 +530,13 @@ void widom_rnd(lattice *sample,long next, long steps, double T)
 	
 }
 
-void exchange_mechanism(lattice *sample,long steps,double T){
+double exchange_mechanism(lattice *sample, long steps, double T){
 
-	double beta=1.0/(kB*T);	
+	double time = 0.0;	
 	long Nsize=sample->get_sim_atom_number();
+
 	for (long i=0; i<steps; i++){
+
 		long N1=(long)(rnd()*Nsize);
 		site* site1=0;	
 		site1=sample->get_site(N1);
@@ -545,27 +547,33 @@ void exchange_mechanism(lattice *sample,long steps,double T){
 		long N2=(long)(rnd()*nsize);
 		site* site2=neighs[N2];
 		
-		int typ1 = site1->get_atom();
-		int typ2 = site2->get_atom();
 
-		double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
-		site1->set_atom(typ2);
-		site2->set_atom(typ1);
-		double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
-		double dE=E2-E1;
-		site1->set_atom(typ1);
-		site2->set_atom(typ2);
+		double p = pot.get_barier(site1, site2);
+		
+	//beta=1.0/(kB*T),
+	//	int typ1 = site1->get_atom();
+	//	int typ2 = site2->get_atom();
+	//	double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+	//	site1->set_atom(typ2);
+	//	site2->set_atom(typ1);
+	//	double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+	//	double bariera=(E1+E2)/2+bar-E1;
 
-		if(dE > 0 ){
-			double p = exp(-beta*dE);
-			double R = rnd();
-			if(R >= p){
+	//	double dE=E2-E1;
+	//	site1->set_atom(typ1);
+	//	site2->set_atom(typ2);
+	//	cout<<i<<" "<<p<<endl;
+		if(p >= 0.0 and p <= 1.0){
+			double R = rnd();												// R=<0,1)
+			if(R <= p){
 				make_jump(sample, site1, site2);
 			}
+			time += 1.0;		//double dt =time_increment( (Nsize*nsize) );		
 		}else{
-			make_jump(sample, site1, site2);
+			i--;
 		}
 	}
+	return time;
 }
 
 void direct_exchange(lattice *sample,long steps,double T)
@@ -1839,6 +1847,8 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 	}	
 	if(name=="EXCHANGE_MECH")
 	{
+		pot.read_bars("barriers.in");
+		
 		initialize();
 		initialize_seed();
 		long step=parameters[0];
@@ -1846,7 +1856,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 		double T = parameters[2];
 		for (long i=1; i<=step;i++){
 			exchange_mechanism(sample, sub_step, T);
-			save_results(sample,savings,"exm",sub_step,i);			
+			save_results(sample,savings,"exm_",sub_step,i);			
 		}
 		control_output<<"EXCHANGE_MECH finished"<<endl;
 	}	
