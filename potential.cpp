@@ -42,7 +42,7 @@ void potential :: init(unsigned int atom_type_size){
 	//}
 	unsigned int ls;
 	for (ls=0;ls<liczba_stref;ls++){
-		V.push_back(vector <vector <double> >(size_V, vector <double>(size_V,1000.0) ) );
+		V.push_back(vector <vector <double> >(size_V, vector <double>(size_V,0.0) ) );
 		
 		for(unsigned int k=0;k<(size_V*size_V+1);k++){							// +1 ze wzgledu na rmin_rmax	
 			unsigned int i=0,j=0;
@@ -57,9 +57,9 @@ void potential :: init(unsigned int atom_type_size){
 																		//int o;//cin>>o;
 			}else{
 				energy_file>>i>>j>>pot;
-				if(V[ls][i][j]!=1000.0){
-				control_output<<"You try overwritte energy in energy.in file!"<<endl;
-				control_output<<i<<" "<<j<<" "<<pot<<endl;exit(0);
+				if(V[ls][i][j]!=0.0){
+				control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
+				control_output<<i<<" "<<j<<" "<<pot<<endl;
 			}
 			if( (i >= size_V) or (j >= size_V)){
 				control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
