@@ -165,6 +165,21 @@ void potential :: get_interaction_zone(double &_rmin,double &_rmax, int i){
 	_rmax=rmax[i];
 }
 
+unsigned int potential::get_zone(double r){
+	
+	int zon = -1;
+	for(unsigned int i=0; i<rmin.size();i++){
+		if( rmin[i] < r and r < rmax[i] ){
+			zon = i;
+		}
+	}
+	
+	if(zon<0){
+		control_output<<"ERROR:potential::get_zone-> no such zone: "<<zon<<endl;exit(0);
+	}
+	
+	return zon;
+}
 	
 double potential :: get_energy(site *atom)	
 {

@@ -714,45 +714,20 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double Ady=atom_to_jump->get_dry();
 	double Adz=atom_to_jump->get_drz();				
 	atom_to_jump->get_jumps(Ajp);//liczba skokow tej wakancji			
+	Vdx -= xjump;
+	Vdy -= yjump;
+	Vdz -= zjump;
+	Adx += xjump;
+	Ady += yjump;
+	Adz += zjump;
+	Vjp[0] += 1;
+	Ajp[0] += 1;
 //identyfikacja rodzaju skoku na podstawie r^2
-	double r2=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
-//	int strefa=-1;			
-	if(r2 < 1.8){		//skoki NN typu 1,1,1 -> sqrt((latt_constx/2.0)^2 + ...) UWAGA - > ustawione na sztywno dla tego przypadku
-		//strefa=1;
-		//vac		//total sum
-		Vjp[0] += 1;
-		Vdx -= xjump;
-		Vdy -= yjump;
-		Vdz -= zjump;
-		//NN shel
-		Vjp[1] += 1;
-		//atom
-		Ajp[0] += 1;
-		Adx += xjump;
-		Ady += yjump;
-		Adz += zjump;
-		//NN shel
-		Ajp[1] += 1;
-	}
-	else if (r2 > 1.8 and r2 < 2.1 ){	//skoki NNN typu 2,0,0
-		//strefa=2;
-		//vac		//total sum
-		Vjp[0] += 1;
-		Vdx -= xjump;
-		Vdy -= yjump;
-		Vdz -= zjump;
-		//NNN shel
-		Vjp[2] += 1;
-		//atoms
-		Ajp[0] += 1;
-		Adx += xjump;
-		Ady += yjump;
-		Adz += zjump;
-		//NNN shel
-		Ajp[2] += 1;
-	}
-	else{control_output<<"ERROR: mc::resident_time_energy -> no possible jumps occurs -> problem with coordinates "<<endl; exit(0);
-	}
+	double r=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
+	unsigned int zone = pot.get_zone(r);	
+	Vjp[(zone+1)] += 1;
+	Ajp[(zone+1)] += 1;
+
 //mam cale wektory skokow vac i atomu zmienione, teraz trzeba je podmienic				//zamieniamy wakancje na atom
 	vac_to_jump->set_atom(atom);//do adresu gdzie jest wakancja nadpisac typ na atom 
 	vac_to_jump->set_drx(Adx);	//nadpisac liczbe skokow w kierunku x

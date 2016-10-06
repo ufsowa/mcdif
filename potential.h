@@ -25,6 +25,7 @@ unsigned int get_coordination_number();
 void get_interaction_zone(double &_rmin,double &_rmax, int i);
 
 int check_coordination_zone(site *A, site *B);
+unsigned int get_zone(double r);
 
 void init(unsigned int atom_type_size);
 void set_boundary_condAt_to_pot(wektor &boundary);
