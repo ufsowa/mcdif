@@ -565,12 +565,16 @@ double exchange_mechanism(lattice *sample, long steps, double T){
 	//	cout<<i<<" "<<p<<endl;
 		if(p >= 0.0 and p <= 1.0){
 			double R = rnd();												// R=<0,1)
-			if(R <= p){
+			if(R < p){
 				make_jump(sample, site1, site2);
 			}
+			//else{
+			//	count_jump(sample, site1, site2);
+			//}
 			time += 1.0;		//double dt =time_increment( (Nsize*nsize) );		
 		}else{
 			i--;
+			control_output<<"WARRNINIG:mc::exchange_mech()-> Possible bad structure,barriers definition"<<endl;
 		}
 	}
 	return time;
@@ -682,6 +686,33 @@ int try_jump(lattice* sample, double T, site* vac_to_jump, site* atom_to_jump){
 	return jump_occured;
 }
 
+void count_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
+	double xjumper=vac_to_jump->get_x();		
+	double yjumper=vac_to_jump->get_y();
+	double zjumper=vac_to_jump->get_z();
+	double xvac=atom_to_jump->get_x();
+	double yvac=atom_to_jump->get_y();
+	double zvac=atom_to_jump->get_z();
+
+	double xjump = sample->move(xjumper,xvac,1);
+	double yjump = sample->move(yjumper,yvac,2);
+	double zjump = sample->move(zjumper,zvac,3);
+
+	vector <long int> Vjp;
+	vector <long int> Ajp;
+	vac_to_jump->get_jumps(Vjp);
+	atom_to_jump->get_jumps(Ajp);
+
+	double r=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
+	unsigned int zone = pot.get_zone(r);	
+	Vjp[(zone+2)] += 1;
+	Ajp[(zone+2)] += 1;
+
+	vac_to_jump->set_jumps(Vjp);
+	atom_to_jump->set_jumps(Ajp);
+	
+}
+
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	
 	int atom = atom_to_jump->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
@@ -701,14 +732,11 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double yjump = sample->move(yjumper,yvac,2);	//UWZGLEDNIONE
 	double zjump = sample->move(zjumper,zvac,3);	//W move {return (xjumper-xvac)}
 
-	//wykonaj monitor
-
-//buforowanie
 	vector <long int> Vjp;
 	double Vdx=vac_to_jump->get_drx();
 	double Vdy=vac_to_jump->get_dry();
 	double Vdz=vac_to_jump->get_drz();
-	vac_to_jump->get_jumps(Vjp);//liczba skokow tej wakancji			
+	vac_to_jump->get_jumps(Vjp);										//liczba skokow tej wakancji			
 	vector <long int> Ajp;
 	double Adx=atom_to_jump->get_drx();
 	double Ady=atom_to_jump->get_dry();

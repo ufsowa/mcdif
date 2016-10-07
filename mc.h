@@ -57,6 +57,7 @@ void update_events(lattice *sample, list <pairjump> &EVENTS, site* sajt);
 void create_events_index(lattice *sample, site* siteA, vector <pairjump> &events);
 int try_jump(lattice* sample,double T,site* vac_to_jump, site* atom_to_jump);
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump);
+void count_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump);
 
 int main(int arg,char *argc[]);
 
