@@ -391,6 +391,14 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
 
 	for( unsigned rez = 0; rez < reservuars.size(); rez++){
+		
+		if( ((reservuars[rez]).get_st() <= X0) and (X0 <= reservuars[rez].get_end()) ){
+			control_output<<"ERROR:opcja::source_localize():-> bad definition of rezervuars: "<<X0<<endl;
+			(reservuars[rez]).show();
+			(BLOKS[in_bin]).show();
+			exit(1);
+		}
+		
 		double Y = 1.0 - fabs( C - (reservuars[rez]).get_stech());
 		if(Y>maxY){
 			maxY=Y;
@@ -645,19 +653,21 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 			if(for_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:631: remove  vac, but move atom from sysstem type: "<<for_typ<<endl; exit(1);}
 			if(DEBUG){	control_output<<"sink act "<<i<<" "<<from_rez<<" "<<in_dir<<" "<<for_typ<<" "<<to_typ<<" "<<AT1<<" "<<AT2<<" ";
 			control_output<<N1<<" "<<N2<<" "<<CREATE<<endl;}
-			
+
 			vector <site*> migration_path; migration_path.reserve(2000);
 			MOVE = find_migration_path(AT1,in_dir,migration_path);	
-
-			int tmp_typ=(migration_path.front())->get_atom();	
-			if(tmp_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:639: create  vac, but remove vac from system type: "<<tmp_typ<<endl; exit(1);}
-			if(tmp_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:640: remove  vac, but move atom from sysstem type: "<<tmp_typ<<endl; exit(1);}
-
+			
 			if(!MOVE){
-				dislocation_walk(migration_path);
-				MOVE=check_rez_dN();
-				if(MOVE){
-					break;
+				if(!migration_path.empty()){
+					int tmp_typ=(migration_path.front())->get_atom();	
+					if(tmp_typ==0 and CREATE){control_output<<"ERROR:opcja::source_sink_act:639: create  vac, but remove vac from system type: "<<tmp_typ<<endl; exit(1);}
+					if(tmp_typ>0 and !CREATE){control_output<<"ERROR:opcja::source_sink_act:640: remove  vac, but move atom from sysstem type: "<<tmp_typ<<endl; exit(1);}
+				
+					dislocation_walk(migration_path);
+					MOVE=check_rez_dN();
+					if(MOVE){
+						break;
+					}
 				}
 			}else{
 				break;
@@ -1294,19 +1304,19 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	double width = reservuars_par[nr][1];
 	double do_kod = od_kod + width;
 //	int typy_atomow=SAMPLE->get_atom_typ_numbers();
-	ST_VOL=min(od_kod,ST_VOL);
-	END_VOL=max(do_kod,END_VOL);
 	
 	(reservuars[nr]).reset_indexes();
 	
 	plaster tmp(2000,BIN_ATOMS_TYP,BIN_DIRECTION,nr,od_kod,do_kod, "rez");
 	SAMPLE->get_sites(tmp);
-	control_output<<"reinit reservuar: "<<nr<<" "<<odkod<<"|"<<stwidth<<"|"<<dokod<<"||"<<od_kod<<"|"<<width<<"|"<<do_kod<<" "<<direction<<endl;
+	control_output<<"reinit reservuar and volume: "<<ST_VOL<<" "<<END_VOL<<" ";
+	control_output<<nr<<" "<<odkod<<"|"<<stwidth<<"|"<<dokod<<"||"<<od_kod<<"|"<<width<<"|"<<do_kod<<" "<<direction<<endl;
+
 	control_output<<"do init_calc in reservuar: "; 
 	//przerzuc zostawione atomy do nowego rezerwuaru (swap atom<->wakancja)
 	if(DIR==1){
-	tmp.init_calc(1);
-	swap(reservuars[nr],tmp,1);
+		tmp.init_calc(1);
+		swap(reservuars[nr],tmp,1);
 	}
 	tmp.init_calc(1);
 	if(!NEW_PLANE){
@@ -1318,6 +1328,16 @@ void opcja :: reinit_reservuars(int nr, int typ){
 	wektor b(e[0],e[1],e[2]);
 	del_L_sim += a;
 	del_R_sim += b;			
+
+	ST_VOL=od_kod;END_VOL=do_kod;
+	for(unsigned int my_rez=0; my_rez < reservuars.size();my_rez++){
+		double tmp_s=reservuars[my_rez].get_st();
+		double tmp_e=reservuars[my_rez].get_end();
+		ST_VOL=min(tmp_s,ST_VOL);
+		END_VOL=max(tmp_e,END_VOL);
+	}
+	control_output<<"New volume: "<<ST_VOL<<" "<<END_VOL<<" "; 
+
 }
 
 void opcja :: reinit_bloks(){
@@ -1335,7 +1355,10 @@ bool opcja :: check_x_belonging_volume(double x){
 				   
 	if( (set_prec(x) >= set_prec(get_start_volume()) ) and ( set_prec(x) < set_prec(get_end_volume()) ) ){
 				return true;
-	}		
+	}
+	//else{
+	//	control_output<<"WARRNING:opcja::check_volume():-> site out of volume: "<<x<<" "<<ST_VOL<<" "<<END_VOL<<endl;	
+	//}
 	return false;
 }
 
@@ -1778,39 +1801,55 @@ void opcja :: reset_site(site *sajt){
 	
 }
 
-void opcja :: swap(plaster &source, plaster &destination, int FLAG){
-																		//move all atoms (no vacancies) from source to destination
+void opcja :: swap(plaster &source, plaster &destination, int FLAG){	//move all atoms (no vacancies) from source to destination
+	
+	control_output<<"swap:->";
 	int count=0;
 	unsigned int dir = source.get_direction();
 	int P0 = destination.get_st();
 	int P1 = destination.get_end();
 	
-	if(FLAG){control_output<<source.size()<<" "<<destination.size()<<endl;}
+	if(FLAG){control_output<<source.size()<<" "<<destination.size()<<endl;
+		source.show();
+		destination.show();
+
+	}
 	
 	for(unsigned int i=0;i<source.size();i++){
 		
-			double x = (source[i])->get_position(dir);
+		site* rnd_vac=0;
+		site* rnd_at=0;
+		rnd_at = source[i];
+		double x = rnd_at->get_position(dir);
 				
-	//	if(FLAG){control_output<<i<<" "<<P0<<" "<<x<<" "<<P1<<endl;}
-		if(!(P0<=x and x<P1)){		
-			int typ=source[i]->get_atom();
-	//		if(FLAG){control_output<<source.ref_to_sites[i]<<" "<<typ<<endl;}
+																		//	if(FLAG){control_output<<i<<" "<<P0<<" "<<x<<" "<<P1<<endl;}
+		if( !( (P0 <= x) and (x < P1) ) ){		
+			int typ = rnd_at->get_atom();
+																		//		if(FLAG){control_output<<source.ref_to_sites[i]<<" "<<typ<<endl;}
 			if(typ>0){
-				long N =(long)(rnd()*(destination.size(0)) );site* rnd_vac=0;
-		//		if(FLAG){control_output<<size(0)<<" "<<N<<endl;}
+				long N =(long)(rnd()*(destination.size(0)) );			//		if(FLAG){control_output<<size(0)<<" "<<N<<endl;}
 				rnd_vac=destination.get_site(0,N);
-
-				count++;
-		//		if(FLAG){control_output<<"delete"<<endl;}
+				double xv = rnd_vac->get_position(dir); bool common = false;
+				if( (source.get_st() <= xv) and (xv<source.get_end()) ){
+					common = true;
+				}		
+				count++;												//		if(FLAG){control_output<<"delete"<<endl;}
 				destination.delete_site(0,N);
+				if(common){
+					source.plaster_delete_site( rnd_vac );				
+				}
 				rnd_vac->set_atom(typ);
 				destination.add_site(typ,rnd_vac);	
-				source.plaster_delete_site( (source[i]) );							//no need because later destroyed
-				source[i]->set_atom(0);
-				source.add_site(0,source[i]);		
+				if(common){
+					source.add_site(typ,rnd_vac);		
+				}
+				
+				source.plaster_delete_site( rnd_at );							//no need because later destroyed
+				rnd_at->set_atom(0);
+				source.add_site(0,rnd_at);		
 				
 				SAMPLE->update_events(rnd_vac);
-				SAMPLE->update_events(source[i]);	
+				SAMPLE->update_events(rnd_at);	
 			}
 		}
 	}
@@ -1818,13 +1857,26 @@ void opcja :: swap(plaster &source, plaster &destination, int FLAG){
 		source.show();
 		destination.show();
 	}
-
-	if(source.size(0) != source.size()){
-		control_output<<"ERROR:opcja::swap():no all atoms moved to new rez"<<endl;
-		source.show();
-		destination.show();
-		exit(1);
+//	if sth wrong then you will see some atoms which stay out of sample
+	for(unsigned int i=0;i<source.size();i++){
+		site* rnd_at=0;
+		rnd_at = source[i];
+		double x = rnd_at->get_position(dir);				
+		int typ = rnd_at->get_atom();
+		if( (P0 <= x) and (x < P1) ){
+			continue;
+		}else{
+			if(typ > 0){
+				control_output<<"ERROR:opcja::swap():no all atoms moved to new rez"<<endl;
+				source.show();
+				destination.show();
+				rnd_at->show_site();
+				exit(1);
+			}	
+		}
 	}
+
+	control_output<<"|->swap";
 }
 
 void opcja :: read_file(string filename){

@@ -134,6 +134,12 @@ class plaster {
 	
 	void	add_site(int typ, site* new_site){
 		unsigned int st_size=PL_SITES_TYP[typ].size();
+		int atyp=new_site->get_atom();
+		if(typ != atyp){
+			control_output<<"ERROR: plaster::add_site(). wrong site type  "<<typ<<" "<<atyp<<endl;
+			new_site->show_site();
+			exit(1);					
+		}
 		PL_SITES_TYP[typ].push_back(new_site);
 		eq_flux_delta(typ,1);
 		

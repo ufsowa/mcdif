@@ -1229,8 +1229,8 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		{
 		//	control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
 			opt_equi.equilibrate();
-			if( (warrinig_jump_event <= 40) and EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-				control_output<<" in step: "<<RTA_energy_executions<<endl;
+			if( (warrinig_jump_event <= 40) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+				control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
 				EVENTS_size=EVENTS.size();
 			}
 		}}
