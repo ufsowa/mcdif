@@ -101,8 +101,8 @@ void insert_atoms(int number,int from_typ, int to_typ,lattice *sample)
 	sample->set_atoms_list(Aatoms,from_typ);
 	long Asize=Aatoms.size();
 	
-	if( ! Aatoms.empty()){
-		while(iter < number){
+	while(iter < number){
+		if( ! Aatoms.empty()){
 			set <site *>::iterator node=Aatoms.begin();
 			long R=rnd()*Asize;
 			advance(node,R);
@@ -115,11 +115,13 @@ void insert_atoms(int number,int from_typ, int to_typ,lattice *sample)
 			}else{
 				control_output<<"ERROR:mc::insert_atoms():->wrong type in container."<<endl;exit(0);
 			}
+		}else{
+			control_output<<iter<<" atoms "<<from_typ<<" empty."<<endl;
+			break;
 		}
-		control_output<<Asize<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
-	}else{
-		control_output<<iter<<" atoms "<<from_typ<<" empty."<<endl;
 	}
+	control_output<<Asize<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
+	
 }
 
 /*
