@@ -96,33 +96,30 @@ control_output<<"...removed..."<<endl;
 void insert_atoms(int number,int from_typ, int to_typ,lattice *sample)
 {
 	control_output<<"Removing atoms..."<<endl;
-	vector <site *> Aatoms;
-	//vector <site *> Batoms;
+	set <site *> Aatoms;
 	int iter=0;
 	sample->set_atoms_list(Aatoms,from_typ);
-	//sample->set_atoms_list(Batoms,to_typ);
-
 	long Asize=Aatoms.size();
-	//long Bsize=Batoms.size();
 	
-	while(iter < number)
-	{
-		long R=rnd()*Asize;
-		int atom=Aatoms[R]->get_atom();
-		if(atom != to_typ)
-		{
-			Aatoms[R]->set_atom(to_typ);
-			iter++;
-			sample->set_atoms_list(Aatoms,from_typ);
-			Asize=Aatoms.size();
+	if( ! Aatoms.empty()){
+		while(iter < number){
+			set <site *>::iterator node=Aatoms.begin();
+			long R=rnd()*Asize;
+			advance(node,R);
+			int atom=(*node)->get_atom();
+			if(atom != to_typ){
+				(*node)->set_atom(to_typ);
+				iter++;
+				Aatoms.erase(node);
+				Asize=Aatoms.size();
+			}else{
+				control_output<<"ERROR:mc::insert_atoms():->wrong type in container."<<endl;exit(0);
+			}
 		}
+		control_output<<Asize<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
+	}else{
+		control_output<<iter<<" atoms "<<from_typ<<" empty."<<endl;
 	}
-	
-	
-	//cout<<number<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
-
-	control_output<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
-
 }
 
 /*

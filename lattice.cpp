@@ -2924,13 +2924,6 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	name=s.str()+"pic.xyz";
 	ofstream file(name.c_str());
 
-	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ... 
-	file<<endl;
-	file<<endl;
-	file<<endl;
-	file<<endl;
-	file<<endl;
-	file<<endl;
 	//Nx=Nx-1;
 	//Ny=Ny-1;
 	//Nz=Nz-1;
@@ -2962,6 +2955,7 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	}
 file.seekp(0);	
 file<<atoms<<endl;
+file<<endl;
 file.close();	
 }		
 
