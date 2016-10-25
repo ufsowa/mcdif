@@ -777,7 +777,6 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	}
 	//collect flux data
 	opt_equi.call_flux(atom_to_jump,vac_to_jump);	
-	
 }
 
 double residence_time_energy(lattice *sample,long number_of_steps,double T, int file_nr)
@@ -1273,8 +1272,9 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 				double Rvalue = (*next_event).first;	
 				//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
 				if( R>=Lvalue and R < Rvalue){
-							//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-							//	(*event).second.show();
+					//control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+					//(*event).second.show();
+					pot.add_barrier( (*event).second );
 					vac_to_jump=(*event).second.get_vac_to_jump();
 					atom_to_jump=(*event).second.get_atom_to_jump();
 					make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
@@ -1756,12 +1756,16 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 			{
 				sample->save_SRO(a,b,output);
 			}
-			else if(name=="Rd2")
-			{
+			else if(name=="Rd2"){
 				sample->save_dR(a,b,output);
-			}
-			else if(name=="HIST")
-			{
+				
+			}else if(name=="BARRS"){
+				if( !( pot.save_status() ) ){
+					pot.set_save();
+				}
+				pot.save_barriers(a,b,output);
+
+			}else if(name=="HIST"){
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=4){control_output<<"Wrong parameter list in conf.in -> HIST: 4"<<endl;exit(1);}
@@ -2321,8 +2325,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 				files_nrRTAE++;
 				stringstream s;
 				s<<files_nrRTAE<<" "<<rob_plik;
-				name_of_file=s.str();
-			
+				name_of_file=s.str();			
 			}				
 			if(j==(proc_zad*licz_print)+1)
 			{
@@ -2781,7 +2784,7 @@ int main(int arg, char *argc[])
 
 		
 	//Wczytuje potencjaly
-	pot.init(_sample->get_atom_typ_numbers());
+	pot.init( _sample->get_atom_typ_numbers(), _sample->get_vec_lattice_typ_size() );
 	
 	//wczytuje sasiadow w I strefie zgodnie z podanymi ustawieniami
 	_sample->jumps_shell_init();

@@ -1,16 +1,17 @@
 Method: 1
 RESIDENT 4 1000 100 5000 1000
-Save: 5
+Save: 6
 HIST 4 0 100 1 1
 NandE 1 1
 Rd2 0
+BARRS 0
 make_pic 7 100 0 0 0 100 40 40
 pic_diff 7 5000 0 0 0 100 40 40
 Options: 4
-EQUILIBRATE 6 2 50 16 84 2 1
+EQUILIBRATE 6 2 0 16 84 2 1
 RESERVUAR 5 8 4 1 1 50
 RESERVUAR 5 88 4 1 1 50
-L_SIM_B 2 1 1
+L_SIM_B 2 1 0
 Memory_Size:
 50 20 20
 Def_atomic_zone:

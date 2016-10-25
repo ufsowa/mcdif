@@ -21,19 +21,27 @@ pairjump :: pairjump(site* from, site* to,double e1,double e2,double bar_con,dou
 		
 pairjump :: ~pairjump(){}
 	
-double pairjump :: get_barier(){
+double pairjump :: get_barier() const {
 	return bariera;
 }
 
-site* pairjump :: get_vac_to_jump(){
+double pairjump :: get_e1() const {
+	return E1;
+}
+
+double pairjump :: get_e2() const {
+	return E2;
+}
+
+site* pairjump :: get_vac_to_jump() const {
 	return vac_to_jump;
 }
 
-site* pairjump :: get_atom_to_jump(){
+site* pairjump :: get_atom_to_jump() const {
 	return atom_to_jump;
 }
 	
-void pairjump :: show(){
+void pairjump :: show() const {
 	control_output<<"Skok: "<<E1<<" "<<E2<<" "<<bar<<" "<<bariera<<endl;
 	vac_to_jump->show_site();
 	atom_to_jump->show_site();
