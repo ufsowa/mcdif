@@ -380,7 +380,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	double C = (BLOKS[in_bin]).get_stech();
 //	control_output<<"Decide for: "<<X0<<" "<<bin<<" "<<C<<" ";
 
-	double maxY=0; 
+	double maxY=0, range=0.8, norma =1.0, min=1.0, max=0.0; 
 	int REZ=-1, sign = 1;
 	long N=-1;
 	site* node =0;
@@ -390,6 +390,13 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	if(DEBUG){	control_output<<"sink loc "<< in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" "<<N<<" "<<create<<" ";
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
 
+	for( unsigned rez = 0; rez < reservuars.size(); rez++){				//find maximum and min stechiometry range
+		double CR = (reservuars[rez]).get_stech();
+		if(CR >= max){max=CR;}
+		if(CR <= min){min=CR;}
+	}
+	if(max > min){norma=fabs(max - min);}
+																		//separate diffusion zone
 	for( unsigned rez = 0; rez < reservuars.size(); rez++){
 		
 		if( ((reservuars[rez]).get_st() <= X0) and (X0 <= reservuars[rez].get_end()) ){
@@ -398,26 +405,30 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			(BLOKS[in_bin]).show();
 			exit(1);
 		}
-		
-		double Y = 1.0 - fabs( C - (reservuars[rez]).get_stech());
-		if(Y>maxY){
-			maxY=Y;
-			mykey.clear();
-			mykey.push_back(rez);
-		}else if(Y==maxY){
-			mykey.push_back(rez);			
-		}else
-		{
-			continue;
-		}
+		double CR = (reservuars[rez]).get_stech();
+		double Y = 1.0 - fabs( CR - C)/norma;							//show percentage belonging to the given rez
+																		// 0.9 means that in 90% belong to rez	
+		if( Y > range ){												//if bin is 0.8 in rez then find max rez
+			if(Y>maxY){													//if not then use flux criteria (empty list)			
+				maxY=Y;
+				mykey.clear();
+				mykey.push_back(rez);
+			}else if(Y==maxY){
+				mykey.push_back(rez);			
+			}else{
+				continue;
+			}
+		}																			
 	}																	//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
 	if(DEBUG){	control_output<<"sink loc "<<maxY<<" "<<mykey.size()<<":";
 	for(unsigned int i=0; i<mykey.size();i++){
 		control_output<<" "<<mykey[i];
 	}
 	control_output<<endl;}
-	
-	if(mykey.size() == 1){
+																		//when in diffusion zone, test local net flux
+	if(mykey.size() == 0){
+		
+	}else if(mykey.size() == 1){
 		REZ=mykey[0];
 		double left = (reservuars[REZ]).get_st() - X0;
 		double right = (reservuars[REZ]).get_end() - X0;
