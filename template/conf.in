@@ -6,6 +6,7 @@ Save: 3
 HIST 4 0 40 1 1
 NandE 1 1
 make_pic 7 100 0 0 0 40 20 20
+BARRS 0
 Options: 4
 EQUILIBRATE 6 2 1 2 38 2 1
 RESERVUAR 5 0 2 1 1 0

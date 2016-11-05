@@ -1,11 +1,13 @@
 #include "potential.h"
 
-potential :: potential(){};
+potential :: potential(){
+	SAVE=false;
+	};
 potential :: ~potential(){};
 
 using namespace std;
 
-void potential :: init(unsigned int atom_type_size){
+void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	
 	control_output<<"Initialize potentials..."<<endl;
 	string text;
@@ -33,7 +35,8 @@ void potential :: init(unsigned int atom_type_size){
 	energy_file>>text;
 	energy_file>>liczba_stref;
 	coordination_zones=liczba_stref;
-	atoms_type=size_V;
+	atoms_type = size_V;
+	sublattices = lattices;
 	//vector<vector<double> > V_tmp(size_V, vector<double> (size_V));
 	//for(int p=0;p<size_V;p++)
 	//{	
@@ -77,12 +80,78 @@ void potential :: init(unsigned int atom_type_size){
 	}
 	
 	show();
+	control_output<<"Potentials initialized-> "<<atoms_type<<" "<<sublattices;
 	
-	control_output<<"Potentials initialized."<<endl;
-		
+	for (unsigned int i=0;i<atoms_type;i++){
+		save_bar.push_back( vector<vector<wektor>>(sublattices, vector<wektor>(sublattices, wektor() )));
+	}
+	control_output<<" save_bar set: "<<save_bar.size()<<endl;
+
+	control_output<<save_bar.size()<<" ";
+	for(unsigned int ib = 0; ib < save_bar.size(); ib++){
+		control_output<<save_bar[ib].size()<<" ";
+		for(unsigned int jb=0; jb < save_bar[ib].size(); jb++){
+		control_output<<save_bar[ib][jb].size()<<endl;
+		for(unsigned int kb=0; kb < save_bar[ib][jb].size(); kb++){	
+			control_output<<ib<<" "<<jb<<" "<<kb<<" "; (save_bar[ib][jb][kb]).show();
+	}}}
 	
 	};
 	
+void potential :: add_barrier(const pairjump &jump){
+
+	if(SAVE){
+	double bariera = jump.get_barier();
+	double Em = ( jump.get_e1() + jump.get_e2() )/2.0 ;
+	
+	site* vac_to_jump = jump.get_vac_to_jump();
+	site* atom_to_jump = jump.get_atom_to_jump();
+	
+	int ATOM = atom_to_jump->get_atom();
+	int NR_LATa = atom_to_jump->get_sub_latt();
+	int NR_LATv = vac_to_jump->get_sub_latt();
+	
+	save_bar[ATOM][NR_LATa][NR_LATv].x = save_bar[ATOM][NR_LATa][NR_LATv].x + Em;
+	save_bar[ATOM][NR_LATa][NR_LATv].y = save_bar[ATOM][NR_LATa][NR_LATv].y + bariera;
+	save_bar[ATOM][NR_LATa][NR_LATv].z = save_bar[ATOM][NR_LATa][NR_LATv].z + 1;
+	}
+}
+
+void potential :: save_barriers(double time, double step, string name){
+	
+	string file="";	
+	stringstream total(name);
+	
+	int word_count=0 ;
+    string word;
+    while( total >> word ) ++word_count;
+    
+	if(word_count == 1){
+		file=name+"bar";
+	}else if(word_count == 2){
+		stringstream ss(name);
+		int log=0;
+		while(ss>>word){
+			if(log==0){
+			file=word+"bar";log++;}
+			else if(log>=1){log++;}
+			else {control_output<<"ERROR1 in potential:save "<<log<<endl;exit(1);}
+			}
+	}else if(word_count>2){control_output<<"ERROR2 in potential::save->file_name: "<<word_count<<endl;exit(1);}
+	else{control_output<<"ERROR3 in potential::save->file_name: "<<word_count<<endl;exit(1);}
+	string name_of_file= file + ".dat";
+	ofstream file_out(name_of_file.c_str(),ios :: app);
+
+	file_out<<step<<" "<<time;
+	for(unsigned int ib = 0; ib < save_bar.size(); ib++){
+		for(unsigned int jb=0; jb < save_bar[ib].size(); jb++){
+		for(unsigned int kb=0; kb < save_bar[ib][jb].size(); kb++){	
+			 file_out<<" "<<save_bar[ib][jb][kb].x<<" "<<save_bar[ib][jb][kb].y<<" "<<save_bar[ib][jb][kb].z;
+			 save_bar[ib][jb][kb].x=0.0; save_bar[ib][jb][kb].y=0.0; save_bar[ib][jb][kb].z=0.0;
+	}}}	
+	file_out<<endl;
+	file_out.close();
+}
 
 void potential :: read_bars(string file_input){
 	

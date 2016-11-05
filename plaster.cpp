@@ -311,7 +311,7 @@ bool plaster :: check_types(){
 			if(typ != i){
 				control_output<<"ERROR:plaster::check_types: "<<i<<" "<<counter<<" "<<typ<<endl;
 				(*item)->show_site();
-				exit(1);
+				//exit(1);
 			}
 		}
 	}

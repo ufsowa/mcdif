@@ -1,0 +1,30 @@
+structures:
+4
+fill_vect/</st-end-trans
+20 0 0 30 50 50 2 2 2
+atoms:
+2
+atom_position:/x,y,z,typ,name,sublatice/
+0 0 0 1 Tr 0
+1 1 1 1 Tr 1
+fill_vect/</st-end-trans
+0 0 0 20 50 50 2 2 2
+atoms:
+2
+atom_position:/x,y,z,typ,name,sublatice/
+0 0 0 2 Ni 0
+1 1 1 3 Al 1
+fill_vect/</st-end-trans
+30 0 0 50 50 50 2 2 2
+atoms:
+2
+atom_position:/x,y,z,typ,name,sublatice/
+0 0 0 2 Ni 0
+1 1 1 3 Al 1
+fill_vect/</st-end-trans
+24 0 0 26 2 2 2 2 2
+atoms:
+2
+atom_position:/x,y,z,typ,name,sublatice/
+0 0 0 0 Fe 0
+1 1 1 0 Fe 1

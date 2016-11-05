@@ -1,0 +1,15 @@
+
+	FILES='total_dR2.dat'
+	FILES1='total_dR2.dat'
+	FILES2=''
+	print FILES
+	ST=900
+	EV=100
+	set title "FREQ"
+#	set terminal wxt size 1800,900; unset key;
+#	set multiplot layout 1,4
+	plot [:] for [ data in FILES ] data u 2:(($21+$22)/($10)) w lp t 'eTr',	for [ data in FILES ] data u 2:(($23+$24)/($14)) w lp t 'eA',	for [ data in FILES ] data u 2:(($25+$26)/($18)) w lp t 'eB'
+#	for [ data in FILES ] data u 2:(($19+$20)/($6) ) w lp t 'eV',
+	pause -1
+#	unset multiplot
+    

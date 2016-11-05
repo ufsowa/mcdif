@@ -2752,7 +2752,7 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 	{
 	string line;
 	while (getline(file_structure,line)){
-	if(!line.empty()){
+	if( !line.empty() and (line.find_first_not_of(' ') != std::string::npos) ){
 	double buf;
 	vector <double> values;	
 	stringstream ss(line);
@@ -2933,11 +2933,7 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	name=s.str()+"pic.xyz";
 	ofstream file(name.c_str());
 
-	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ... 
-	file<<endl;
-	file<<endl;
-	file<<endl;
-	file<<endl;
+	file<<"          "<<endl;
 	file<<endl;
 	file<<endl;
 	//Nx=Nx-1;

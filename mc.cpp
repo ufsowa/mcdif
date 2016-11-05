@@ -96,33 +96,32 @@ control_output<<"...removed..."<<endl;
 void insert_atoms(int number,int from_typ, int to_typ,lattice *sample)
 {
 	control_output<<"Removing atoms..."<<endl;
-	vector <site *> Aatoms;
-	//vector <site *> Batoms;
+	set <site *> Aatoms;
 	int iter=0;
 	sample->set_atoms_list(Aatoms,from_typ);
-	//sample->set_atoms_list(Batoms,to_typ);
-
 	long Asize=Aatoms.size();
-	//long Bsize=Batoms.size();
 	
-	while(iter < number)
-	{
-		long R=rnd()*Asize;
-		int atom=Aatoms[R]->get_atom();
-		if(atom != to_typ)
-		{
-			Aatoms[R]->set_atom(to_typ);
-			iter++;
-			sample->set_atoms_list(Aatoms,from_typ);
-			Asize=Aatoms.size();
+	while(iter < number){
+		if( ! Aatoms.empty()){
+			set <site *>::iterator node=Aatoms.begin();
+			long R=rnd()*Asize;
+			advance(node,R);
+			int atom=(*node)->get_atom();
+			if(atom != to_typ){
+				(*node)->set_atom(to_typ);
+				iter++;
+				Aatoms.erase(node);
+				Asize=Aatoms.size();
+			}else{
+				control_output<<"ERROR:mc::insert_atoms():->wrong type in container."<<endl;exit(0);
+			}
+		}else{
+			control_output<<iter<<" atoms "<<from_typ<<" empty."<<endl;
+			break;
 		}
 	}
+	control_output<<Asize<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
 	
-	
-	//cout<<number<<" "<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
-
-	control_output<<iter<<" atoms "<<from_typ<<" exchange to "<<to_typ<<endl;
-
 }
 
 /*
@@ -530,12 +529,16 @@ double exchange_mechanism(lattice *sample, long steps, double T){
 	//	cout<<i<<" "<<p<<endl;
 		if(p >= 0.0 and p <= 1.0){
 			double R = rnd();												// R=<0,1)
-			if(R <= p){
+			if(R < p){
 				make_jump(sample, site1, site2);
 			}
+			//else{
+			//	count_jump(sample, site1, site2);
+			//}
 			time += 1.0;		//double dt =time_increment( (Nsize*nsize) );		
 		}else{
 			i--;
+			control_output<<"WARRNINIG:mc::exchange_mech()-> Possible bad structure,barriers definition"<<endl;
 		}
 	}
 	return time;
@@ -647,6 +650,33 @@ int try_jump(lattice* sample, double T, site* vac_to_jump, site* atom_to_jump){
 	return jump_occured;
 }
 
+void count_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
+	double xjumper=vac_to_jump->get_x();		
+	double yjumper=vac_to_jump->get_y();
+	double zjumper=vac_to_jump->get_z();
+	double xvac=atom_to_jump->get_x();
+	double yvac=atom_to_jump->get_y();
+	double zvac=atom_to_jump->get_z();
+
+	double xjump = sample->move(xjumper,xvac,1);
+	double yjump = sample->move(yjumper,yvac,2);
+	double zjump = sample->move(zjumper,zvac,3);
+
+	vector <long int> Vjp;
+	vector <long int> Ajp;
+	vac_to_jump->get_jumps(Vjp);
+	atom_to_jump->get_jumps(Ajp);
+
+	double r=sqrt(xjump*xjump + yjump*yjump + zjump*zjump);
+	unsigned int zone = pot.get_zone(r);	
+	Vjp[(zone+2)] += 1;
+	Ajp[(zone+2)] += 1;
+
+	vac_to_jump->set_jumps(Vjp);
+	atom_to_jump->set_jumps(Ajp);
+	
+}
+
 void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	
 	int atom = atom_to_jump->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
@@ -666,14 +696,11 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	double yjump = sample->move(yjumper,yvac,2);	//UWZGLEDNIONE
 	double zjump = sample->move(zjumper,zvac,3);	//W move {return (xjumper-xvac)}
 
-	//wykonaj monitor
-
-//buforowanie
 	vector <long int> Vjp;
 	double Vdx=vac_to_jump->get_drx();
 	double Vdy=vac_to_jump->get_dry();
 	double Vdz=vac_to_jump->get_drz();
-	vac_to_jump->get_jumps(Vjp);//liczba skokow tej wakancji			
+	vac_to_jump->get_jumps(Vjp);										//liczba skokow tej wakancji			
 	vector <long int> Ajp;
 	double Adx=atom_to_jump->get_drx();
 	double Ady=atom_to_jump->get_dry();
@@ -715,7 +742,6 @@ void make_jump(lattice* sample, site* vac_to_jump, site* atom_to_jump){
 	}
 	//collect flux data
 	opt_equi.call_flux(atom_to_jump,vac_to_jump);	
-	
 }
 
 double residence_time_energy(lattice *sample,long number_of_steps,double T, int file_nr)
@@ -1166,8 +1192,8 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		{
 		//	control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
 			opt_equi.equilibrate();
-			if( (warrinig_jump_event <= 40) and EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-				control_output<<" in step: "<<RTA_energy_executions<<endl;
+			if( (warrinig_jump_event <= 40) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+				control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
 				EVENTS_size=EVENTS.size();
 			}
 		}}
@@ -1211,8 +1237,9 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 				double Rvalue = (*next_event).first;	
 				//	control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
 				if( R>=Lvalue and R < Rvalue){
-							//	control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
-							//	(*event).second.show();
+					//control_output<<"Find event: "<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+					//(*event).second.show();
+					pot.add_barrier( (*event).second );
 					vac_to_jump=(*event).second.get_vac_to_jump();
 					atom_to_jump=(*event).second.get_atom_to_jump();
 					make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
@@ -1694,12 +1721,16 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 			{
 				sample->save_SRO(a,b,output);
 			}
-			else if(name=="Rd2")
-			{
+			else if(name=="Rd2"){
 				sample->save_dR(a,b,output);
-			}
-			else if(name=="HIST")
-			{
+				
+			}else if(name=="BARRS"){
+				if( !( pot.save_status() ) ){
+					pot.set_save();
+				}
+				pot.save_barriers(a,b,output);
+
+			}else if(name=="HIST"){
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=4){control_output<<"Wrong parameter list in conf.in -> HIST: 4"<<endl;exit(1);}
@@ -2259,8 +2290,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 				files_nrRTAE++;
 				stringstream s;
 				s<<files_nrRTAE<<" "<<rob_plik;
-				name_of_file=s.str();
-			
+				name_of_file=s.str();			
 			}				
 			if(j==(proc_zad*licz_print)+1)
 			{
@@ -2719,7 +2749,7 @@ int main(int arg, char *argc[])
 
 		
 	//Wczytuje potencjaly
-	pot.init(_sample->get_atom_typ_numbers());
+	pot.init( _sample->get_atom_typ_numbers(), _sample->get_vec_lattice_typ_size() );
 	
 	//wczytuje sasiadow w I strefie zgodnie z podanymi ustawieniami
 	_sample->jumps_shell_init();
