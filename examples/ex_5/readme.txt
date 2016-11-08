@@ -1,0 +1,1 @@
+default diffusion couple

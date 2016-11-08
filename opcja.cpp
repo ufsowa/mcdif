@@ -454,16 +454,20 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		//build list of rez
 		typedef vector <pair <double,double> > lista; double sum=0;
 		lista tmp_rta;
+		control_output<<"Build list for rez:"<<endl;
 		for(unsigned int i=0; i<mykey.size();i++){
 			double left = (reservuars[REZ]).get_st() - X0;
 			double right = (reservuars[REZ]).get_end() - X0;
 			double dx = fabs(left) > fabs(right) ? right : left;
 			double P = exp(-(sign*dx*Ft)/(TEMPERATURE*kB));				
 			tmp_rta.push_back(make_pair(sum,mykey[i]));sum += P;
+			control_output<<left<<" "<<right<<" "<<dx<<" "<<Ft<<" "<<P<<" "<<sum<<endl;
+
 		}
 		tmp_rta.push_back(make_pair(sum,-1));
 
 		//select rez
+		control_output<<"Select rez:"<<endl;
 		double R=rnd()*sum; 
 		lista::iterator event=tmp_rta.begin();
 		lista::iterator next_event=tmp_rta.begin();
@@ -472,6 +476,8 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			double Rvalue = (*next_event).first;	
 			if( R>=Lvalue and R < Rvalue){
 				REZ=(*event).second;
+				control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<endl;
+				
 			}
 		}		
 	}else{
@@ -479,14 +485,16 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	}
 
 	//select initial node from bin
-	if(DEBUG){	control_output<<"sink loc 6 "<<N<<" "<<REZ<<" "<<displace<<" "<<endl;}
+	control_output<<"Get first node in bin:"<<endl;
 	if(REZ>=0 and ( N < 0 and node == 0 )){
 		node=get_node(in_bin,create,REZ,N);
 	}else{
 		control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);
 	}
+	control_output<<REZ<<" "<<N<<" "<<endl;node->show_site();
 	
 	//calculate direction
+	control_output<<"Cal direction:"<<endl;
 	double wal_l = (reservuars[REZ]).get_st();
 	double wal_r = (reservuars[REZ]).get_end();
 	if(wal_l < X0 and X0 < wal_r){
@@ -495,11 +503,18 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	double left = wal_l - X0;
 	double right = wal_r - X0;
 	displace = fabs(left) > fabs(right) ? right : left;				//take shorter distance to the wall
-																	
+	control_output<<wal_l<<" "<<wal_r<<" "<<displace<<endl;
+	
+	
+	
 	from_rez=REZ;
 	nr_site=N;
 	in_dir=displace;
-	if(DEBUG){	control_output<<"sink loc end "<< in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" "<<N<<" "<<create<<" ";
+	control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<endl;
+	node->show_site();
+
+
+	if(DEBUG){	control_output<<"sink loc end "<<in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" ";
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
 	if(DEBUG_SMALL){control_output<<"|->sink_loc";}
 
