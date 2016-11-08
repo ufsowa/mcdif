@@ -257,7 +257,12 @@ class plaster {
 
 	long net_flux_get(unsigned int typ){
 		if(typ>=PL_NET_FLUX.size()){cout<<"ERROR in plaster::eq_flux: "<<typ<<endl;exit(1);}
-		return PL_NET_FLUX[typ];
+		double particles = PL_NET_FLUX[typ];
+		double jumps = PL_JUMPS;
+		if(jumps <=0){jumps =1.0;}
+		double flux = particles/jumps;
+		
+		return flux;
 	};
 	
 	long flux_net_get(unsigned int typ){
