@@ -363,7 +363,7 @@ return node;
 
 double opcja :: call_total_flux(double range, unsigned int nr_bin){
 
-	if(DEBUG_SMALL){control_output<<"call_tot_flux:->";}
+	if(DEBUG_SMALL  or DEBUG_CRITERIA_FLUX){control_output<<"call_tot_flux:->";}
 
 	double SUM=0;double iter=0;
 //	unsigned int st = nr_bin - int(range/2.0);
@@ -377,15 +377,25 @@ double opcja :: call_total_flux(double range, unsigned int nr_bin){
 	vector <plaster>::iterator P=HIST.begin();
 	
 	for(; P!=HIST.end(); ++P){
-		SUM += P->net_flux_get(0); iter++;
+		double f = P->net_flux_get(0);
+		if(DEBUG_CRITERIA_FLUX){
+			control_output<<iter<<" "<<f<<" "<<SUM<<" ";P->show_small(); 
+		}
+		
+		SUM += f; iter++;
 	}
 	if(DEBUG_SMALL){control_output<<"|->call_tot_flux";}	
 	if(iter==0){iter=1;}
+	if(DEBUG_CRITERIA_FLUX){
+		control_output<<SUM<<endl; 
+	}
+
 	return SUM;
 }
 
 site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long int &nr_site, int &in_dir){
 
+	bool debug_flux = false;
 	double displace = 0;
 	double X0=( (BLOKS[in_bin]).get_st() + (BLOKS[in_bin]).get_end() )/2.0;
 	double C = (BLOKS[in_bin]).get_stech();
@@ -444,22 +454,18 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		}
 		if(DEBUG_CRITERIA){control_output<<rez<<" "<<C<<" "<<CR<<" "<<Y<<" "<<maxY<<" "<<(maxY - 0.5*norma)<<" "<<(maxY + 0.5*norma)<<endl;}
 	}																	//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
-	if(DEBUG){	control_output<<"sink loc "<<maxY<<" "<<mykey.size()<<":";
-	for(unsigned int i=0; i<mykey.size();i++){
-		control_output<<" "<<mykey[i];
-	}control_output<<endl;}
 																		
 	if(mykey.size() == 1){												//when out off diffusion zone, get nearest rez
 		REZ=mykey[0];
 	}else if(mykey.size() > 1){											//when in diffusion zone, test local net flux
-		double Ft = call_total_flux(10, in_bin);									//change to temporary flux (time) and local (position). Add rounding of flux to include fluctuations
-		
-		if(!create){sign=-1;}													//if vacancy is to be removed -> change direction of movement
-	
+		debug_flux = true;
+		double Ft = call_total_flux(10, in_bin);									//change to temporary flux (time) and local (position). Add rounding of flux to include fluctuations		
+		if(!create){sign=-1;}													//if vacancy is to be removed -> change direction of movement	
 		//build list of rez
 		typedef vector <pair <double,double> > lista; double sum=0;
 		lista tmp_rta;
-		if(DEBUG_CRITERIA){control_output<<"Build list for rez:"<<endl;}
+		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<"Build list for rez: ";
+			control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C<<endl;}
 		for(unsigned int i=0; i<mykey.size();i++){
 			unsigned int tmp_rez = mykey[i];
 			double left = (reservuars[tmp_rez]).get_st() - X0;
@@ -469,13 +475,13 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			
 			double P = exp(-(sign*dx*Ft)/(TEMPERATURE*kB));				
 			tmp_rta.push_back(make_pair(sum,tmp_rez));sum += P;
-			if(DEBUG_CRITERIA){control_output<<REZ<<" "<<tmp_rez<<" "<<left<<" "<<right<<" "<<dx<<" "<<sign<<" "<<Ft<<" "<<P<<" "<<sum<<endl;}
+			if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<tmp_rez<<" "<<left<<" "<<right<<" "<<dx<<" "<<sign<<" "<<Ft<<" "<<P<<" "<<sum<<endl;}
 
 		}
 		tmp_rta.push_back(make_pair(sum,-1));
 
 		//select rez
-		if(DEBUG_CRITERIA){control_output<<"Select rez:"<<endl;}
+		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<"Select rez:"<<endl;}
 		double R=rnd()*sum; 
 		lista::iterator event=tmp_rta.begin();
 		lista::iterator next_event=tmp_rta.begin();
@@ -484,7 +490,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			double Rvalue = (*next_event).first;	
 			if( R>=Lvalue and R < Rvalue){
 				REZ=(*event).second;
-				if(DEBUG_CRITERIA){control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<" "<<REZ<<endl;}
+				if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<" "<<REZ<<endl;}
 				
 			}
 		}		
@@ -493,16 +499,16 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	}
 
 	//select initial node from bin
-	if(DEBUG_CRITERIA){control_output<<"Get first node in bin:"<<endl;}
+	if(DEBUG_CRITERIA or debug_flux){control_output<<"Get first node in bin:"<<endl;}
 	if(REZ>=0 and ( N < 0 and node == 0 )){
 		node=get_node(in_bin,create,REZ,N);
 	}else{
 		control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);
 	}
-	if(DEBUG_CRITERIA){control_output<<REZ<<" "<<N<<" ";node->show_site();}
+	if(DEBUG_CRITERIA or debug_flux){control_output<<REZ<<" "<<N<<" ";node->show_site();}
 	
 	//calculate direction
-	if(DEBUG_CRITERIA){control_output<<"Cal direction:"<<endl;}
+	if(DEBUG_CRITERIA or debug_flux){control_output<<"Cal direction:"<<endl;}
 	double wal_l = (reservuars[REZ]).get_st();
 	double wal_r = (reservuars[REZ]).get_end();
 	if(wal_l < X0 and X0 < wal_r){
@@ -511,14 +517,14 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	double left = wal_l - X0;
 	double right = wal_r - X0;
 	displace = fabs(left) > fabs(right) ? right : left;				//take shorter distance to the wall
-	if(DEBUG_CRITERIA){control_output<<wal_l<<" "<<wal_r<<" "<<displace<<endl;}
+	if(DEBUG_CRITERIA or debug_flux){control_output<<wal_l<<" "<<wal_r<<" "<<displace<<endl;}
 	
 	
 	
 	from_rez=REZ;
 	nr_site=N;
 	in_dir=displace;
-	if(DEBUG_CRITERIA){control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<" ";
+	if(DEBUG_CRITERIA or debug_flux){control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<" ";
 	node->show_site();}
 
 

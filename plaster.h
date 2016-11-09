@@ -88,6 +88,7 @@ class plaster {
 	void jump_occured(){PL_JUMPS++;};
 	void jump_occured_dislocation(){PL_JUMPS_EQ++;};
 	void show();
+	void show_small();
 	bool check_types();
 	
 	site* get_site(int typ,int nr){

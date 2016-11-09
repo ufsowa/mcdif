@@ -301,6 +301,35 @@ void plaster :: show(){
 	
 }
 
+void plaster :: show_small(){
+	
+	control_output<<PL_NAME<<" "<<PL_INDEX<<" "<<PL_P0<<" "<<PL_P1<<" ";
+	
+	for(unsigned int i=0; i<PL_SITES_TYP.size(); i++){
+		control_output<<i<<" "<<PL_SITES_TYP[i].size()<<" ";
+	}
+	
+	for(unsigned int i=0; i<PL_ATOMS.size(); i++){
+		control_output<<PL_ATOMS[i]<<" ";
+	}
+	
+	for(unsigned int i=0; i<PL_NET_FLUX.size(); i++){
+		control_output<<PL_NET_FLUX[i]<<" ";
+	}
+	
+	control_output<<endl;
+	
+	check_types();
+//	vector <long> PL_EQ_FLUX;
+//	vector <long> PL_NET_FLUX;
+//	vector <long> PL_PROB_ADD;
+//	vector <long> PL_PROB_DEL;
+//	vector<double> PL_AVG_PARS;	//p0,p1,A,B,V,flux_A,...,eq_fluxA,..., counter;
+//	unsigned long PL_JUMPS;
+//	unsigned long PL_JUMPS_EQ;
+	
+}
+
 bool plaster :: check_types(){
 
 	for(unsigned int i=0; i<PL_SITES_TYP.size(); i++){
