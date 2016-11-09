@@ -32,6 +32,7 @@ double set_prec(double x, double prec = 4);
 const int control_atom=99; //must be set to 0 if want see sth
 const bool DEBUG = false;
 const bool DEBUG_SMALL = false;
+const bool DEBUG_CRITERIA = true;
 
 double integral_data(std::vector<double> &X, std::vector<double> &Y, double a);
 float CalculateTrapezoidArea(float sideA, float sideB, float height);
