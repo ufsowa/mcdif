@@ -31,6 +31,7 @@ plaster ::	plaster(int i, int atoms_type, int dir, int id, double x0, double x1,
 		for(unsigned int i=0;i<PL_PROB_DEL.size();i++){PL_AVG_PARS.push_back(PL_PROB_DEL[i]);};
 		PL_AVG_PARS.push_back(0);
 		PL_AVG_PARS.push_back(0);
+		phase_vac=false;
 //		control_output<<"plaster initied"<<endl;
 
 }
@@ -303,7 +304,7 @@ void plaster :: show(){
 
 void plaster :: show_small(){
 	
-	control_output<<PL_NAME<<" "<<PL_INDEX<<" "<<PL_P0<<" "<<PL_P1<<" ";
+	control_output<<PL_NAME<<" "<<PL_INDEX<<" "<<PL_P0<<" "<<PL_P1<<" "<<phase_vac<<" ";
 	
 	for(unsigned int i=0; i<PL_SITES_TYP.size(); i++){
 		control_output<<i<<" "<<PL_SITES_TYP[i].size()<<" ";
@@ -319,7 +320,8 @@ void plaster :: show_small(){
 	
 	control_output<<endl;
 	
-	check_types();
+//	check_types();
+
 //	vector <long> PL_EQ_FLUX;
 //	vector <long> PL_NET_FLUX;
 //	vector <long> PL_PROB_ADD;

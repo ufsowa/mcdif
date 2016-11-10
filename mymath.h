@@ -34,6 +34,7 @@ const bool DEBUG = false;
 const bool DEBUG_SMALL = false;
 const bool DEBUG_CRITERIA = false;
 const bool DEBUG_CRITERIA_FLUX = true;
+const bool DEBUG_CRITERIA_PHASE = false;
 
 double integral_data(std::vector<double> &X, std::vector<double> &Y, double a);
 float CalculateTrapezoidArea(float sideA, float sideB, float height);

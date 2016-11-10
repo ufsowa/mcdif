@@ -365,7 +365,7 @@ double opcja :: call_total_flux(double range, unsigned int nr_bin){
 
 	if(DEBUG_SMALL  or DEBUG_CRITERIA_FLUX){control_output<<"call_tot_flux:->";}
 
-	double SUM=0;double iter=0;
+	double SUMF=0;double SUMN=0;double iter=0;
 //	unsigned int st = nr_bin - int(range/2.0);
 	
 	//using bin to calculate over hist??
@@ -377,20 +377,29 @@ double opcja :: call_total_flux(double range, unsigned int nr_bin){
 	vector <plaster>::iterator P=HIST.begin();
 	
 	for(; P!=HIST.end(); ++P){
-		double f = P->net_flux_get(0);
+		double F = P->net_flux_get(0);
+		double N = P->get_jumps();
+		bool phase = P->get_phase();
+
 		if(DEBUG_CRITERIA_FLUX){
-			control_output<<iter<<" "<<f<<" "<<SUM<<" ";P->show_small(); 
+			control_output<<iter<<" "<<F<<" "<<N<<" "<<SUMF<<" "<<SUMN<<" ";P->show_small(); 
 		}
-		
-		SUM += f; iter++;
+		if(phase){
+			SUMF += F; 
+			SUMN += N; 
+		}
+		iter++;
 	}
 	if(DEBUG_SMALL){control_output<<"|->call_tot_flux";}	
 	if(iter==0){iter=1;}
+	
+	double f=SUMF/SUMN;
+	if(SUMN<=0){f=0;}
+	
 	if(DEBUG_CRITERIA_FLUX){
-		control_output<<SUM<<endl; 
+		control_output<<f<<endl; 
 	}
-
-	return SUM;
+	return f;
 }
 
 site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long int &nr_site, int &in_dir){
@@ -739,6 +748,7 @@ void opcja :: do_equi_vac(){
 void opcja :: equilibrate(){
 	
 	refresh(0);
+	identify_phases();
 	do_equi_vac();
 	do_equi_rez();
 	refresh_vac_list();
@@ -987,6 +997,64 @@ void opcja :: set_opcja_lattice(lattice *sample){
 	
 	SAMPLE=sample;
 	BIN_ATOMS_TYP=sample->get_atom_typ_numbers();
+}
+
+void opcja :: identify_phases(){
+
+	if(DEBUG_CRITERIA_PHASE){control_output<<"Identify phase:"<<endl;}
+	for(vector <plaster>::iterator P=HIST.begin(); P!=HIST.end(); ++P){
+		double V=P->get_vac();
+
+		double stech=P->get_stech();
+		double Veq = Ceq_vac(stech);
+	//	double Ver = errCeq_vac(stech);
+	//	double Y = fabs( V - Veq);	
+		double norma = 0.02*fabs(1.0-Veq);
+		if( (V > Veq - norma) and (V < Veq + norma) ){
+			P->mark_phase(true);				
+		}else{
+			P->mark_phase(false);
+		}
+		if(DEBUG_CRITERIA_PHASE){ control_output<<stech<<" "<<V<<" "<<Veq<<" "<<Veq - norma<<" "<<Veq + norma<<" "; P->show_small();}
+	}
+
+	//second loop to cut intermediate region
+	set < vector<plaster>::iterator > intermediate;
+	vector <plaster>::iterator actual=HIST.begin();
+	for(; actual!=HIST.end(); ++actual){
+		bool status = actual->get_phase();
+		if(status){
+			vector <plaster>::iterator prev=actual;
+			vector <plaster>::iterator next=actual;
+			for(int range = 0; range<3; range++){
+				prev=prev-range;
+				next=next+range;
+				
+				bool stat_p = prev->get_phase();
+				if(!stat_p){
+					intermediate.insert(actual);
+				}
+				bool stat_n = next->get_phase();
+				if(!stat_n){
+					intermediate.insert(actual);
+				}
+			}
+		}
+	}
+	if(DEBUG_CRITERIA_PHASE){control_output<<"Intermediate phase:"<<endl;}
+	set < vector<plaster>::iterator >::iterator IN=intermediate.begin();
+	for(; IN!=intermediate.end(); ++IN){
+		if(DEBUG_CRITERIA_PHASE){ (*IN)->show_small();}
+		(*IN)->mark_phase(false);
+	}
+	if(DEBUG_CRITERIA_PHASE){ 
+		control_output<<"Atomic phase:"<<endl;
+		for(vector <plaster>::iterator actual=HIST.begin();actual!=HIST.end(); ++actual){
+			actual->show_small();
+		}
+	}
+
+		
 }
 
 void opcja :: init_EQ(vector <double> &parameters ){

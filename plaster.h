@@ -22,6 +22,7 @@ class plaster {
 	vector <site*> PL_REF_TO_SITES;			//przechowuje wszystkie sity w plastrze
 	vector < list < site* > > PL_SITES_TYP;
 	
+	bool phase_vac;
 	string PL_NAME;
 	unsigned int PL_TYPES,PL_DIRECTION,PL_INDEX;
 	double PL_P0,PL_P1;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
@@ -261,9 +262,13 @@ class plaster {
 		double particles = PL_NET_FLUX[typ];
 		double jumps = PL_JUMPS;
 		if(jumps <=0){jumps =1.0;}
-		double flux = particles/jumps;
+		double flux = particles;
 		
 		return flux;
+	};
+
+	double get_jumps(){	
+		return PL_JUMPS;
 	};
 	
 	long flux_net_get(unsigned int typ){
@@ -289,6 +294,14 @@ class plaster {
 		long int size = PL_REF_TO_SITES.size();	
 		double vac = static_cast<double> (PL_ATOMS[0])/static_cast<double> (size);
 		return vac;
+	};
+
+	void mark_phase(bool status){
+		phase_vac=status;
+	};
+
+	bool get_phase(){
+		return phase_vac;
 	};
 
 

@@ -142,6 +142,7 @@ void save_write();
 void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
 
+void identify_phases();
 void find_interface();
 void source_sink_act(int i, int vac, bool &FLAG);	
 site* source_sink_localize(int in_bin, bool create, int &for_rez, long int &nr_site, int &dir);	
