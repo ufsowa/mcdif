@@ -430,7 +430,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		if(CR <= min){min=CR;}
 	}
 	norma=fabs(max - min);
-	double range = 0.2*norma;
+	double range = 0.8*norma;
 	if(DEBUG_CRITERIA){control_output<<" "<<norma<<endl;}
 
 	if(norma > 1.0){
@@ -756,6 +756,7 @@ void opcja :: equilibrate(){
 	
 	refresh(0);
 	identify_phases();
+	identify_matano();
 	do_equi_vac();
 	do_equi_rez();
 	refresh_vac_list();
@@ -1006,6 +1007,15 @@ void opcja :: set_opcja_lattice(lattice *sample){
 	BIN_ATOMS_TYP=sample->get_atom_typ_numbers();
 }
 
+void opcja :: identify_matano(){
+	if(DEBUG_MATANO){control_output<<"Identify matano:"<<endl;}
+
+	for(vector <plaster>::iterator P=HIST.begin(); P!=HIST.end(); ++P){
+		double M = matano_localize(P);
+		P->set_matano(M);
+	}
+}
+
 void opcja :: identify_phases(){
 
 	if(DEBUG_CRITERIA_PHASE){control_output<<"Identify phase:"<<endl;}
@@ -1186,6 +1196,49 @@ void opcja :: init_reservuar(vector <double> &parameters){
 	ST_VOL=min(od_kod,ST_VOL);
 	END_VOL=max(do_kod,END_VOL);
 
+}
+
+double opcja :: matano_localize(vector <plaster>::iterator bin){
+
+	double L=0.0,R=0.0, LF =0.0, LN=0.0, RF =0.0, RN=0.0;
+	vector <plaster>::iterator actual=HIST.begin();
+	if(DEBUG_MATANO){ bin->show_small();
+		control_output<<"Left side:"<<endl;}
+	for(; actual!=HIST.end(); ++actual){	
+		double F = actual->net_flux_get(0);
+		double N = actual->get_jumps();
+		bool phase = actual->get_phase();
+		if(DEBUG_MATANO){
+			control_output<<F<<" "<<N<<" "<<phase<<" "; actual->show_small();
+		}
+		if(phase){
+			LF += F;
+			LN += N; 
+		}
+	}
+	actual=HIST.end();
+	if(DEBUG_MATANO){ control_output<<"Right side:"<<endl;}
+	for(; actual==HIST.begin(); --actual){
+		double F = actual->net_flux_get(0);
+		double N = actual->get_jumps();
+		bool phase = actual->get_phase();
+		if(DEBUG_MATANO){
+			control_output<<F<<" "<<N<<" "<<phase<<" "; actual->show_small();
+		}
+		if(phase){
+			RF += F;
+			RN += N; 
+		}
+	}
+	if(LN>0){ L = LF/LN;}
+	if(RN>0){ R = RF/RN;}
+	double M = fabs(L) - fabs(R);
+
+	if(DEBUG_MATANO){
+		control_output<<LF<<" "<<LN<<" "<<RF<<" "<<RN<<" "<<L<<" "<<R<<" "<<M<<" "; bin->show_small();
+	}
+	return M;
+	
 }
 
 
@@ -1971,7 +2024,7 @@ void opcja :: save_call(){
 	vector<plaster>& wsk2blok=BLOKS;
 	vector<plaster>& wsk2rez=reservuars;
 	for(unsigned int i =0;i<wsk2hist.size();i++){
-		wsk2hist[i].cumulate();	
+		wsk2hist[i].cumulate();		
 		}	
 	for(unsigned int i =0;i<wsk2blok.size();i++){
 		wsk2blok[i].cumulate();	

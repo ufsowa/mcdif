@@ -25,7 +25,7 @@ class plaster {
 	bool phase_vac;
 	string PL_NAME;
 	unsigned int PL_TYPES,PL_DIRECTION,PL_INDEX;
-	double PL_P0,PL_P1;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
+	double PL_P0,PL_P1,PL_M;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
 	vector <long> PL_EQ_FLUX;
 	vector <long> PL_NET_FLUX;
 	vector <long> PL_PROB_ADD;
@@ -261,7 +261,7 @@ class plaster {
 	};
 
 	double net_flux_get(unsigned int typ){
-		if(typ>=PL_NET_FLUX.size()){cout<<"ERROR in plaster::eq_flux: "<<typ<<endl;exit(1);}
+		if(typ>=PL_NET_FLUX.size()){cout<<"ERROR in plaster::net_flux: "<<typ<<endl;exit(1);}
 		double particles = PL_NET_FLUX[typ];
 		double jumps = PL_JUMPS;
 		if(jumps <=0){jumps =1.0;}
@@ -307,6 +307,12 @@ class plaster {
 		return phase_vac;
 	};
 
+	void set_matano(double m){
+		PL_M=m;
+	};
+	double get_matano(){
+		return PL_M;
+	};
 
 };
 
