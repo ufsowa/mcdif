@@ -306,7 +306,8 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 	site* node=0; int j=-1;
 	vector <int> exclude;exclude.reserve(10);
 	if(create){
-		j=(reservuars[for_rez]).choose_typ();
+//		j=(reservuars[for_rez]).choose_typ();
+		j=(BLOKS[in_bin]).choose_typ();
 	}else{
 		j=0;
 	}
@@ -363,7 +364,7 @@ return node;
 
 double opcja :: call_total_flux(double range, unsigned int nr_bin){
 
-	if(DEBUG_SMALL  or DEBUG_CRITERIA_FLUX){control_output<<"call_tot_flux:->";}
+	if(DEBUG_SMALL  or DEBUG_CRITERIA_PHASE){control_output<<"call_tot_flux:->";}
 
 	double SUMF=0;double SUMN=0;double iter=0;
 //	unsigned int st = nr_bin - int(range/2.0);
@@ -381,16 +382,15 @@ double opcja :: call_total_flux(double range, unsigned int nr_bin){
 		double N = P->get_jumps();
 		bool phase = P->get_phase();
 
-		if(DEBUG_CRITERIA_FLUX){
-			control_output<<iter<<" "<<F<<" "<<N<<" "<<SUMF<<" "<<SUMN<<" ";P->show_small(); 
-		}
 		if(phase){
-			SUMF += F; 
+			SUMF += F*N; 
 			SUMN += N; 
+		}
+		if(DEBUG_CRITERIA_PHASE){
+			control_output<<iter<<" "<<F<<" "<<N<<" "<<SUMF<<" "<<SUMN<<" ";P->show_small(); 
 		}
 		iter++;
 	}
-	if(DEBUG_SMALL){control_output<<"|->call_tot_flux";}	
 	if(iter==0){iter=1;}
 	
 	double f=SUMF/SUMN;
@@ -399,6 +399,8 @@ double opcja :: call_total_flux(double range, unsigned int nr_bin){
 	if(DEBUG_CRITERIA_FLUX){
 		control_output<<f<<endl; 
 	}
+	if(DEBUG_SMALL){control_output<<"|->call_tot_flux";}	
+
 	return f;
 }
 
@@ -428,6 +430,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		if(CR <= min){min=CR;}
 	}
 	norma=fabs(max - min);
+	double range = 0.2*norma;
 	if(DEBUG_CRITERIA){control_output<<" "<<norma<<endl;}
 
 	if(norma > 1.0){
@@ -447,34 +450,39 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 
 		double CR = (reservuars[rez]).get_stech();
 		double Y = 1.0 - fabs( CR - C);	
-		if( (Y >= maxY - 0.5*norma) and (Y <= maxY + 0.5*norma) ){				
+
+		if(DEBUG_CRITERIA){control_output<<rez<<" "<<C<<" "<<CR<<" "<<Y<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<endl;}
+		if( (Y >= maxY - range) and (Y <= maxY + range) ){	
+			maxY=Y;			
 			mykey.push_back(rez);					
-		}else if(Y > maxY + 0.5*norma){
+		}else if(Y > maxY + range){
 			maxY=Y;
 			mykey.clear();
 			mykey.push_back(rez);		
-		}else if (Y < maxY - 0.5*norma){
+		}else if (Y < maxY - range){
 			continue;
 		}else{
-			control_output<<"ERROR:opcja::source_localize():-> bad definition of rezervuars:419"<<X0<<endl;
+			control_output<<"ERROR:opcja::source_localize():-> bad definition of rezervuars:419 "<<X0<<endl;
 			(reservuars[rez]).show();
 			(BLOKS[in_bin]).show();
 			exit(1);
 		}
-		if(DEBUG_CRITERIA){control_output<<rez<<" "<<C<<" "<<CR<<" "<<Y<<" "<<maxY<<" "<<(maxY - 0.5*norma)<<" "<<(maxY + 0.5*norma)<<endl;}
+		
 	}																	//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
 																		
 	if(mykey.size() == 1){												//when out off diffusion zone, get nearest rez
 		REZ=mykey[0];
 	}else if(mykey.size() > 1){											//when in diffusion zone, test local net flux
-		debug_flux = true;
+		
 		double Ft = call_total_flux(10, in_bin);									//change to temporary flux (time) and local (position). Add rounding of flux to include fluctuations		
 		if(!create){sign=-1;}													//if vacancy is to be removed -> change direction of movement	
 		//build list of rez
 		typedef vector <pair <double,double> > lista; double sum=0;
 		lista tmp_rta;
-		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<"Build list for rez: ";
-			control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C<<endl;}
+		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){
+			debug_flux = true;
+			control_output<<"Build list for rez: ";
+			control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<endl;}
 		for(unsigned int i=0; i<mykey.size();i++){
 			unsigned int tmp_rez = mykey[i];
 			double left = (reservuars[tmp_rez]).get_st() - X0;
@@ -504,7 +512,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			}
 		}		
 	}else{
-		control_output<<"ERROR: opcja::source_sink_localize:469"<<endl;exit(1);
+		control_output<<"ERROR: opcja::source_sink_localize:509"<<endl;exit(1);
 	}
 
 	//select initial node from bin
@@ -512,8 +520,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	if(REZ>=0 and ( N < 0 and node == 0 )){
 		node=get_node(in_bin,create,REZ,N);
 	}else{
-		control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);
-	}
+		control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);	}
 	if(DEBUG_CRITERIA or debug_flux){control_output<<REZ<<" "<<N<<" ";node->show_site();}
 	
 	//calculate direction
@@ -1723,15 +1730,15 @@ void opcja :: update_opcja( site* node, bool status){
 //	control_output<<ID_B<<" "<<ID_H<<" "<<ID_R<<endl;
 	if(ID_B >=0){
 //		control_output<<"in block ";
-		BLOKS[ID_B].update_plaster(node,status);
+		BLOKS[ID_B].update_plaster(node,status,true);
 	}
 	if(ID_H >=0){
 //		control_output<<"in hist "<<endl;;
-//		HIST[ID_H].update_hist(node,status);							//will change HIST, which keep data to print. Not to equlibrate.
+		HIST[ID_H].update_plaster(node,status,false);							//will change HIST, which keep data to print. Not to equlibrate.
 	}																	//if ON, then it means that flux comming from dislocation movement 
 	if(ID_R >=0){														// is added to flux of particles. 	
 //		control_output<<"in rez ";
-		reservuars[ID_R].update_plaster(node,status);
+		reservuars[ID_R].update_plaster(node,status,true);
 	}
 }
 
@@ -1821,7 +1828,7 @@ void opcja :: swap(plaster &source, plaster &destination, int FLAG){	//move all 
 				count++;												//		if(FLAG){control_output<<"delete"<<endl;}
 				destination.delete_site(0,N);
 				if(common){
-					source.plaster_delete_site( rnd_vac );				
+					source.plaster_delete_site( rnd_vac, true );				
 				}
 				rnd_vac->set_atom(typ);
 				destination.add_site(typ,rnd_vac);	
@@ -1829,7 +1836,7 @@ void opcja :: swap(plaster &source, plaster &destination, int FLAG){	//move all 
 					source.add_site(typ,rnd_vac);		
 				}
 				
-				source.plaster_delete_site( rnd_at );							//no need because later destroyed
+				source.plaster_delete_site( rnd_at, true );							//no need because later destroyed
 				rnd_at->set_atom(0);
 				source.add_site(0,rnd_at);		
 				

@@ -320,7 +320,7 @@ void plaster :: show_small(){
 	
 	control_output<<endl;
 	
-//	check_types();
+	check_types();
 
 //	vector <long> PL_EQ_FLUX;
 //	vector <long> PL_NET_FLUX;
@@ -396,13 +396,13 @@ void plaster :: reset_indexes(){
 	}
 }
 
-void plaster :: update_plaster(site* node, bool status){
+void plaster :: update_plaster(site* node, bool status, bool flux){
 
 	if(status){
 //		control_output<<"stat: "<<status;;
-		plaster_add_site(node);
+		plaster_add_site(node,flux);
 	}else{
 //		control_output<<"stat: "<<status;
-		plaster_delete_site(node);
+		plaster_delete_site(node,flux);
 	}
 }
