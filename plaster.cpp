@@ -112,7 +112,7 @@ void plaster :: cumulate(){
 	for(unsigned int i=0;i<PL_PROB_ADD.size();i++,j++){PL_AVG_PARS[j]+=(PL_PROB_ADD[i]);};
 	for(unsigned int i=0;i<PL_PROB_DEL.size();i++,j++){PL_AVG_PARS[j]+=(PL_PROB_DEL[i]);};
 	PL_AVG_PARS[j]=PL_JUMPS;j++;
-	PL_AVG_PARS[j]=PL_JUMPS_EQ;
+	PL_AVG_PARS[j]=PL_JUMPS_EQ;j++;
 	PL_AVG_PARS[j]=PL_M;
 }
 

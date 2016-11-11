@@ -1200,42 +1200,30 @@ void opcja :: init_reservuar(vector <double> &parameters){
 
 double opcja :: matano_localize(vector <plaster>::iterator bin){
 
-	double L=0.0,R=0.0, LF =0.0, LN=0.0, RF =0.0, RN=0.0;
-	vector <plaster>::iterator actual=HIST.begin();
-	if(DEBUG_MATANO){ bin->show_small();
-		control_output<<"Left side:"<<endl;}
-	for(; actual!=HIST.end(); ++actual){	
-		double F = actual->net_flux_get(0);
-		double N = actual->get_jumps();
+	double x0 = bin->get_index();
+	double L=0.0,R=0.0, LF =0.0, LN=0.0, RN=0.0, RF =0.0;
+	
+	if(DEBUG_MATANO){ control_output<<"For: ";bin->show_small();}
+	for(vector <plaster>::iterator actual=HIST.begin(); actual!=HIST.end(); ++actual){
+		double x = actual->get_index();
 		bool phase = actual->get_phase();
-		if(DEBUG_MATANO){
-			control_output<<F<<" "<<N<<" "<<phase<<" "; actual->show_small();
-		}
-		if(phase){
-			LF += F;
-			LN += N; 
+		if(phase){	
+			double F = actual->net_flux_get(0);
+			double n = actual->get_jumps();
+			if(x < x0){	LF += (F*n);LN += n; }	
+			if(x >= x0){ RF += (F*n);RN += n; }
+			if(DEBUG_MATANO){	
+				control_output<<x<<" "<<x0<<" "<<F<<" "<<n<<" "<<LF<<" "<<RF<<" "; actual->show_small();}
 		}
 	}
-	actual=HIST.end();
-	if(DEBUG_MATANO){ control_output<<"Right side:"<<endl;}
-	for(; actual==HIST.begin(); --actual){
-		double F = actual->net_flux_get(0);
-		double N = actual->get_jumps();
-		bool phase = actual->get_phase();
-		if(DEBUG_MATANO){
-			control_output<<F<<" "<<N<<" "<<phase<<" "; actual->show_small();
-		}
-		if(phase){
-			RF += F;
-			RN += N; 
-		}
-	}
-	if(LN>0){ L = LF/LN;}
-	if(RN>0){ R = RF/RN;}
+
+	if(LN > 0){ L = LF/LN;}
+	if(RN > 0){R = RF/RN;}
 	double M = fabs(L) - fabs(R);
 
 	if(DEBUG_MATANO){
-		control_output<<LF<<" "<<LN<<" "<<RF<<" "<<RN<<" "<<L<<" "<<R<<" "<<M<<" "; bin->show_small();
+		control_output<<"Final:"<<endl;
+		control_output<<LF<<" "<<RF<<" "<<LN<<" "<<RN<<" "<<L<<" "<<R<<" "<<M<<" "; bin->show_small();
 	}
 	return M;
 	
