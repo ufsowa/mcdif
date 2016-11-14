@@ -430,7 +430,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		if(CR <= min){min=CR;}
 	}
 	norma=fabs(max - min);
-	double range = 0.8*norma;
+	double range = 0.01*norma;
 	if(DEBUG_CRITERIA){control_output<<" "<<norma<<endl;}
 
 	if(norma > 1.0){
@@ -756,7 +756,7 @@ void opcja :: equilibrate(){
 	
 	refresh(0);
 	identify_phases();
-	identify_matano();
+//	identify_matano();
 	do_equi_vac();
 	do_equi_rez();
 	refresh_vac_list();
