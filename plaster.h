@@ -22,9 +22,10 @@ class plaster {
 	vector <site*> PL_REF_TO_SITES;			//przechowuje wszystkie sity w plastrze
 	vector < list < site* > > PL_SITES_TYP;
 	
+	bool phase_vac;
 	string PL_NAME;
 	unsigned int PL_TYPES,PL_DIRECTION,PL_INDEX;
-	double PL_P0,PL_P1;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
+	double PL_P0,PL_P1,PL_M;		//P - pozycja poczatkowa i koncowa plastra |....| size bin
 	vector <long> PL_EQ_FLUX;
 	vector <long> PL_NET_FLUX;
 	vector <long> PL_PROB_ADD;
@@ -77,8 +78,7 @@ class plaster {
 	int	get_index(){return PL_INDEX;};
 	void reset_indexes();
 	string get_name(){return PL_NAME;};
-	void update_plaster(site* node, bool status);
-	void update_hist(site* node, bool status);
+	void update_plaster(site* node, bool status, bool flux);
 	void copy_fluxes(plaster &source);
 	void push_back( site* item ){PL_REF_TO_SITES.push_back(item);};
 	unsigned int size(){return PL_REF_TO_SITES.size();};
@@ -88,6 +88,7 @@ class plaster {
 	void jump_occured(){PL_JUMPS++;};
 	void jump_occured_dislocation(){PL_JUMPS_EQ++;};
 	void show();
+	void show_small();
 	bool check_types();
 	
 	site* get_site(int typ,int nr){
@@ -153,7 +154,7 @@ class plaster {
 	};
 
 
-	void	plaster_delete_site(site* node){
+	void	plaster_delete_site(site* node, bool flux){
 		unsigned int typ = node->get_atom();
 		unsigned int st_size=PL_SITES_TYP[typ].size();
 		if( PL_SITES_TYP[typ].empty() ){
@@ -163,8 +164,10 @@ class plaster {
 		}																//		control_output<<" del site in plaster "<<node<<" ";
 																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].remove_if(is_equal(node));
-		eq_flux_delta(typ,0);
-		prob_update(typ,0);
+		if(flux){
+			eq_flux_delta(typ,0);
+			prob_update(typ,0);
+		}
 		if( (st_size - PL_SITES_TYP[typ].size()) != 1){
 			control_output<<"ERROR: plaster::plaster_delete_site(). site not removed "<<typ<<endl;
 			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
@@ -174,15 +177,17 @@ class plaster {
 																		//		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 	};
 	
-	void	plaster_add_site(site* node){
+	void	plaster_add_site(site* node, bool flux){
 //		control_output<<" add site in plaster "<<node<<" ";
 		unsigned int typ = node->get_atom();
 		unsigned int st_size=PL_SITES_TYP[typ].size();
 
 //		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<" ";node->show_site();
 		PL_SITES_TYP[typ].push_back(node);
-		eq_flux_delta(typ,1);
-		prob_update(typ,1);
+		if(flux){
+			eq_flux_delta(typ,1);
+			prob_update(typ,1);
+		}
 //		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 		if( (PL_SITES_TYP[typ].size() - st_size ) != 1){
 			control_output<<"ERROR: plaster::plaster_add_site(). site not added ";
@@ -255,9 +260,18 @@ class plaster {
 		return PL_EQ_FLUX[typ];
 	};
 
-	long net_flux_get(unsigned int typ){
-		if(typ>=PL_NET_FLUX.size()){cout<<"ERROR in plaster::eq_flux: "<<typ<<endl;exit(1);}
-		return PL_NET_FLUX[typ];
+	double net_flux_get(unsigned int typ){
+		if(typ>=PL_NET_FLUX.size()){cout<<"ERROR in plaster::net_flux: "<<typ<<endl;exit(1);}
+		double particles = PL_NET_FLUX[typ];
+		double jumps = PL_JUMPS;
+		if(jumps <=0){jumps =1.0;}
+		double flux = particles;
+		
+		return flux;
+	};
+
+	double get_jumps(){	
+		return PL_JUMPS;
 	};
 	
 	long flux_net_get(unsigned int typ){
@@ -285,6 +299,20 @@ class plaster {
 		return vac;
 	};
 
+	void mark_phase(bool status){
+		phase_vac=status;
+	};
+
+	bool get_phase(){
+		return phase_vac;
+	};
+
+	void set_matano(double m){
+		PL_M=m;
+	};
+	double get_matano(){
+		return PL_M;
+	};
 
 };
 

@@ -105,7 +105,7 @@ void reset_site(site *node);
 void read_file(string filename);
 void call_flux(site* atom_to_jump,site* vac_to_jump);	
 void call_flux_dislocation(site* atom_to_jump,site* vac_to_jump);	
-long call_total_flux();
+double call_total_flux(double range, unsigned int nr_bin);
 double Ceq_vac(double stech);
 int choose_reservuar(site* atom);
 int check_stech(double stech, double vac, double size);
@@ -141,6 +141,10 @@ void save_call();
 void save_write();
 void add_MCtime(double dt){Actual_MCtime += dt;};
 void set_temperature(double T){TEMPERATURE=T;}
+
+void identify_phases();
+void identify_matano();
+double matano_localize(vector <plaster>::iterator bin);
 
 void find_interface();
 void source_sink_act(int i, int vac, bool &FLAG);	
