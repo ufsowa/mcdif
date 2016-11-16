@@ -27,7 +27,7 @@ vector <vector <double> > reservuars_par;	//zawiera parametry inicjowania dla re
 
 set <site* > Vtoadd;		//zawiera adresy wakancju dodane do symulacji podczas do_equi()
 
-double TEMPERATURE, MATANO_POSITION;
+double TEMPERATURE, OPCJA_NORM;
 int EQ_STEP, TRYB;			//TRYB ==2 : path;	TRYB == 1 : swap;	TRYB == 0 : converse; set in opcja::init()
 
 double BIN_ST,BIN_END,BIN_SIZE;		//describe plasterki
@@ -81,6 +81,7 @@ opcja(potential& pot_in, vector < vector <double> > &bar, set <site*> &vatoms) :
 	DIRECT_STEPS=0;
 	ST_VOL=0;
 	END_VOL=0;
+	OPCJA_NORM=0.0005;
 
 	equi_curve.reserve(2000);
 	BLOKS.reserve(5000);
@@ -98,6 +99,7 @@ void build_bins(vector<plaster>& layer_new, string name);
 void init_EQ(vector <double> &parameters);
 void init_reservuar(vector <double> &parameters);
 void set_opcja_lattice(lattice *sample);
+void init_settings(vector <double> &parameters);
 
 void execute(string name, vector<double>&parameters);
 void show();

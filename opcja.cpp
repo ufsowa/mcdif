@@ -10,6 +10,8 @@ void opcja :: execute(string name, vector<double>&parameters){
 		this->init_reservuar(parameters);
 	}else if(name=="L_SIM_B"){
 		SAMPLE->init_sim_boundary(parameters);
+	}else if(name=="SET"){
+		init_settings(parameters);
 	}else{
 		control_output<<"No posibility of doing "<<name<<" as an option."<<endl;
 	}
@@ -306,8 +308,8 @@ site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site)
 	site* node=0; int j=-1;
 	vector <int> exclude;exclude.reserve(10);
 	if(create){
-//		j=(reservuars[for_rez]).choose_typ();
-		j=(BLOKS[in_bin]).choose_typ();
+		j=(reservuars[for_rez]).choose_typ();
+//		j=(BLOKS[in_bin]).choose_typ();
 	}else{
 		j=0;
 	}
@@ -421,15 +423,16 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	if(DEBUG_SMALL){control_output<<"sink_loc:->";}
 	if(DEBUG){	control_output<<"sink loc "<< in_bin<<" "<<from_rez<<" "<<in_dir<<" "<<nr_site<<" "<<N<<" "<<create<<" ";
 	control_output<<maxY<<" "<<REZ<<" "<<N<<" "<<node<<endl;}
-	if(DEBUG_CRITERIA){control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C;}
+	if(DEBUG){control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C;}
 	
 	for( unsigned rez = 0; rez < reservuars.size(); rez++){				//find maximum and min stechiometry range
 		double CR = (reservuars[rez]).get_stech();
-		if(DEBUG_CRITERIA){control_output<<"|r: "<<rez<<"-"<<CR;}
+		if(DEBUG){control_output<<"|r: "<<rez<<"-"<<CR;}
 		if(CR >= max){max=CR;}
 		if(CR <= min){min=CR;}
 	}
 	norma=fabs(max - min);
+
 	double range = 0.01*norma;
 	if(DEBUG_CRITERIA){control_output<<" "<<norma<<endl;}
 
@@ -438,7 +441,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			exit(1);
 	}
 																		//separate diffusion zone
-	if(DEBUG_CRITERIA){control_output<<"Separate:"<<endl;}
+	if(DEBUG){control_output<<"Separate:"<<endl;}
 	for( unsigned rez = 0; rez < reservuars.size(); rez++){
 		
 		if( ((reservuars[rez]).get_st() <= X0) and (X0 <= reservuars[rez].get_end()) ){
@@ -451,7 +454,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		double CR = (reservuars[rez]).get_stech();
 		double Y = 1.0 - fabs( CR - C);	
 
-		if(DEBUG_CRITERIA){control_output<<rez<<" "<<C<<" "<<CR<<" "<<Y<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<endl;}
+		
 		if( (Y >= maxY - range) and (Y <= maxY + range) ){	
 			maxY=Y;			
 			mykey.push_back(rez);					
@@ -460,13 +463,14 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			mykey.clear();
 			mykey.push_back(rez);		
 		}else if (Y < maxY - range){
-			continue;
+			//do notink
 		}else{
 			control_output<<"ERROR:opcja::source_localize():-> bad definition of rezervuars:419 "<<X0<<endl;
 			(reservuars[rez]).show();
 			(BLOKS[in_bin]).show();
 			exit(1);
 		}
+		if(DEBUG){control_output<<SAVE_MCtime<<" "<<rez<<" "<<C<<" "<<CR<<" "<<Y<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<endl;}
 		
 	}																	//		control_output<<"	"<<REZ<<" "<<Y<<" "<<minY<<" "<<XL<<" "<<XP<<" "<<X<<" "<<minX<<endl;
 																		
@@ -481,8 +485,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 		lista tmp_rta;
 		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){
 			debug_flux = true;
-			control_output<<"Build list for rez: ";
-			control_output<<in_bin<<" "<<create<<" "<<X0<<" "<<C<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<endl;}
+			control_output<<SAVE_MCtime<<" "<<in_bin<<" "<<create<<" "<<X0<<" "<<C<<" "<<maxY<<" "<<(maxY - range)<<" "<<(maxY + range)<<" "<<Ft<<endl;}
 		for(unsigned int i=0; i<mykey.size();i++){
 			unsigned int tmp_rez = mykey[i];
 			double left = (reservuars[tmp_rez]).get_st() - X0;
@@ -492,13 +495,13 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			
 			double P = exp(-(sign*dx*Ft)/(TEMPERATURE*kB));				
 			tmp_rta.push_back(make_pair(sum,tmp_rez));sum += P;
-			if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<tmp_rez<<" "<<left<<" "<<right<<" "<<dx<<" "<<sign<<" "<<Ft<<" "<<P<<" "<<sum<<endl;}
+			if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<"		"<<tmp_rez<<" "<<left<<" "<<right<<" "<<dx<<" "<<sign<<" "<<Ft<<" "<<P<<" "<<sum<<endl;}
 
 		}
 		tmp_rta.push_back(make_pair(sum,-1));
 
 		//select rez
-		if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<"Select rez:"<<endl;}
+		if(DEBUG){control_output<<"Select rez:"<<endl;}
 		double R=rnd()*sum; 
 		lista::iterator event=tmp_rta.begin();
 		lista::iterator next_event=tmp_rta.begin();
@@ -507,7 +510,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 			double Rvalue = (*next_event).first;	
 			if( R>=Lvalue and R < Rvalue){
 				REZ=(*event).second;
-				if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<Lvalue<<" "<<R<<" "<<Rvalue<<" "<<REZ<<endl;}
+				if(DEBUG_CRITERIA or DEBUG_CRITERIA_FLUX){control_output<<" 	"<<Lvalue<<" "<<R<<" "<<Rvalue<<" "<<REZ<<endl;}
 				
 			}
 		}		
@@ -516,15 +519,15 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	}
 
 	//select initial node from bin
-	if(DEBUG_CRITERIA or debug_flux){control_output<<"Get first node in bin:"<<endl;}
+	if(DEBUG){control_output<<"Get first node in bin:"<<endl;}
 	if(REZ>=0 and ( N < 0 and node == 0 )){
 		node=get_node(in_bin,create,REZ,N);
 	}else{
 		control_output<<"ERROR: opcja::source_sink_localize:476"<<endl;exit(1);	}
-	if(DEBUG_CRITERIA or debug_flux){control_output<<REZ<<" "<<N<<" ";node->show_site();}
+	if(DEBUG){control_output<<REZ<<" "<<N<<" ";node->show_site();}
 	
 	//calculate direction
-	if(DEBUG_CRITERIA or debug_flux){control_output<<"Cal direction:"<<endl;}
+	if(DEBUG){control_output<<"Cal direction:"<<endl;}
 	double wal_l = (reservuars[REZ]).get_st();
 	double wal_r = (reservuars[REZ]).get_end();
 	if(wal_l < X0 and X0 < wal_r){
@@ -533,14 +536,14 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	double left = wal_l - X0;
 	double right = wal_r - X0;
 	displace = fabs(left) > fabs(right) ? right : left;				//take shorter distance to the wall
-	if(DEBUG_CRITERIA or debug_flux){control_output<<wal_l<<" "<<wal_r<<" "<<displace<<endl;}
+	if(DEBUG){control_output<<wal_l<<" "<<wal_r<<" "<<displace<<endl;}
 	
 	
 	
 	from_rez=REZ;
 	nr_site=N;
 	in_dir=displace;
-	if(DEBUG_CRITERIA or debug_flux){control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<" ";
+	if(debug_flux){control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<" ";
 	node->show_site();}
 
 
@@ -569,7 +572,6 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 		return ;
 	}
 	if(DEBUG){control_output<<"sink act "<<ile_at<<" "<<CREATE<<endl;}
-	if(DEBUG_CRITERIA){control_output<<"sink act "<<in_bin<<" "<<ile_at<<" "<<CREATE<<endl;}
 	
 	for(int i=0; i<ile_at;i++){
 		int from_rez = -1, in_dir = 0, for_typ=-1, to_typ=-1;
@@ -715,7 +717,6 @@ void opcja :: do_equi_vac(){
 		double size=BLOKS[i].size();
 		int delta_vac = check_stech(stech,vac,size);	//zwracac ile wakancji remove/create
 	if(DEBUG){	control_output<<"do_equi "<<i<<" "<<stech<<" "<<vac<<" "<<size<<" "<<delta_vac<<" "<<endl;}
-	if(DEBUG_CRITERIA){	control_output<<"do_equi "<<i<<" "<<stech<<" "<<vac<<" "<<size<<" "<<delta_vac<<" "<<endl;}
 		if(delta_vac < 0){
 			source_sink_act(i, delta_vac, LOCAL_MOVE);
 		}
@@ -1103,6 +1104,7 @@ void opcja :: init_EQ(vector <double> &parameters ){
 	ST_VOL=BIN_ST;
 	END_VOL=BIN_END;
 
+
 	wektor a(0.0,0.0,0.0);
 	del_L_sim=a;
 	del_R_sim=a;
@@ -1131,6 +1133,13 @@ void opcja :: init_EQ(vector <double> &parameters ){
 	EQ_BUILDED=true;	
 }
 
+void opcja :: init_settings(vector <double> &parameters ){
+	
+		if(parameters.size()!=1){cout<<"ERROR in opcja::init. Wrong parameters list in conf.in"<<endl;exit(1);}
+
+	double norma = parameters[0]; 
+	OPCJA_NORM=norma;
+}
 
 void opcja :: build_bins(vector<plaster>& layer, string name){	
 	
