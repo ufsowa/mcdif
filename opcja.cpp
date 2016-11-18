@@ -433,8 +433,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	}
 	norma=fabs(max - min);
 
-	double range = 0.01*norma;
-	if(DEBUG_CRITERIA){control_output<<" "<<norma<<endl;}
+	double range = OPCJA_NORM*norma;
 
 	if(norma > 1.0){
 			control_output<<"ERROR:opcja::source_localize():400 "<<min<<" "<<max<<" "<<norma<<endl;
