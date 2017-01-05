@@ -1756,6 +1756,10 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 			{
 				sample->save_SRO(a,b,output);
 			}
+			else if(name=="SROdeep")
+			{
+				sample->save_SRO_deep(a,b,output);
+			}
 			else if(name=="Rd2"){
 				sample->save_dR(a,b,output);
 				

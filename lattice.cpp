@@ -3646,6 +3646,62 @@ string lattice :: get_file_name(string name, string format){
 	return file;
 }
 
+void lattice :: save_SRO_deep(double Time, double Step, string name){
+	
+	
+	string name_of_file = get_file_name(name,"sro_deep") + ".dat";
+	ofstream out_data(name_of_file.c_str(),ios :: app);
+
+	unsigned int size = get_atom_typ_numbers();
+	unsigned  int zones= POTENCIALY->get_coordination_number();	
+	vector < vector < vector <vector<long > > > > results(zones, vector < vector <vector<long > > > (size, vector < vector <long> > (sublattice,vector <long> (size, 0) ) ) );
+
+//	vector <vector<long > > results(size,vector <long> (sublattice,0));
+	
+	//cout<<results.size()<<" "<<results[0].size()<<" "<<results[0][0].size()<<endl;
+	
+	int MAX_THREADS = omp_get_max_threads();
+	
+	#pragma omp parallel shared(results) num_threads(MAX_THREADS) 	
+	{	
+//		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
+		#pragma omp for schedule(runtime)
+		for(unsigned int i=0;i<atom_list.size();i++){
+			if(check_site_belonging_to_sim_area(atom_list[i])){
+				vector <site*> neighbours;
+				atom_list[i]->read_site_neighbours(neighbours,1);
+				int typ1 = atom_list[i]->get_atom();			
+				int podsiec=atom_list[i]->get_sub_latt();
+
+				for(unsigned int k =0;k<neighbours.size();k++){
+					if(check_site_belonging_to_sim_area(neighbours[k])){	
+						int typ2 = neighbours[k]->get_atom();
+						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);		
+						#pragma omp critical(collectSRO)
+						{
+//							cout<<"threadN: "<<omp_get_thread_num()<<endl;
+						results[zone][typ1][podsiec][typ2]++;
+						}		
+					}
+				}
+			}
+		}
+			 
+	}//koniec parallel
+
+	out_data<<" "<<Step<<" "<<Time;
+	for(unsigned int i=0;i<zones;i++){
+		for(unsigned int j=0;j<size;j++){
+			for(unsigned int k=0;k<sublattice;k++){
+				for(unsigned int l=0;l<size;l++){
+				out_data<<" "<<results[i][j][k][l];
+	}}}}
+
+	out_data<<endl;	
+	out_data.close();
+
+}
+
 void lattice :: save_SRO(double Time, double Step, string name){
 	
 	
