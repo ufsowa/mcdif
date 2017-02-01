@@ -306,7 +306,7 @@ void opcja :: do_equi_rez(){
 site* opcja :: get_node(int in_bin, bool create, int for_rez, long int &nr_site){
 	
 	site* node=0; int j=-1;
-	vector <int> exclude;exclude.reserve(10);
+	vector <unsigned int> exclude;exclude.reserve(10);
 	if(create){
 		j=(reservuars[for_rez]).choose_typ();
 //		j=(BLOKS[in_bin]).choose_typ();
@@ -647,12 +647,15 @@ void opcja :: source_sink_act(int in_bin, int ile_at, bool &FLAG){
 				N1=(long)(rnd()*(BLOKS[in_bin].size(for_typ)));
 				AT1 = (BLOKS[in_bin]).get_site(for_typ,N1);
 			}
+			BLOKS[in_bin].plaster_delete_site(AT1,1);
 			AT1->set_atom(to_typ);
 			reset_site(AT1);
-			BLOKS[in_bin].delete_site(for_typ,N1);
-			BLOKS[in_bin].add_site(to_typ,AT1);
-			BLOKS[in_bin].prob_update(for_typ,1);
-			Vtoadd.insert(AT1);	
+			BLOKS[in_bin].plaster_add_site(AT1,1);
+			
+			SAMPLE->update_events(AT1);
+			if(AT1->events_size() > 0){
+			    Vtoadd.insert(AT1);
+			}
 		}
 	}																	// end for(j=delta)
 	
@@ -1078,13 +1081,7 @@ void opcja :: init_EQ(vector <double> &parameters ){
 	
 	if(parameters.size()!=6){cout<<"ERROR in opcja::init. Wrong parameters list in conf.in"<<endl;exit(1);}
 
-	//dla -1: tylko monitoruj	+biny -rezerwuary +flux	+flux_eq -do_equi
-	//dla 0 nie rob nic:		-biny -rezerwuary -flux -flux_eq -do_equi
-	//dla 1 do_eq				+biny +rezerwuary +flux +flux_eq +do_equi
-	int tryb = parameters[0];
-	if(tryb > 0){		
 	control_output<<"Init equilibrations..."<<endl;
-
 
 	int tryb = parameters[0];
 
@@ -1127,7 +1124,6 @@ void opcja :: init_EQ(vector <double> &parameters ){
 		string file_name="stech_curve.in";
 		read_file(file_name);
 		}
-	}
 	
 	EQ_BUILDED=true;	
 }

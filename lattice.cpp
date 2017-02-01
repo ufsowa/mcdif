@@ -3532,7 +3532,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 	
 	string name_of_file = file + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
-	int size = atoms_type.size();
+	unsigned int size = atoms_type.size();
 	vector <vector<long > > results(size,vector <long> (sublattice,0));
 	vector <vector<long > > results_global(size,vector <long> (sublattice,0));
 	int MAX_THREADS = omp_get_max_threads();
@@ -3563,8 +3563,8 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 //	cout<<"tot_thread: "<<tot_results[0][0]<<endl;
 
 	out_data<<" "<<Step<<" "<<Time;
-	for(int i=0;i<size;i++){
-		for(int j=0;j<sublattice;j++){
+	for(unsigned int i=0;i<size;i++){
+		for(unsigned int j=0;j<sublattice;j++){
 					out_data<<" "<<results[i][j];
 	}}
 	out_data<<endl;	
@@ -3574,8 +3574,8 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 		name_of_file= file + "global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
 		out_data<<" "<<Step<<" "<<Time;
-		for(int i=0;i<size;i++){
-			for(int j=0;j<sublattice;j++){
+		for(unsigned int i=0;i<size;i++){
+			for(unsigned int j=0;j<sublattice;j++){
 				out_data<<" "<<results_global[i][j];
 		}}
 		out_data<<endl;	

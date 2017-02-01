@@ -85,7 +85,7 @@ wektor interaction_zone;		//zawiera maksymalny rozmiar zakresu sasiadow
 int max_coordination_number;	//maksymalna liczba sasiadow atomu w probce
 
 public:
-int sublattice;
+unsigned int sublattice;
 int local_control_atom;
 lattice(int _sizex,int _sizey,int _sizez);
 ~lattice();

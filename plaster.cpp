@@ -170,7 +170,7 @@ site* plaster :: choose_atom(unsigned int typ){
 	return node;
 }
 
-int plaster :: choose_typ(const vector <int> &exclude){	
+int plaster :: choose_typ(const vector <unsigned int> &exclude){	
 	
 	unsigned int SUM = 0; unsigned int i=1; 	int TYP = -1;
 	typedef vector <pair <unsigned int,int> > mykey;

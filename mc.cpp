@@ -1216,8 +1216,9 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 	if(EVENTS.empty()){
 		sample->init_events_list(V_LIST);
 		if(EVENTS_size!=EVENTS.size()){control_output<<"Warrning! EVENTS changed after init from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-		control_output<<" in step: "<<RTA_energy_executions<<endl;
-					EVENTS_size=EVENTS.size();}
+		control_output<<" "<<V_LIST.size()<<" in step: "<<RTA_energy_executions<<endl;
+		EVENTS_size=EVENTS.size();
+		}
 	}
 	
 	for(long n=0;n<number_of_steps;n++){
@@ -1227,9 +1228,10 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 		{
 		//	control_output<<"rownowaze... "<<(RTA_energy_executions*number_of_steps+n)<<endl;
 			opt_equi.equilibrate();
-			if( (warrinig_jump_event <= 40) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-				control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
-				EVENTS_size=EVENTS.size();
+			if( (warrinig_jump_event <= 101) and (EVENTS_size!=EVENTS.size()) ){
+			control_output<<"Warrning! EVENTS changed after equilibrate from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+			control_output<<" "<<V_LIST.size()<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
+			EVENTS_size=EVENTS.size();warrinig_jump_event++;
 			}
 		}}
 
@@ -1280,11 +1282,10 @@ double residence_time(lattice *sample,long number_of_steps, double T, int file_n
 					make_jump(sample,vac_to_jump,atom_to_jump);		//zaminia miejscami typy
 					sample->update_events(vac_to_jump);	
 					sample->update_events(atom_to_jump);
-					if( (warrinig_jump_event <= 40) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after jump from:"<<EVENTS_size<<" to: "<<EVENTS.size();
-						control_output<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
+					if( (warrinig_jump_event <= 101) and (EVENTS_size!=EVENTS.size()) ){control_output<<"Warrning! EVENTS changed after jump from:"<<EVENTS_size<<" to: "<<EVENTS.size();
+						control_output<<" "<<V_LIST.size()<<" in step: "<<RTA_energy_executions<<" "<<warrinig_jump_event<<endl;
 						EVENTS_size=EVENTS.size();
 						(*event).second.show();
-						warrinig_jump_event++;
 					}
 					break;
 				}
