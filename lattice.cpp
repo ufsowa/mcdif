@@ -3496,7 +3496,7 @@ void lattice :: save_energy(double Time, double Step, string name, int setON)
 	
 	if(setON==1){
 		Etotal=calc_energy_global();
-		name_of_file= file + "global.dat";
+		name_of_file= file + "_global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
 		out_data<<" "<<Step<<" "<<Time<<" "<<Etotal<<endl;
 	}
@@ -3571,7 +3571,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 	out_data.close();
 	
 	if(setON==1){
-		name_of_file= file + "global.dat";
+		name_of_file= file + "_global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
 		out_data<<" "<<Step<<" "<<Time;
 		for(unsigned int i=0;i<size;i++){
@@ -3753,11 +3753,11 @@ void lattice :: save_SRO(double Time, double Step, string name){
 
 }
 
-
-void lattice :: save_dR(double Time, long Step, string name)
+void lattice :: save_dR(double Time, long Step, string name, int setON)
 {
-	string name_of_fileR="";	
-	string name_of_fileR2="";	
+	string fileR="";	
+	string fileR2="";	
+
 	stringstream total(name);
 	
 	int word_count=0 ;
@@ -3766,8 +3766,8 @@ void lattice :: save_dR(double Time, long Step, string name)
     
 	if(word_count == 1)
 	{
-			name_of_fileR=name+"dR.dat";
-			name_of_fileR2=name+"dR2.dat";
+			fileR=name+"dR";
+			fileR2=name+"dR2";
 	}
 	else if(word_count == 2)
 	{
@@ -3775,16 +3775,17 @@ void lattice :: save_dR(double Time, long Step, string name)
 		int log=0;
 		while(ss>>word){
 			if(log==0){
-			name_of_fileR=word+"dR.dat";
-			name_of_fileR2=word+"dR2.dat";log++;}
+			fileR=word+"dR";
+			fileR2=word+"dR2";log++;}
 			else if(log>=1){log++;}
 			else {control_output<<"ERROR in lattice::save_Natoms: "<<log<<endl;exit(1);}
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	
+	string name_of_fileR = fileR + ".dat";	
+	string name_of_fileR2 = fileR2 + ".dat";	
 	
-
 	ofstream out_data(name_of_fileR.c_str(),ios :: app);
 	out_data.precision(10);
 
@@ -3800,26 +3801,35 @@ void lattice :: save_dR(double Time, long Step, string name)
 	vector <double> results2_2(size,0.0);
 	vector <double> results4(size,0.0);
 
-#pragma omp parallel shared(results1,results3,results4,results2_0,results2_1,results2_2)	
+	vector <wektor> results1_global(size,wektor());
+	vector <wektor> results3_global(size,wektor());
+	vector <double> results2_0_global(size,0.0);
+	vector <double> results2_1_global(size,0.0);
+	vector <double> results2_2_global(size,0.0);
+	vector <double> results4_global(size,0.0);
+
+#pragma omp parallel shared(results1,results3,results4,results2_0,results2_1,results2_2,\
+				results1_global,results3_global,results4_global,results2_0_global,results2_1_global,results2_2_global)	
 	{
 //	if(omp_get_thread_num()==0){cout<<"Threat numbers R: "<<omp_get_num_threads()<<endl;}
 
 	#pragma omp for nowait schedule(runtime)
 
-	for(unsigned int i=0;i<sim_atom_list.size();i++){	
-		int atom=sim_atom_list[i]->get_atom();
+	for(unsigned int i=0;i<atom_list.size();i++){	
+		int atom=atom_list[i]->get_atom();
 		if(atom<0){cout<<"Atom type <0 in save_dR "<<endl;exit(0);}
 
-		double dx=sim_atom_list[i]->get_drx();
-		double dy=sim_atom_list[i]->get_dry();
-		double dz=sim_atom_list[i]->get_drz();
-		long int j0=sim_atom_list[i]->get_jumps(0);
-		long int j1=sim_atom_list[i]->get_jumps(1);
-		long int j2=sim_atom_list[i]->get_jumps(2);
+		double dx=atom_list[i]->get_drx();
+		double dy=atom_list[i]->get_dry();
+		double dz=atom_list[i]->get_drz();
+		long int j0=atom_list[i]->get_jumps(0);
+		long int j1=atom_list[i]->get_jumps(1);
+		long int j2=atom_list[i]->get_jumps(2);
 
-		#pragma omp critical(collectR)
-		{
-//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
+		
+		if(check_site_belonging_to_sim_area(atom_list[i])){
+			#pragma omp critical(collectR)
+			{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
 			results1[atom].x=results1[atom].x+dx;
 			results1[atom].y=results1[atom].y+dy;
 			results1[atom].z=results1[atom].z+dz;
@@ -3830,7 +3840,25 @@ void lattice :: save_dR(double Time, long Step, string name)
 			results3[atom].y=results3[atom].y+dy*dy;
 			results3[atom].z=results3[atom].z+dz*dz;
 			results4[atom]=results4[atom]+1;
+			}
 		}
+		if(setON){
+			#pragma omp critical(collectR)
+			{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
+			results1_global[atom].x=results1_global[atom].x+dx;
+			results1_global[atom].y=results1_global[atom].y+dy;
+			results1_global[atom].z=results1_global[atom].z+dz;
+			results2_0_global[atom]=results2_0_global[atom]+j0;
+			results2_1_global[atom]=results2_1_global[atom]+j1;
+			results2_2_global[atom]=results2_2_global[atom]+j2;
+			results3_global[atom].x=results3_global[atom].x+dx*dx;
+			results3_global[atom].y=results3_global[atom].y+dy*dy;
+			results3_global[atom].z=results3_global[atom].z+dz*dz;
+			results4_global[atom]=results4_global[atom]+1;
+			}
+		}
+
+
 	}//koniec for
 	}//koniec omp parallel
 
@@ -3857,6 +3885,40 @@ void lattice :: save_dR(double Time, long Step, string name)
 		out_data1.close();
 	}
 	}//koniec omp sections	
+
+	if(setON==1){
+
+	name_of_fileR= fileR + "_global.dat";
+	ofstream out_data(name_of_fileR.c_str(),ios :: app);
+	name_of_fileR2= fileR2 + "_global.dat";
+	ofstream out_data1(name_of_fileR2.c_str(),ios :: app);
+	#pragma omp parallel sections num_threads(2)
+	{	
+	#pragma omp section
+	{
+	out_data<<Step<<" "<<Time;
+		for(unsigned int i=0;i<results2_0_global.size();i++){
+			out_data<<" "<<results1_global[i].x<<" "<<results1_global[i].y<<" "<<results1_global[i].z<<" ";
+			out_data<<results2_0_global[i]<<" "<<results2_1_global[i]<<" "<<results2_2_global[i];
+		}
+		out_data<<endl;	
+		out_data.close();
+	}
+	#pragma omp section
+	{	
+		out_data1<<Step<<" "<<Time;
+		for(unsigned int i=0;i<results4_global.size();i++){
+			out_data1<<" "<<results3_global[i].x<<" "<<results3_global[i].y<<" ";
+			out_data1<<results3_global[i].z<<" "<<results4_global[i];
+		}
+		out_data1<<endl;
+		out_data1.close();
+	}
+	}//koniec omp sections	
+	
+	}//end of if globla setON
+	
+	
 }
 	
 void lattice :: clear_dR()

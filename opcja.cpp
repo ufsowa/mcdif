@@ -276,24 +276,36 @@ void opcja :: do_equi_rez(){
 			site1->set_atom(typ2);
 			site2->set_atom(typ1);
 			double E2=POT.get_energy(site1)+POT.get_energy(site2)-POT.get_energy(site1,site2);		
+			site1->set_atom(typ1);
+			site2->set_atom(typ2);
 			double dE=E2-E1,p=0.0,R=0.0;
-			if(dE > 0 ){
+			if( dE <= 0 ){												//do exchange
+				site bufor(site1);
+				site1->change_to( *site2 );
+				site2->change_to(bufor);
+				SAMPLE->update_events( site1 );
+				SAMPLE->update_events( site2 );
+				if(site1->events_size() > 0){
+					Vtoadd.insert(site1);}
+				if(site2->events_size() > 0){
+					Vtoadd.insert(site2);}
+			}
+			else{
 				p = exp(-beta*dE);
 				R = rnd();
-				if(R > p){
-				site1->set_atom(typ1);
-				site2->set_atom(typ2);
+				if(R > p){												//do exchange
+					site bufor(site1);
+					site1->change_to( *site2 );
+					site2->change_to(bufor);
+					SAMPLE->update_events( site1 );
+					SAMPLE->update_events( site2 );
+					if(site1->events_size() > 0){
+						Vtoadd.insert(site1);}
+					if(site2->events_size() > 0){
+						Vtoadd.insert(site2);}
 				}
 			}
 	 		
-			SAMPLE->update_events( site1 );
-			SAMPLE->update_events( site2 );
-			if(site1->events_size() > 0){
-				Vtoadd.insert(site1);
-			}
-			if(site2->events_size() > 0){
-				Vtoadd.insert(site2);
-			}
 		
 	//	ofstream dir_file("dir_tmp.dat", ios::app); 
 	//	dir_file<<i<<" "<<iter<<" "<<E1<<"|-"<<E2<<"|="<<dE<<"|"<<p<<"<?"<<R<<endl;
@@ -541,7 +553,7 @@ site* opcja :: source_sink_localize(int in_bin, bool create, int &from_rez, long
 	
 	from_rez=REZ;
 	nr_site=N;
-	in_dir=displace;
+	in_dir= displace;
 	if(debug_flux){control_output<<"Sumary: "<<create<<"|B:"<<in_bin<<"|R:"<<from_rez<<"|d:"<<in_dir<<" "<<nr_site<<" "<<maxY<<" ";
 	node->show_site();}
 

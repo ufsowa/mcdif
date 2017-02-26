@@ -122,7 +122,7 @@ void save_NandE(double Time, double Step, string name, int setON=0);
 void save_SRO(double Time, double Step, string name);
 void save_SRO_deep(double Time, double Step, string name);
 void clear_dR();
-void save_dR(double Time, long step, string name_of_file);
+void save_dR(double Time, long step, string name_of_file, int setON=0);
 void save_hist_dR(string file_name,int typ, double Time, double st_bin, double size_bin, double end_bin);
 void makepic(long step,long step_break,wektor st, wektor end, string name_of_file);
 void pic_stech(long step,double stech, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file);

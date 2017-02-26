@@ -1762,7 +1762,11 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 				sample->save_SRO_deep(a,b,output);
 			}
 			else if(name=="Rd2"){
-				sample->save_dR(a,b,output);
+				vector <double> parameters;
+				savings[i].get_parameters(parameters);
+				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> Rd2: 1"<<endl;exit(1);}
+				int global_on = parameters[0];
+				sample->save_dR(a,b,output,global_on);
 				
 			}else if(name=="BARRS"){
 				if( !( pot.save_status() ) ){

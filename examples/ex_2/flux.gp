@@ -43,6 +43,9 @@ plot(){
 #		file every :100::100 u 2:4:((\$16 + \$10)/1) w l,\
 #		file every :100::100 u 2:4:((\$17 + \$11)/1) w l
 
+        splot file every :100::100 u 2:4:((\$22)/1) w l
+
+
 #labolatory reference frame
 #        splot file every :100::100 u 2:4:((\$15 + \$18)/1) w l,\
 #		file every :100::100 u 2:4:((\$16 + \$19)/1) w l,\
@@ -50,9 +53,9 @@ plot(){
 
 
 #sample reference frame
-        splot file every :100::100 u 2:4:((\$9 + \$12*0)/1) w l,\
-		file every :100::100 u 2:4:((\$10 + \$13*0)/1) w l,\
-		file every :100::100 u 2:4:((\$11 + \$14*0)/1) w l
+#        splot file every :100::100 u 2:4:((\$9 + \$12*0)/1) w l,\
+#		file every :100::100 u 2:4:((\$10 + \$13*0)/1) w l,\
+#		file every :100::100 u 2:4:((\$11 + \$14*0)/1) w l
 
 
 #        splot file every :100:20:100:80 u 2:((\$4+\$5)/2.):((\$9 - \$12)/\$2) w l,\
