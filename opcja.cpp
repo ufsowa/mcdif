@@ -293,7 +293,7 @@ void opcja :: do_equi_rez(){
 			else{
 				p = exp(-beta*dE);
 				R = rnd();
-				if(R > p){												//do exchange
+				if(R <= p){												//do exchange
 					site bufor(site1);
 					site1->change_to( *site2 );
 					site2->change_to(bufor);
