@@ -126,7 +126,7 @@ class plaster {
 		}
 		if( (st_size - PL_SITES_TYP[typ].size()) != 1){
 			control_output<<"ERROR: plaster::delete_site(). site not removed "<<typ<<endl;
-			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(static_cast<int>(st_size - PL_SITES_TYP[typ].size()))<<typ<<endl;
 			show();
 			exit(1);		
 		}
@@ -146,7 +146,7 @@ class plaster {
 		
 		if( ( PL_SITES_TYP[typ].size() - st_size ) != 1){
 			control_output<<"ERROR: plaster::add_site(). site not added "<<typ<<endl;
-			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<( PL_SITES_TYP[typ].size() - st_size )<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<( PL_SITES_TYP[typ].size() - st_size )<<" "<<abs(static_cast<int>(st_size - PL_SITES_TYP[typ].size()))<<typ<<endl;
 			show();
 			exit(1);		
 		}
@@ -170,7 +170,7 @@ class plaster {
 		}
 		if( (st_size - PL_SITES_TYP[typ].size()) != 1){
 			control_output<<"ERROR: plaster::plaster_delete_site(). site not removed "<<typ<<endl;
-			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(st_size - PL_SITES_TYP[typ].size())<<" "<<abs(static_cast<int>(st_size - PL_SITES_TYP[typ].size()))<<typ<<endl;
 			show();
 			exit(1);		
 		}
@@ -191,7 +191,7 @@ class plaster {
 //		control_output<<typ<<" | "<<size()<<" | "<<size(typ)<<endl;
 		if( (PL_SITES_TYP[typ].size() - st_size ) != 1){
 			control_output<<"ERROR: plaster::plaster_add_site(). site not added ";
-			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(PL_SITES_TYP[typ].size() - st_size)<<" "<<abs(st_size - PL_SITES_TYP[typ].size())<<typ<<endl;
+			control_output<<st_size<<" "<<PL_SITES_TYP[typ].size()<<" "<<(PL_SITES_TYP[typ].size() - st_size)<<" "<<abs(static_cast<int>(st_size - PL_SITES_TYP[typ].size()))<<typ<<endl;
 			show();
 			exit(1);		
 		}
