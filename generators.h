@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 
 #ifndef TIME
 #define TIME
@@ -17,7 +17,7 @@
 
 #ifndef STDLIB
 #define STDLIB
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #ifndef SYS

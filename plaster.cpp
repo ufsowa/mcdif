@@ -163,8 +163,8 @@ void plaster :: copy_fluxes(plaster &source){
 site* plaster :: choose_atom(unsigned int typ){
 	unsigned long N1=(long)(rnd()*(size(typ)));
 	site* node = get_site(typ,N1);
-	int atyp = node->get_atom();
-	if(typ != typ){
+	unsigned int atyp = node->get_atom();
+	if(typ != atyp){
 		control_output<<"ERROR:plaster::choose_atom:problem with types: "<<typ<<" "<<atyp<<endl;exit(1);
 	}
 	return node;
