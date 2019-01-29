@@ -67,6 +67,11 @@ void clear_events_index();
 void clear_neighbours(int _typ);
 void put_neigh( site *Site, int typ, int zone);
 void put_neighbours(std :: vector <site*> &neig_vect, int typ);
+ 
+    //get all neighs in the radious r_min-r_max. This is set up in lattice
+    //for all neighs get clusters. This method can goes to site
+ //       atom->calc_clusters(cs, cluster);   //todo: store calculated clster in site
+
 void set_atom(int _atom);
 void set_x(double _x);
 void set_y(double _y);
