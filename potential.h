@@ -16,7 +16,12 @@ unsigned int coordination_zones, atoms_type, sublattices;
 
 std::vector<std::vector<std::vector<double> > > V;
 //3D table v[k][i][j] zawiera potencjaly Vij dla kolejnych stref k 
-//in case of CVM it store [cluster_size][atom_type_size][eci]
+std::vector<std::vector<double> > ECI;
+//in case of CVM it store ECI[cluster_size][atom_type_size]=eci
+std::vector<std::vector<double> > ORT_FUN;
+//it is needed also to store parameters for orthogonal functions
+//ORT_FUN[atoms_type_size][0-4]=a,b,c,d
+
 std::vector <double> rmin;
 std::vector <double> rmax;
 //zawieraja zasieg oddzialywan
@@ -33,6 +38,10 @@ int check_coordination_zone(site *A, site *B);
 unsigned int get_zone(double r);
 
 void init(unsigned int atom_type_size, unsigned int lattices);
+void init_ising(ifstream energy_file, unsigned int size_V, unsigned int lattices);
+void init_cvm(ifstream energy_file, unsigned int size_V, unsigned int lattices);
+
+  
 void set_boundary_condAt_to_pot(wektor &boundary);
 void set_boundary_condEn_to_pot(wektor &boundary);
 void show();
