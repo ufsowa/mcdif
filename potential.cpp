@@ -31,7 +31,16 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	//int o;
 	//cin>>o;
 
-		
+	energy_file>>text;
+	energy_file>>model;
+	if(text=="CVM"){
+		//set variable model for cmv
+	} else if(text=="Ising"){
+		//set variable model for Ising
+	}
+	else{
+		//error
+	}
 	energy_file>>text;
 	energy_file>>liczba_stref;
 	coordination_zones=liczba_stref;
