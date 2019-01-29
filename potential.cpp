@@ -74,12 +74,12 @@ void potential :: init_cvm(ifstream energy_file, unsigned int size_V, unsigned i
 	sublattices = lattices;
 
 	for (unsigned int ls=0;ls<cluster_size;ls++){
-		V.push_back(vector <double>(size_V,0.0) );		//[cluster_size][eci1,eci2,eci3]
+		ECI.push_back(vector <double>(size_V,0.0) );		//[cluster_size][eci1,eci2,eci3]
 
 		for(unsigned int k=0;k<(size_V);k++){
 			double pot=0.0,
 			energy_file>>pot;
-			if(V[ls][k]!=0.0){
+			if(ECI[ls][k]!=0.0){
 				control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
 				control_output<<ls<<" "<<k<<" "<<pot<<endl;
 			}
@@ -93,7 +93,7 @@ void potential :: init_cvm(ifstream energy_file, unsigned int size_V, unsigned i
 		//int o;
 		//cin>>o;
 			
-			V[ls][k]=pot;						
+			ECI[ls][k]=pot;						
 		}
 	}	
 	//here need also read in othogonal functions for every cluster and atom type
@@ -103,22 +103,22 @@ void potential :: init_cvm(ifstream energy_file, unsigned int size_V, unsigned i
 	energy_file>>text>>functions_size;
 	if(text!="FunParameters: "){control_output<<"Bad format in energy.in. 'FunParameters: '/="<<text<<endl; exit(0);}
 	for (unsigned int ls=0;ls<functions_size;ls++){
-		ort_fun.push_back(vector <double>(4,0.0) );		//[cluster_size][eci1,eci2,eci3]
+		ORT_FUN.push_back(vector <double>(4,0.0) );		//[cluster_size][eci1,eci2,eci3]
 		double a=0.0, b=0.0, c=0.0, d=0.0;
 		energy_file>>a>>b>>c>>d;
 
-		if( ort_fun[ls][0]!=0.0 or ort_fun[ls][1]!=0.0 or ort_fun[ls][2]!=0.0 or ort_fun[ls][3]!=0.0){
+		if( ORT_FUN[ls][0]!=0.0 or ORT_FUN[ls][1]!=0.0 or ORT_FUN[ls][2]!=0.0 or ORT_FUN[ls][3]!=0.0){
 			control_output<<"WARRNING:You try overwritte function parameters in energy.in file!"<<endl;
-			control_output<<ls<<" "<<ort_fun[ls][0]<<ort_fun[ls][1]<<ort_fun[ls][2]<<ort_fun[ls][3]<<endl;
+			control_output<<ls<<" "<<ORT_FUN[ls][0]<<ORT_FUN[ls][1]<<ORT_FUN[ls][2]<<ORT_FUN[ls][3]<<endl;
 		}
 		if( (ls >= functions_size){
 			control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
 			control_output<<ls<<endl;exit(0);
 		}
-		ort_fun[ls][0]=a;
-		ort_fun[ls][1]=b;
-		ort_fun[ls][2]=c;
-		ort_fun[ls][3]=d;
+		ORT_FUN[ls][0]=a;
+		ORT_FUN[ls][1]=b;
+		ORT_FUN[ls][2]=c;
+		ORT_FUN[ls][3]=d;
 
 };
 
@@ -347,8 +347,54 @@ unsigned int potential::get_zone(double r){
 	return zon;
 }
 	
-double potential :: get_energy(site *atom)	
-{
+double potential :: get_energy(site *atom){
+	potential *pointer = 
+	if(model=="CVM"){
+		cvm_get_energy(atom);
+	}else if(model=="Ising"){
+		ising_get_energy(atom);
+	}else{
+ 		control_output<<"ERROR:potential::get_energy: "<<model<<endl;exit(0);
+	}
+	//here heritage+virtual function match very well 
+	//http://cpp0x.pl/kursy/Programowanie-obiektowe-C++/Polimorfizm/Metody-wirtualne/495
+};
+
+           
+double potential :: cvm_get_energy(site *atom){
+//	cout<<"get_energy() for "<<endl;
+	double Vsite=0.0;
+	int A=atom->get_atom(); //typ atomu
+//	atom->show_site();
+//	atom->show_neigh(0);
+//	int o;	cin>>o;
+//	control_output<<"Rozmiar V.size: "<<V.size()<<endl;
+	//check size of coordination zones. Should be 1 in case of cvm.
+	if(V.size()!=1){control_output<<"ERROR:potential::get_energy: "<<model<<endl;exit(0);}
+
+    //cs - cluster size
+    for(unsigned int cs=0;cs<ECI.size();cs++){
+        vector <site *> cluster;
+        atom->calc_clusters(cs, cluster);   //todo: store calculated clster in site
+        for(unsigned int ts =0; ts<ORD_FUN.size(); ts++){    
+            Vsite=+ECI[cs][ts]*rho(ts, cluster);
+        }
+    }
+    return Vsite;
+};
+
+double potential :: rho(ts, vector **site cluster){
+    double phi = 1.0;
+    for(unsigned int cs =0; cs<cluster.size(); cs++){
+        int spin = cluster[cs]->get_spin();
+    //0-a 1-b 2-c 3-c 4-d
+    phi=*ORT_FUN[ts][0]*pow((spin+ORT_FUN[ts][4]),ORT_FUN[ts][1]) + ORT_FUN[ts][3]
+    }
+    return phi;
+}
+           
+double potential :: ising_get_energy(site *atom){
+
 //	cout<<"get_energy() for "<<endl;
 	double Vsite=0.0;
 //	int zone=0;
