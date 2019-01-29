@@ -52,8 +52,14 @@ void show();
 double get_energy(site *atom1, site* atom2); 
 double get_energy(site *atom1, int typ1, site* atom2, int typ2);
 double get_energy(site *atom);
+double cvm_get_energy(site *atom);
+double ising_get_energy(site *atom);
+
 double get_energy(site *atom, int typ);
 
+double rho(ts, vector **site cluster);
+
+  
 void read_bars(string file_input);
 double get_barier(site* node1, site* node2);
 
