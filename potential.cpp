@@ -2,6 +2,7 @@
 
 potential :: potential(){
 	SAVE=false;
+	model="Hamiltonian model not assigned!"
 	};
 potential :: ~potential(){};
 
@@ -19,12 +20,6 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	exit(0);
 	}  
 	
-	vector< vector<int> >::iterator iter_ii;
-    vector<int>::iterator iter_jj;
-    unsigned int liczba_stref=0;
-
-	//tyle ile bylo typow atomow uzytych w strukturze, tyle par energii
-	unsigned int size_V = atom_type_size;
 	//vector Vrow(size_V);
 	//V.push_back;
 	//cout<<"Ile typow: "<<size_V<<endl;
@@ -32,15 +27,33 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	//cin>>o;
 
 	energy_file>>text;
-	energy_file>>model;
-	if(text=="CVM"){
-		//set variable model for cmv
-	} else if(text=="Ising"){
-		//set variable model for Ising
+	energy_file>>use_model;
+	if(model=="CVM" or model=="Ising"){    //set variable model for cmv
+		model=use_model;
+		control_output<<"Used energy model: "<<model<<endl;	
+	}else{
+		control_output<<"Bad model used in energy.in: "<<used_model<<endl;	
+		control_output<<model<<endl;	
+		exit(0);
 	}
-	else{
-		//error
+	//from this point must distinguise for CVM or Ising becasue of different files format
+	if(model=="CVM"){
+		//init_cvm();
+	}else if(model=="Ising"){
+		init_ising(energy_file, atom_type_size, lattices);
+	}else{
+		control_output<<"Bad model used in energy.in: "<<used_model<<endl;	
+		control_output<<model<<endl;	
+		exit(0);
 	}
+}
+
+void potential :: init_ising(ifstream energy_file, unsigned int size_V, unsigned int lattices){
+	string text;
+	vector< vector<int> >::iterator iter_ii;
+    vector<int>::iterator iter_jj;
+    unsigned int liczba_stref=0;
+
 	energy_file>>text;
 	energy_file>>liczba_stref;
 	coordination_zones=liczba_stref;

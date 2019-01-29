@@ -11,14 +11,16 @@
 class potential {
 
 bool SAVE;
+string model;
 unsigned int coordination_zones, atoms_type, sublattices;
+
 std::vector<std::vector<std::vector<double> > > V;
-//tablica 3D v[k][i][j] zawiera potencjaly Vij dla kolejnych stref k 
+//3D table v[k][i][j] zawiera potencjaly Vij dla kolejnych stref k 
+//in case of CVM it store [cluster_size][atom_type_size][eci]
 std::vector <double> rmin;
 std::vector <double> rmax;
 //zawieraja zasieg oddzialywan
 vector <vector <vector<double> > > bars;								//keeps energy of the jumps barrier
-
 vector <vector <vector <wektor > > > save_bar;
 
 public:
