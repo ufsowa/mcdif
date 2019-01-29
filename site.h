@@ -20,7 +20,7 @@
 
 #ifndef STDLIB
 #define STDLIB
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #ifndef PAIRJUMP_H
@@ -89,7 +89,7 @@ double get_y();
 double get_z();
 double get_position(int dir);
 wektor get_position();
-int get_atom();
+unsigned int get_atom();
 int get_sub_latt();
 double get_drx();
 double get_dry();

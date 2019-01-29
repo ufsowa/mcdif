@@ -16,7 +16,7 @@ timeval seed2;
 struct timezone zone1;
 gettimeofday(&seed2,&zone1);
 srand(seed1+seed2.tv_usec);
-srandom (seed1+seed2.tv_usec);
+//srandom (seed1+seed2.tv_usec);
 //history<<"seed: "<<seed1+seed2.tv_usec<<" start: "<<start<<" "<<start2<<endl;
 for(long j=0;j<10000;j++)
 ran01();
@@ -72,7 +72,7 @@ double rownomierny(double a,double b)
 	double y1;
 	
 	
-	x1 = double(random())/double(RAND_MAX);//ładujemy losowa liczbe
+	x1 = double(rand())/double(RAND_MAX);//ładujemy losowa liczbe
 	y1 = (double)((b-a)*x1+a);//sprowadzamy do rozkładu rownomiernego od <a,b>
 			
 	return y1;	//zwracamy jedna z wartosci

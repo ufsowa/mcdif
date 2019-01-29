@@ -421,7 +421,7 @@ double site :: get_drz(){return dz;}
 long int site :: get_jumps(int zon){return nr_jump[zon];}
 void site :: get_jumps( std :: vector <long int> &output){output=nr_jump;}
 int site :: get_latt_number(){return latt_number;}
-int site :: get_atom(){if(atom<0){ cout<<"ERROR: atom type < 0. Bad lattice introduction."<<endl;exit(0);}return atom;}
+unsigned int site :: get_atom(){if(atom<0){ cout<<"ERROR: atom type < 0. Bad lattice introduction."<<endl;exit(0);}return atom;}
 int site :: get_sub_latt(){return sub_latt_name;}
 long site :: get_vindex(){return Vindex;}
 int site :: get_hist_index(){return hist_index;}
