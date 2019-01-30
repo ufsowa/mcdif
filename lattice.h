@@ -57,6 +57,7 @@ vector <vector<site> > cells;
 
 vector <int> atoms_type;			//zawiera typy atomow 0 is reserved for vacancy
 vector <string> atoms_name;			//ZAMIENIC NA KEY MAP
+vector <int> atoms_spins;			//ZAMIENIC NA KEY MAP
 
 
 unsigned int x_size;			// obszar wykorzystany na zbudowanie siatki w pamieci
