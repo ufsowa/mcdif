@@ -139,8 +139,10 @@ void exchange_sites( site* A, site* B);
 void get_sites(vector <plaster> &tmp);
 void get_sites(plaster &tmp);
 site* get_site(long pozition);
-int get_atom_type(int typ);
+int get_atom_name(int typ);
+int get_atom_spin(int typ);
 int get_atom_type(string name);
+int get_atom_type(int spin);
 double move(double x2, double x1, int dir);
 
 //reading lattice parameters
