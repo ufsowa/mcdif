@@ -484,7 +484,7 @@ unsigned int lattice :: get_atom_typ_numbers()
 	return vec_size;
 }
 
-int lattice :: get_atom_type(int typ)
+int lattice :: get_atom_spin(int typ)
 {
 	//	atoms_type.push_back(new_atom); // [0]=1;[1]=0;[2]=2
 	//	atoms_name.push_back(name);     // [0]="Ni";[1]="Fe";[2]="Al"
@@ -494,14 +494,40 @@ int lattice :: get_atom_type(int typ)
 // Common point is the same index. Find index for type =1  in atoms_type.
 // then use this index to get name or spin.
 // So use the next function.
-	return atoms_type[typ];
+	int pozycja=0;
+	for(unsigned int i=0;i<atoms_type.size();i++){
+		if(typ == atoms_type[i])
+			break;
+		pozycja++;
+	}
+	return atoms_spins[pozycja];
 }
 
-int lattice :: get_atom_type(string name)
-{
+int lattice :: get_atom_name(int typ){
+	int pozycja=0;
+	for(unsigned int i=0;i<atoms_type.size();i++){
+		if(typ == atoms_type[i])
+			break;
+		pozycja++;
+	}
+	return atoms_name[pozycja];
+}
+
+int lattice :: get_atom_type(string name){
 	int pozycja=0;
 	for(unsigned int i=0;i<atoms_name.size();i++){
 		if(name == atoms_name[i])
+			break;
+		pozycja++;
+	}
+	
+	return atoms_type[pozycja];
+}
+
+int lattice :: get_atom_type(int spin){
+	int pozycja=0;
+	for(unsigned int i=0;i<atoms_spins.size();i++){
+		if(spin == atoms_spins[i])
 			break;
 		pozycja++;
 	}
