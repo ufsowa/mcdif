@@ -42,15 +42,30 @@ int sub_latt_name;		//nazwa podsieci
 int latt_number;		//numer sieci krystalicznej
 double dx;
 double dy;		//liczba skokow w danym kerunku
-double dz;		
+double dz;
 std :: vector <long int> nr_jump; 			// licza wszystkich skokow situ
 std :: vector <site*> site_at_neigh; 		//sasiedzie dla bcc przy liczeniu skokow
 std :: vector <std::vector <site*> > site_en_neigh;		//sasiedzie dla bcc przy liczeniu energii w kolejnych strefach
+std :: vector <std::vector <std::vector <site*> > > &clusters 
+ // keeps calculated clusters [cluster_size][cluster_number_of_that_size][site_in_cluster]=site
+ // This approach requires that site_in_cluster index is the same for all cluster which is not true. Same for cluster_number_of_that_size.
+ // Beter idea is to use vector of list, or sth else. 
+ //http://www.cplusplus.com/forum/general/26669/
+ // Here a good idea woud be to use multimap of vectors/deque/lists.
+ // We need later to iterate very often over it. So I think vector is better here.
+ //https://www.fluentcpp.com/2018/04/10/maps-vectors-multimap/
+ //http://www.cplusplus.com/reference/map/multimap/
 std :: vector < list <pairjump>::iterator > site_events;
 long int Vindex;
 int hist_index;
 int block_index;
 int rez_index;
+
+    //get all neighs in the radious r_min-r_max. This is set up in lattice
+    //for all neighs get clusters. This method can goes to site
+ //       atom->calc_clusters(cs, cluster);   //todo: store calculated clster in site
+void calc_clusters(int cs, std::vector <std::vector <<site*> > &clusters);
+
  
 public:
 site ();
@@ -68,10 +83,7 @@ void clear_neighbours(int _typ);
 void put_neigh( site *Site, int typ, int zone);
 void put_neighbours(std :: vector <site*> &neig_vect, int typ);
  
-    //get all neighs in the radious r_min-r_max. This is set up in lattice
-    //for all neighs get clusters. This method can goes to site
- //       atom->calc_clusters(cs, cluster);   //todo: store calculated clster in site
-
+void calc_clusters(int cs, std::vector <std::vector <site*> > &clusters);
 void set_atom(int _atom);
 void set_x(double _x);
 void set_y(double _y);
