@@ -244,6 +244,107 @@ void site :: show_neigh(int typ)
 		
 }
 
+/**
+	Find all clusters of size within neighbours atoms. 
+	Store calculated clusters in site::clusters for reuse.
+	
+	@param cs Cluster size
+	@return list of cluster of size to clusters_of_size used in potentials to calc energy.
+	
+	//size=4 requires 3 iterators to step over, etc.
+	for(unsigned int i = 0; i <site_en_neigh[0].size(); i++){
+	for(unsigned int j = i+1; j <site_en_neigh[0].size(); j++){
+	for(unsigned int k = j+1; k <site_en_neigh[0].size(); k++){
+		vector <site*> cluster; cluster.reserve(10);
+		cluster.push_back(self());
+		cluster.push_back(site_en_neigh[0][i]);		
+		cluster.push_back(site_en_neigh[0][j]);
+		cluster.push_back(site_en_neigh[0][k]);
+		clusters_of_size.push_back(cluster);
+	}}}
+*/
+void site :: calc_clusters(int cluster_size, std::vector <std::vector <<site*> > &clusters_of_size){
+	int zones=get_no_zones();	//should be only one zoe in case of CVM, thus site_en_neigh[0]
+	unsigned int max = site_en_neigh[0].size();
+	//get clusters	
+	//https://stackoverflow.com/questions/18732974/c-dynamic-number-of-nested-for-loops-without-recursion
+	//https://gist.github.com/davidair/8cd9e906eeab26083a4a3727001830ff
+	//http://www.cplusplus.com/forum/beginner/40711/		-combinations
+	// Initialize the slots to hold the current iteration value for each depth
+	// for cluster_size=4 requires 3 iterators to step over, etc. thus (cluster_size - 1)
+	int* slots = (int*)alloca(sizeof(int) * (cluster_size-1));
+	int* max = (int*)alloca(sizeof(int) * (cluster_size-1));
+
+	for (int i = 0; i < (cluster_size - 1); i++){		// size=3	size=5
+	        slots[i] = i;					// slots=	slots=
+		max[i] = max - cluster_size + 1 + i;		// {0,1,2}	{0,1,2,3,4}
+	}							// max={6,7,8}	max={4,5,6,7,8}
+								
+	int index = (cluster_size-2);				// index=2	index=3
+	while (true){
+		vector <site*> cluster; cluster.reserve(10);
+		cluster.push_back(self());
+		for(int at = 0; at < (cluster_size - 1); at++){
+			cluster.push_back(site_en_neigh[0][(slots[at])]);		
+		}
+		clusters_of_size.push_back(cluster);
+        	slots[index]++;				//max = 8 index=2 slots={0,1,8}
+							//max = 8 index=4 slots={0,1,2,3,8}
+		while(slots[index] == max[index]){
+			index--;
+			if (index < 0){
+                		return;
+            		}
+			slots[index]++;			//index=1 slot[2]=3
+			for(int from = index; from < (cluster_size - 1); from++)
+				slots[from+1]=slots[from]+1
+			}
+		}
+		index = (cluster_size-2);
+	}		
+	/**
+	max = 8 {0,1,2,3,4,5,6,7} cluster_size=4
+	{0,1,2}	{0,2,3} {0,3,4} {0,4,5} {0,5,6} {0,6,7}	 {1,2,3} {1,3,4} {1,4,5} {1,5,6} {1,6,7} {2,3,4} {2,4,5} {2,5,6} {2,6,7}
+	{0,1,3} {0,2,4} {0,3,5} {0,4,6} {0,5,7}		 {1,2,4} {1,3,5} {1,4,6} {1,5,7}	 {2,3,5} {2,4,6} {2,5,7}
+	{0,1,4} {0,2,5} {0,3,6} {0,4,7}			 {1,2,5} {1,3,6} {1,4,7}		 {2,3,6} {2,4,7}
+	{0,1,5} {0,2,6} {0,3,7}				 {1,2,6} {1,3,7}			 {2,3,7}
+	{0,1,6} {0,2,7}					 {1,2,7}
+	{0,1,7}					
+		
+	{3,4,5} {3,5,6} {3,6,7}				{4,5,6} {4,6,7}				""{5,6,7}""
+	{3,4,6} {3,5,7}					{4,5,7}					
+	{3,4,7}
+
+	cluster_size=6
+	{0,1,2,3,4} {0,1,2,4,5} {0,1,2,5,6} {0,1,2,6,7} {0,1,3,4,5} {0,1,3,5,6} {0,1,3,6,7} 	{0,1,4,5,6} {0,1,4,6,7} {0,1,5,6,7}
+	{0,1,2,3,5} {0,1,2,4,6} {0,1,2,5,7}        	{0,1,3,4,6} {0,1,3,5,7} 	    	{0,1,4,5,7}
+	{0,1,2,3,6} {0,1,2,4,7}				{0,1,3,4,7}
+	{0,1,2,3,7}
+
+	{0,2,3,4,5} {0,2,3,5,6} {0,2,3,6,7} 		{0,2,4,5,6} {0,2,4,6,7}		    	{0,2,5,6,7}
+	{0,2,3,4,6} {0,2,3,5,7}				{0,2,4,5,7}
+	{0,2,3,4,7}
+	
+	{0,3,4,5,6} {0,3,4,6,7}				{0,3,5,6,7}
+	{0,3,4,5,7}
+	
+	{0,4,5,6,7}
+	
+	{1,2,3,4,5} {1,2,3,5,6} {1,2,3,6,7}		{1,2,4,5,6} {1,2,4,6,7}			{1,2,5,6,7}
+	{1,2,3,4,6} {1,2,3,5,7}				{1,2,4,5,7}
+	{1,2,3,4,7}
+	...
+	""{3,4,5,6,7}""
+*/
+						
+	delete slots;
+	delete max;
+
+	//save clusters
+	clusters.insert(std::make_pair(cs, &clusters_of_size));
+}
+
+
 double site :: cal_stech(int typ1){
 	double x=-1.0;
 	
