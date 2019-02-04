@@ -2,6 +2,10 @@
 
 potential :: potential(){
 	SAVE=false;
+	model="Hamiltonian model not assigned!";
+	coordination_zones=0;
+	atoms_type=0;
+	sublattices=0;
 	};
 potential :: ~potential(){};
 
@@ -10,7 +14,7 @@ using namespace std;
 void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	
 	control_output<<"Initialize potentials..."<<endl;
-	string text;
+	string text, used_model;
 	ifstream energy_file("energy.in");
 	if (energy_file)
 	{	control_output<<"energy_file reading from energy.in..."<<endl;}	
@@ -18,29 +22,107 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	control_output<<"nie ma pliku energy.in"<<endl;	
 	exit(0);
 	}  
+
+	energy_file>>text;
+	energy_file>>used_model;
+	if(used_model=="CVM" or used_model=="Ising"){    //set variable model for cmv
+		model=used_model;
+		control_output<<"Used energy model: "<<model<<endl;
+		}else{
+		control_output<<"Bad model used in energy.in: "<<used_model<<endl;	
+		control_output<<model<<endl;	
+		exit(0);
+	}
+	//from this point must distinguise for CVM or Ising becasue of different files format
+	if(model=="CVM"){
+		init_cvm(energy_file, atom_type_size, lattices);
+	}else if(model=="Ising"){
+		init_ising(energy_file, atom_type_size, lattices);
+	}else{
+		control_output<<"Bad model used in energy.in: "<<used_model<<endl;	
+		control_output<<model<<endl;	
+		exit(0);
+	}
+}
+
+void potential :: init_cvm(std::ifstream &energy_file, unsigned int size_V, unsigned int lattices){
+	string text;
+	vector< vector<int> >::iterator iter_ii;
+    vector<int>::iterator iter_jj;
+    unsigned int cluster_size=0;
+    unsigned int functions_size=0;
 	
+	double r1=0.0,r2=0.0;
+	energy_file>>text;
+	if(text=="rmin_rmax"){
+		energy_file>>r1>>r2;
+		rmin.push_back(r1);
+		rmax.push_back(r2);
+	}else{control_output<<"Bad format in energy.in: "<<text<<endl;	exit(0);}
+
+	energy_file>>text>>cluster_size;
+	if(text!="Clusters: "){control_output<<"Bad format in energy.in. 'Clusters: '/="<<text<<endl; exit(0);}
+	coordination_zones=cluster_size;
+
+	atoms_type = size_V;
+	sublattices = lattices;
+
+	for (unsigned int ls=0;ls<cluster_size;ls++){
+		ECI.push_back(vector <double>(size_V,0.0) );		//[cluster_size][eci1,eci2,eci3]
+
+		for(unsigned int k=0;k<(size_V);k++){
+			double pot=0.0;
+			energy_file>>pot;
+			if(ECI[ls][k]!=0.0){
+				control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
+				control_output<<ls<<" "<<k<<" "<<pot<<endl;
+			}
+			if( (ls >= size_V) or (k >= size_V)){
+				control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
+				control_output<<ls<<" "<<k<<" "<<pot<<endl;exit(0);
+			}
+			
+		//cout<<text<<endl;
+		//cout<<"Oddzialywanie: i j V "<<i<<" "<<j<<" "<<pot<<endl;
+		//int o;
+		//cin>>o;
+			
+			ECI[ls][k]=pot;						
+		}
+	}	
+	//here need also read in othogonal functions for every cluster and atom type
+	//fun(a,b,x) = a*(x+d)^c + b all function has the same shape with one variable
+	//so need just read all parameters a and b for evry cluster/type
+	//functions[cluster_size][atom type][a,b]
+	energy_file>>text>>functions_size;
+	if(text!="FunParameters: "){control_output<<"Bad format in energy.in. 'FunParameters: '/="<<text<<endl; exit(0);}
+	for (unsigned int ls=0;ls<functions_size;ls++){
+		ORT_FUN.push_back(vector <double>(4,0.0) );		//[cluster_size][eci1,eci2,eci3]
+		double a=0.0, b=0.0, c=0.0, d=0.0;
+		energy_file>>a>>b>>c>>d;
+
+		if( ORT_FUN[ls][0]!=0.0 or ORT_FUN[ls][1]!=0.0 or ORT_FUN[ls][2]!=0.0 or ORT_FUN[ls][3]!=0.0){
+			control_output<<"WARRNING:You try overwritte function parameters in energy.in file!"<<endl;
+			control_output<<ls<<" "<<ORT_FUN[ls][0]<<ORT_FUN[ls][1]<<ORT_FUN[ls][2]<<ORT_FUN[ls][3]<<endl;
+		}
+		if(ls >= functions_size){
+			control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
+			control_output<<ls<<endl;exit(0);
+		}
+		ORT_FUN[ls][0]=a;
+		ORT_FUN[ls][1]=b;
+		ORT_FUN[ls][2]=c;
+		ORT_FUN[ls][3]=d;
+
+	}
+}
+
+void potential :: init_ising(std::ifstream &energy_file, unsigned int size_V, unsigned int lattices){
+	string text;
 	vector< vector<int> >::iterator iter_ii;
     vector<int>::iterator iter_jj;
     unsigned int liczba_stref=0;
 
-	//tyle ile bylo typow atomow uzytych w strukturze, tyle par energii
-	unsigned int size_V = atom_type_size;
-	//vector Vrow(size_V);
-	//V.push_back;
-	//cout<<"Ile typow: "<<size_V<<endl;
-	//int o;
-	//cin>>o;
-
-	energy_file>>text;
-	energy_file>>model;
-	if(text=="CVM"){
-		//set variable model for cmv
-	} else if(text=="Ising"){
-		//set variable model for Ising
-	}
-	else{
-		//error
-	}
 	energy_file>>text;
 	energy_file>>liczba_stref;
 	coordination_zones=liczba_stref;
@@ -64,9 +146,8 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 				energy_file>>r1>>r2;
 				rmin.push_back(r1);
 				rmax.push_back(r2);
-																		//cout<<text<<endl;
-																		//cout<<"Promien oddzialywania: "<<r1<<" "<<r2<<endl;
-																		//int o;//cin>>o;
+								//cout<<text<<endl;
+								//cout<<"Promien oddzialywania: "<<r1<<" "<<r2<<endl																	//int o;//cin>>o;
 			}else{
 				energy_file>>i>>j>>pot;
 				if(V[ls][i][j]!=0.0){
@@ -89,7 +170,7 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 	}
 	
 	show();
-	control_output<<"Potentials initialized-> "<<atoms_type<<" "<<sublattices;
+	control_output<<"Ising potentials initialized-> "<<atoms_type<<" "<<sublattices;
 	
 	for (unsigned int i=0;i<atoms_type;i++){
 		save_bar.push_back( vector<vector<wektor>>(sublattices, vector<wektor>(sublattices, wektor() )));
@@ -105,7 +186,7 @@ void potential :: init(unsigned int atom_type_size, unsigned int lattices){
 			control_output<<ib<<" "<<jb<<" "<<kb<<" "; (save_bar[ib][jb][kb]).show();
 	}}}
 	
-	};
+}
 	
 void potential :: add_barrier(const pairjump &jump){
 
