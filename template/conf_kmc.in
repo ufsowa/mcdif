@@ -1,0 +1,28 @@
+Method: 3
+INSERT 3 0 1 0
+INSERT 3 0 2 0
+RESIDENT 4 100 1 5000 1000
+Save: 3
+HIST 4 0 40 1 1
+NandE 1 1
+make_pic 7 100 0 0 0 40 20 20
+BARRS 0
+Options: 4
+EQUILIBRATE 6 2 1 2 38 2 1
+RESERVUAR 5 0 2 1 1 0
+RESERVUAR 5 38 2 1 1 0
+BOUNDARY 2 1 1
+Memory_Size:
+20 10 10
+Def_atomic_zone:
+1.6 2.1 1.5 1.5 1.5
+Region_area:/</
+0 0 0 40 20 20
+Simulation_area:/</
+2 0 0 38 20 20
+Boundary_conditions:?energy_atoms?/<0/=0/0<vec_transition
+40 20 20 40 20 20
+Build_starting_structure:ile?yes?no/st_end_from/
+2 0
+left.in 10 0 0 50 40 40 0 0 0 0
+right.in 50 0 0 90 40 40 0 0 0 0
