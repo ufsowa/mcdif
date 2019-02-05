@@ -15,7 +15,7 @@ string model;
 unsigned int coordination_zones, atoms_type, sublattices;
 
 std::vector<std::vector<std::vector<double> > > V;
-//3D table v[k][i][j] zawiera potencjaly Vij dla kolejnych stref k 
+//3D table v[k][i][j] zawiera potencjaly Vij dla kolejnych stref k
 std::vector<std::vector<double> > ECI;
 //in case of CVM it store ECI[cluster_size][atom_type_size]=eci
 std::vector<std::vector<double> > ORT_FUN;
@@ -48,8 +48,8 @@ void show();
 //double getV1(int _at1,int _at2);
 //double getV2(int _at1,int _at2);
 
-//double get_energy(int atom, vector <site*> &jumper_neighbour); 
-double get_energy(site *atom1, site* atom2); 
+//double get_energy(int atom, vector <site*> &jumper_neighbour);
+double get_energy(site *atom1, site* atom2);
 double get_energy(site *atom1, int typ1, site* atom2, int typ2);
 double get_energy(site *atom);
 double get_energy(site *atom, int typ);
