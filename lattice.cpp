@@ -6,7 +6,7 @@ using namespace std;
 
 
 
-lattice :: lattice(int _xsize,int _ysize,int _zsize ){ 
+lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	//init global lattice variable
 	MOVE_SIM_REGION = false;
 	TRANSPARENT = false;
@@ -24,7 +24,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		//cout<<i<<" ";
 		matrix.push_back( vector<vector<box> >(y_size,vector <box> (z_size, box(iter))));
 	//	matrix.push_back( vector<vector<box> > ());
-		
+
 	}
 
 /*	for(int i=0;i < int(x_size);i++)
@@ -36,7 +36,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 			matrix[i].push_back(vector<box> ());
 		}
 	}
-	
+
 	for(int i=0;i < int(x_size);i++)
 	{
 	for(int j=0;j < int(y_size);j++)
@@ -52,7 +52,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	}
 	}
 
-*/	
+*/
 	for(int i=0;i < int(x_size);i++)
     {
 		for(int j=0;j < int(y_size);j++)
@@ -65,22 +65,22 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 //	cout<<&matrix[i][j][k]<<endl;
 
 	}}}
-	
-	
-		
+
+
+
 //	int o;
 	string text;
 	//wczytuje atomy bazowe struktury
 	ifstream unit_cell("structure.in");
 	if (unit_cell)
 	{	control_output<<"unit_cell reading from structure.in..."<<endl;
-	control_output<<"All conditions are taken with '/<' not '<=' "<<endl;}	
+	control_output<<"All conditions are taken with '/<' not '<=' "<<endl;}
 	else{
-	control_output<<"nie ma pliku structure.in"<<endl;	
+	control_output<<"nie ma pliku structure.in"<<endl;
 	exit(0);
 	}
-	
-	
+
+
 	int nr_struct;
 	int nr_atoms;
 	//rozmiary komorki elementarnej i wektor translacji tej komorki
@@ -93,80 +93,80 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	double z_left_border;
 	double z_right_border;
 	double z_translation;
-	
-	cells.reserve(5);	
+
+	cells.reserve(5);
 	cells.clear();
 	atoms_type.reserve(8);
 	atoms_type.clear();
 	//liczba struktur do wczytania
 	unit_cell>>text>>nr_struct;
-	
+
 	//iteruje dla kazdej struktury
 	for(int l=0;l<nr_struct;l++)
 	{
 		unit_cell>>text>>x_left_border>>y_left_border>>z_left_border;
 		unit_cell>>x_right_border>>y_right_border>>z_right_border;
 		unit_cell>>x_translation>>y_translation>>z_translation;
-	
+
 		control_output<<"structure size: Lbord/Rbord/trans"<<endl;
 		control_output<<x_left_border<<" "<<x_right_border<<" "<<x_translation<<endl;
 		control_output<<y_left_border<<" "<<y_right_border<<" "<<y_translation<<endl;
 		control_output<<z_left_border<<" "<<z_right_border<<" "<<z_translation<<endl;
-		
+
 		//zapisanie rozmiaru komorki elementarnej
-		x_trans.push_back(x_translation);		
+		x_trans.push_back(x_translation);
 		y_trans.push_back(y_translation);
 		z_trans.push_back(z_translation);
-				
+
 		// tablica vecorow do przechowywania sitow. Pelni role sitow/boxow w ktorych siedza atomy o double cord: 1<=1.44 <2
 		//wypelnione -3. atom <0 means that site is not used in simulation
-		
-		
-		
+
+
+
 		//cin>>o;
 		//liczba atom w tej komorce do wczytania
 		unit_cell>>text>>nr_atoms;
 		control_output<<"atoms in unit cell: "<<nr_atoms<<endl;
 		//cin>>o;
-		
-		
+
+
 	//	cout<<"LATTICE"<<endl;
 	//	matrix[2][2][2].show_site();
-		
+
 		vector <site> atoms_incell;
-		atoms_incell.reserve(10);	
+		atoms_incell.reserve(10);
 		atoms_incell.clear();
 		unit_cell>>text;
-		
-		//wczytuje uzyte atomy komorki do tablicy 
+
+		//wczytuje uzyte atomy komorki do tablicy
 		for (int i=0;i<nr_atoms;i++)
 			{
 				double x=0.0,y=0.0,z=0.0;
-				int atom=1;
-				string name=""; 
+				int atom=1, spin=1;
+				string name="";
 				int sub_lat_name;
-				unit_cell>>x>>y>>z>>atom>>name>>sub_lat_name;
+				unit_cell>>x>>y>>z>>atom>>name>>spin>>sub_lat_name;
 				control_output<<x<<" "<<y<<" "<<z<<" "<<atom<<" "<<name<<" "<<sub_lat_name<<" || ";
 				control_output<<endl;
-				  
+
 				if(x<x_translation and y<y_translation and z<z_translation)
 				{
 					add_sublatt_typ(sub_lat_name, atom);
-					add_atom_type(atom,name,spin);	//dodaje typy uzytych atomow				
+					add_atom_type(atom,name,spin);	//dodaje typy uzytych atomow
 					atoms_incell.push_back(site(x,y,z,atom,sub_lat_name,l));
-				} 
-				else 
+				}
+				else
 			 	{
 					control_output<<"Erorr: Atoms in cell behind cell. Site cord must be < trans"<<endl;
 					exit(0);
 				}
-			  
+
 			}
-		
+
 		control_output<<"atoms in cell: "<<atoms_incell.size()<<endl;
-		
-		cells.push_back(atoms_incell);   
-		
+
+		cells.push_back(atoms_incell);
+
 		//cin>>o;
 		for(double x=x_left_border;x<x_right_border;x=x+x_translation)
 		{
@@ -180,12 +180,12 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 				{
 					double X=K->get_x();
 					double Y=K->get_y();
-					double Z=K->get_z();  
+					double Z=K->get_z();
 					int ATOM=K->get_atom();
 					int name=K->get_sub_latt();
-					  
+
 					//control_output<<" "<<name;
-							
+
 					if(set_prec(x+X)<set_prec(x_right_border) and set_prec(y+Y)<set_prec(y_right_border) and set_prec(z+Z)<set_prec(z_right_border))
 					{
 					//	control_output<<set_prec(x+X)<<" "<<set_prec(y+Y)<<" "<<set_prec(z+Z)<<" "<<ATOM<<" / ";
@@ -198,24 +198,24 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 						int a = int((x+X)/x_trans[l]);
 						int b = int((y+Y)/y_trans[l]);
 						int c = int((z+Z)/z_trans[l]);
-		//				control_output<<a<<" "<<b<<" "<<c<<endl;  
+		//				control_output<<a<<" "<<b<<" "<<c<<endl;
 						matrix[a][b][c].put_site(new_site);
 					//	cout<<"Jeszcze raz sprawdzam sity w boxie z lattice"<<endl;
-			//			matrix[a][b][c].show_sity();  
+			//			matrix[a][b][c].show_sity();
 					//	int o;
-					//	cin>>o; 
-					  
-						
+					//	cin>>o;
+
+
 					}
-				}				
+				}
 			}
 		}
 		}
-		
-		
-		
+
+
+
 		control_output<<"structure " <<l<<" readed ok"<<endl;
-	
+
 	//	for(int i=0;i<int(x_size);i++)
 	//	{
 	//		for(int j=0;j<int(y_size);j++)
@@ -227,39 +227,39 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	//			}
 	//		}
 	//	}
-		
+
 //cin>>o;
-	
-	
-	
-	
+
+
+
+
 	}
-	
+
 	//wczytuje energie do tablicy potencjalow V znajduje sie w klasie potencial
-	
-		
+
+
 }
 
 long lattice :: get_atoms_number()
 {
 	return atom_list.size();
-	
+
 	}
 
 void lattice :: set_atoms_map(vector <site *> &kontener)
 {
 	site *pointer=0;
-	
+
 	kontener.clear();
-	
+
 	for(unsigned int i=0;i<atom_list.size();i++)
 	{
 		pointer=atom_list[i];
-		
+
 		if(check_site_belonging_to_sim_area(pointer))
 		{
 		int atom = atom_list[i]->get_atom();
-		
+
 		if(atom >= 0)
 		{
 			kontener.push_back(pointer);
@@ -271,9 +271,9 @@ void lattice :: set_atoms_map(vector <site *> &kontener)
 //	{
 //		 control_output<<"nr "<<i<<" "<<kontener[i]<<" "<<endl;
 //		kontener[i]->show_site();
-//		}	
-	
-}	
+//		}
+
+}
 
 site* lattice :: get_site(long pozition)
 {
@@ -281,7 +281,7 @@ site* lattice :: get_site(long pozition)
 }
 
 void lattice :: init_sim_boundary(vector <double> &parameters){
-	int if_move = parameters[0];	
+	int if_move = parameters[0];
 	int trans = parameters[1];
 	MOVE_SIM_REGION = (if_move != 0);
 	TRANSPARENT = (trans != 0);
@@ -289,9 +289,9 @@ void lattice :: init_sim_boundary(vector <double> &parameters){
 
 void lattice :: init_events_list(set <site *> &kontener){
 
-	control_output<<"set event list Vsize/EVENTS/po: "<<kontener.size()<<" / "<<EVENTY->size();		
+	control_output<<"set event list Vsize/EVENTS/po: "<<kontener.size()<<" / "<<EVENTY->size();
 
-	list <pairjump>::iterator event=EVENTY->begin(); 	
+	list <pairjump>::iterator event=EVENTY->begin();
 	while ( event != EVENTY->end() ){
 		site* node = event->get_vac_to_jump();
 		node->clear_events_index();
@@ -299,27 +299,27 @@ void lattice :: init_events_list(set <site *> &kontener){
 	}
 
 		for ( set<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
-				
+
 //		if(check_site_belonging_to_sim_area(pointer)){
 			int atom = (*it)->get_atom();
 			if(atom==0){
-				update_site_events((*it));			
+				update_site_events((*it));
 			}
-//		}	
+//		}
 	}
 	control_output<<" / "<<EVENTY->size()<<endl;
 }
-	
+
 void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 {
 	site *pointer=0;
 	long int counter=0;
-	
+
 	for ( vector<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
 		(*it)->reset_vindex();
 	}
 	kontener.clear();
-	
+
 	for(unsigned int i=0;i<atom_list.size();i++){
 		pointer=atom_list[i];
 		int atom = pointer->get_atom();
@@ -337,29 +337,29 @@ void lattice :: set_atoms_list(vector <site *> &kontener, int typ)
 			}
 		}
 	}
-	
+
 	if(typ==0){
 		control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
-	
+
 //	for(int i=0;i<kontener.size();i++)
 //	{
 //		control_output<<"nr "<<i<<" "<<kontener[i]<<" "<<kontener[i]->get_vindex()<<endl;
 //		kontener[i]->show_site();
 //		kontener[i]->show_neigh(1);
-//	}	
+//	}
 	}
-}	
+}
 
 void lattice :: set_atoms_list(set <site *> &kontener, int typ)
 {
 	site *pointer=0;
 	long int counter=0;
-	
+
 	for ( set<site*>::iterator it = kontener.begin(); it != kontener.end(); ++it){
 		(*it)->reset_vindex();
 	}
 	kontener.clear();
-	
+
 	for(unsigned int i=0;i<atom_list.size();i++){
 		pointer=atom_list[i];
 		int atom = pointer->get_atom();
@@ -377,23 +377,23 @@ void lattice :: set_atoms_list(set <site *> &kontener, int typ)
 			}
 		}
 	}
-	
+
 	if(typ==0){
 		control_output<<"set atom list typ/size: "<<typ<<" / "<<kontener.size()<<endl;
-	
+
 //	for(int i=0;i<kontener.size();i++)
 //	{
 //		control_output<<"nr "<<i<<" "<<kontener[i]<<" "<<kontener[i]->get_vindex()<<endl;
 //		kontener[i]->show_site();
 //		kontener[i]->show_neigh(1);
-//	}	
+//	}
 	}
-}	
+}
 
 void lattice :: add_sublatt_typ(int sublatt, int atom_typ)
 	{
 		wektor typ_sublat(atom_typ,sublatt,0);
-		
+
 		vector <wektor> :: iterator I;
 		wektor new_sublatt= typ_sublat;
 		int add_new_type = 1;
@@ -407,33 +407,33 @@ void lattice :: add_sublatt_typ(int sublatt, int atom_typ)
 			for(I=sublatt_typ.begin();I!=sublatt_typ.end();I++)
 			{
 				wektor old_sublatt = wektor(*I);
-				
+
 				if(sublatt==old_sublatt.y)
 					{
 						new_sublattice=0;
 					}
-				
+
 				if(old_sublatt == new_sublatt)	// sprawdza czy typ jest juz w lisice
 				{
-					add_new_type = 0;	
+					add_new_type = 0;
 				}
 			}
 		}
-		
+
 	if(new_sublattice)
-	{	
+	{
 		sublattice++;
 	}
-	
+
 	if(add_new_type)
 	{
 		sublatt_typ.push_back(typ_sublat);
 	}
-	
+
 	control_output<<"latt/typ:"<< sublatt<<"/"<<atom_typ<<" |sublatt_typ size "<<sublatt_typ.size()<<" nr_sublattice "<<sublattice<<endl;
 }
-	
-	
+
+
 void lattice :: add_atom_type(int new_atom, string new_name, int new_spin){
 	int add_new_type = 1;
 
@@ -442,32 +442,32 @@ void lattice :: add_atom_type(int new_atom, string new_name, int new_spin){
 	//	{
 	//		atoms_type.push_back(0);
 	//		atoms_name.push_back("Fe");
-	//	control_output<<"in add at. new typ: "<< 0 <<" "<<"Fe"<<endl;	
+	//	control_output<<"in add at. new typ: "<< 0 <<" "<<"Fe"<<endl; ALOALO
 	//	}
 
 	for(unsigned int index=0; index<atoms_type.size();index++){
 		int old_atom = atoms_type[index];
 		int old_spin = atoms_spin[index];
 		string old_name = atoms_name[index];
-		
+
 		//	control_output<<"in add at. old typ: "<< old_atom<<" "<<atoms_name[iter]<<endl;
 
 		if(old_atom == new_atom){	// check if type is already added
-			add_new_type = 0;	
+			add_new_type = 0;
 			if((old_name != new_name) or (old_spin != new_spin)){  // check if not fault in atoms/spins/names
 				control_output<<"ERROR in add at. new typ: "<<new_atom<<" "<<new_name<<" "<<new_spin<<endl;
-				control_output<<"atoms in cells duplicated<<endl; exit(0);
+				control_output<<"atoms in cells duplicated and ignored"<<endl;;
 			}
 		}
 	}
-	
+
 	if(add_new_type){
 		atoms_type.push_back(new_atom); // [0]=1;[1]=0;[2]=2
-		atoms_name.push_back(name);     // [0]="Ni";[1]="Fe";[2]="Al"
-		atoms_spin.push_back(spin);	// [0]=0;[1]=-1;[2]=1
-				//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;	
+		atoms_name.push_back(new_name);     // [0]="Ni";[1]="Fe";[2]="Al"
+		atoms_spin.push_back(new_spin);	// [0]=0;[1]=-1;[2]=1
+				//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;
 	}
-	
+
 	control_output<<"size: |typ "<<atoms_type.size()<<" |name: "<<atoms_name.size()<<endl;
 }
 
@@ -484,26 +484,24 @@ unsigned int lattice :: get_atom_typ_numbers()
 	return vec_size;
 }
 
-int lattice :: get_atom_spin(int typ)
-{
-	//	atoms_type.push_back(new_atom); // [0]=1;[1]=0;[2]=2
-	//	atoms_name.push_back(name);     // [0]="Ni";[1]="Fe";[2]="Al"
-	//	atoms_spin.push_back(spin);	// [0]=0;[1]=-1;[2]=1
-// scenario:
-// 	I have site of type = 1. Whant its name and spin.
-// Common point is the same index. Find index for type =1  in atoms_type.
-// then use this index to get name or spin.
-// So use the next function.
+/**
+    scenario:
+ 	I have site of type = 1. Whant its name and spin.
+    Common point is the same index. Find index for type =1  in atoms_type.
+    then use this index to get name or spin.
+ */
+
+int lattice :: get_atom_spin(int typ){
 	int pozycja=0;
 	for(unsigned int i=0;i<atoms_type.size();i++){
 		if(typ == atoms_type[i])
 			break;
 		pozycja++;
 	}
-	return atoms_spins[pozycja];
+	return atoms_spin[pozycja];
 }
 
-int lattice :: get_atom_name(int typ){
+string lattice :: get_atom_name(int typ){
 	int pozycja=0;
 	for(unsigned int i=0;i<atoms_type.size();i++){
 		if(typ == atoms_type[i])
@@ -520,37 +518,37 @@ int lattice :: get_atom_type(string name){
 			break;
 		pozycja++;
 	}
-	
+
 	return atoms_type[pozycja];
 }
 
 int lattice :: get_atom_type(int spin){
 	int pozycja=0;
-	for(unsigned int i=0;i<atoms_spins.size();i++){
-		if(spin == atoms_spins[i])
+	for(unsigned int i=0;i<atoms_spin.size();i++){
+		if(spin == atoms_spin[i])
 			break;
 		pozycja++;
 	}
-	
+
 	return atoms_type[pozycja];
 }
 
 int lattice :: get_vec_lattice_typ_size()
 {
 	int vec_size=sublattice;
-	return vec_size;	
+	return vec_size;
 }
 
 void lattice :: get_window(site* A, site* V, vector <site> &tab){
-	
+
 	vector <site*> Aneigh;
 	vector <site*> Vneigh;
 	vector <site> tmp_window;
 	tmp_window.reserve(10);
 	tmp_window.clear();
-	V->read_site_neighbours(Vneigh,1,0);  //- atomy sasiedzi	
+	V->read_site_neighbours(Vneigh,1,0);  //- atomy sasiedzi
 	A->read_site_neighbours(Aneigh,1,0); // - 0 enegia
-	
+
 	for(unsigned int vn=0; vn<Vneigh.size();vn++){
 		for(unsigned int jn=0; jn<Aneigh.size();jn++){
 			if(*(Vneigh[vn])==*(Aneigh[jn])){
@@ -559,7 +557,7 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 			}
 		}
 	}
-	
+
 	double boundary_conx = boundary_con_at.x;
 	double boundary_cony = boundary_con_at.y;
 	double boundary_conz = boundary_con_at.z;
@@ -571,14 +569,14 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 //	double st_areax=st_sim_area.x;
 //	double st_areay=st_sim_area.y;
 //	double st_areaz=st_sim_area.z;
-	
+
 //	double ed_areax=end_sim_area.x;
 //	double ed_areay=end_sim_area.y;
 //	double ed_areaz=end_sim_area.z;
 
 	double N0X=A->get_x();
 	double N0Y=A->get_y();
-	double N0Z=A->get_z();	
+	double N0Z=A->get_z();
 
 	double N1X=V->get_x();
 	double N1Y=V->get_y();
@@ -593,11 +591,11 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 
 													//sprawdz warunki brzegowe i przesun
 
-	//		(set_prec(x0-r_maxx) < set_prec(st_areax))						
-	//		double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
+	//		(set_prec(x0-r_maxx) < set_prec(st_areax))
+	//		double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
 
 
-	
+
 //	double RN0X=N0X-N0X;
 //	double RN0Y=N0Y-N0Y;
 //	double RN0Z=N0Z-N0Z;
@@ -605,7 +603,7 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 	double RN1X=N1X-N0X;
 	double RN1Y=N1Y-N0Y;
 	double RN1Z=N1Z-N0Z;
-	
+
 	double leftx=(-1.5*latt_constx);
 	double lefty=(-1.5*latt_consty);
 	double leftz=(-1.5*latt_constz);
@@ -618,7 +616,7 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 //	control_output<<lefty<<" "<<righty<<" "<<latt_consty<<endl;
 //	control_output<<leftz<<" "<<righty<<" "<<latt_constz<<endl;
 
-	
+
 	if(RN1X < leftx){RN1X += boundary_conx;}
 	if(RN1Y < lefty){RN1Y += boundary_cony;}
 	if(RN1Z < leftz){RN1Z += boundary_conz;}
@@ -626,7 +624,7 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 	if(RN1X > rightx){RN1X -= boundary_conx;}
 	if(RN1Y > righty){RN1Y -= boundary_cony;}
 	if(RN1Z > rightz){RN1Z -= boundary_conz;}
-	
+
 	//wektory
 	double Rxy=sqrt(pow(RN1X,2) + pow(RN1Y,2));
 	double Rxyz=sqrt(pow(RN1X,2) + pow(RN1Y,2) + pow(RN1Z,2));
@@ -662,12 +660,12 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 		double new_z=((-r)*(sinL) + (WZ)*(cosL));
 		tmp_window[i].set_x(new_x);
 		tmp_window[i].set_y(new_y);
-		tmp_window[i].set_z(new_z);		
+		tmp_window[i].set_z(new_z);
 
 
 //		tmp_window[i].set_x(WX);
 //		tmp_window[i].set_y(WY);
-//		tmp_window[i].set_z(WZ);		
+//		tmp_window[i].set_z(WZ);
 		}
 
 //	control_output<<"Absloute:"<<endl;
@@ -683,13 +681,13 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 //		double WY=(tmp_window[i].get_y());
 //		double WZ=(tmp_window[i].get_z());
 //		double r=((WX)*(cosB) + (WY)*(sinB));
-		
+
 //		double new_x=((r)*(cosL) + (WZ)*sinL);
 //		double new_y=((-WX)*(sinB) + (WY)*(cosB));
 //		double new_z=((-r)*(sinL) + (WZ)*(cosL));
 //		tmp_window[i].set_x(new_x);
 //		tmp_window[i].set_y(new_y);
-//		tmp_window[i].set_z(new_z);		
+//		tmp_window[i].set_z(new_z);
 //	}
 
 //		control_output<<"Rotated:"<<endl;
@@ -698,11 +696,11 @@ void lattice :: get_window(site* A, site* V, vector <site> &tab){
 //		for (int ii=0;ii<tmp_window.size();ii++){
 //			tmp_window[ii].show_site();
 //		}
-	
 
-	
+
+
 	tab=tmp_window;
-		
+
 }
 
 void lattice :: sort_atoms(vector <site> &atoms){
@@ -726,7 +724,7 @@ void lattice :: sort_atoms(vector <site> &atoms){
 		I.push_back(i);
 	}
 //	control_output<<"Sizes:"<<Z.size()<<" "<<Y.size()<<" "<<I.size()<<endl;
-	
+
 //	for(int i=0;i<Z.size();i++){
 //		control_output<<Z[i]<<" ";
 //	}
@@ -739,7 +737,7 @@ void lattice :: sort_atoms(vector <site> &atoms){
 //		control_output<<I[i]<<" ";
 //	}
 //	control_output<<endl;
-	
+
 	unsigned int licznik=0;
 	while(licznik < I.size()){
 		double minZ=Z[licznik];
@@ -748,7 +746,7 @@ void lattice :: sort_atoms(vector <site> &atoms){
 		unsigned int index=licznik;
 //		control_output<<"przed: "<<licznik<<" "<<index<<" "<<minZ<<" "<<minY<<" "<<minI<<endl;
 
-	
+
 		for(unsigned int i=licznik;i<Z.size();i++){
 			if(minZ > Z[i]){
 				minZ=Z[i];
@@ -762,7 +760,7 @@ void lattice :: sort_atoms(vector <site> &atoms){
 					minI=I[i];
 					index=i;
 				}
-			}	
+			}
 		}
 //porownalem element[licznik] z wszystkimi w tablicy, mam minimum teraz podmien elementy z licznik
 		if(index != licznik){
@@ -814,12 +812,12 @@ void lattice :: sort_atoms(vector <site> &atoms){
 
 	atoms.clear();
 	atoms=tmp;
-	
+
 //	for (int ii=0;ii<atoms.size();ii++){
 //		atoms[ii].show_site();
 //	}
 
-	
+
 }
 
 void lattice::sim_atoms_list_init()
@@ -829,46 +827,46 @@ void lattice::sim_atoms_list_init()
 	vector <site*> tmp_vector;
 	sim_atom_list.reserve(50000);
 	sim_atom_list.clear();
-	
-	
+
+
 
 	for(unsigned int i=0;i<x_size;i++)
 	{
 	for(unsigned int j=0;j<y_size;j++)
 	{
-		
+
 		for(unsigned int k=0;k<z_size;k++)
 		{
 			tmp_vector.clear();
 			tmp_vector.reserve(50);
-		//	control_output<<i<<" "<<j<<" "<<k<<endl;  
+		//	control_output<<i<<" "<<j<<" "<<k<<endl;
 	//		matrix[i][j][k].show_sity();
 			matrix[i][j][k].get_sity_in_box(tmp_vector);
-			
-			
-			for(unsigned int l=0;l<tmp_vector.size();l++) 
+
+
+			for(unsigned int l=0;l<tmp_vector.size();l++)
 			{
 				//int ATOM=tmp_vector[l]->get_atom();
 	//			control_output<<i<<" "<<j<<" "<<k;
-		
-				
-				
+
+
+
 					site *wsk_site=0;
 					wsk_site=tmp_vector[l];
-					
+
 				//	control_output<<"wskaznik "<<wsk_site<<endl;
 					if(check_site_belonging_to_sim_area(wsk_site))
 					{
 						int atom = wsk_site->get_atom();
-						
+
 					//	control_output<<"Atom in sim: "<<atom<<endl;
-						
+
 						if(atom >= 0)
 						{
 							sim_atom_list.push_back(wsk_site);
 							//control_output<<" "<<atom<<" "<<tmp_vector[l]<<endl;
 						}
-					}			
+					}
 			}
 }}}
 
@@ -878,8 +876,8 @@ void lattice::sim_atoms_list_init()
 //		sim_atom_list[i]->show_site();
 //		}
 control_output<<"Atoms list - ok: "<<sim_atom_list.size()<<endl;
-	//cin>>o;	
-}	
+	//cin>>o;
+}
 
 
 
@@ -890,32 +888,32 @@ void lattice::atoms_list_init()
 	vector <site*> tmp_vector;
 	atom_list.reserve(500000);
 	atom_list.clear();
-	
-	
+
+
 
 	for(unsigned int i=0;i<x_size;i++)
 	{
 	for(unsigned int j=0;j<y_size;j++)
 	{
-		
+
 		for(unsigned int k=0;k<z_size;k++)
 		{
 			tmp_vector.clear();
 	//		control_output<<i<<" "<<j<<" "<<k<<endl;
 	//		matrix[i][j][k].show_sity();
 			matrix[i][j][k].get_sity_in_box(tmp_vector);
-			
-			
-			for(unsigned int l=0;l<tmp_vector.size();l++) 
+
+
+			for(unsigned int l=0;l<tmp_vector.size();l++)
 			{
 	//			int ATOM=tmp_vector[l]->get_atom();
 	//			control_output<<i<<" "<<j<<" "<<k;
 	//			control_output<<" "<<ATOM<<" "<<tmp_vector[l]<<endl;
-				
-				
+
+
 					site * wsk_site=tmp_vector[l];
 					atom_list.push_back(wsk_site);
-				
+
 			}
 }}}
 
@@ -925,12 +923,12 @@ void lattice::atoms_list_init()
 	//	atom_list[i]->show_site();
 	//	}
 	control_output<<"Atoms list - ok: "<<atom_list.size()<<endl;
-	//cin>>o;	
-}	
+	//cin>>o;
+}
 
 
 void lattice :: set_alg_objects(list <pairjump> &evt, vector < vector <double> > &bar, potential &pot){
-	
+
 	POTENCIALY=&pot;
 	BARIERY=&bar;
 	EVENTY=&evt;
@@ -951,10 +949,10 @@ long lattice :: get_sim_atom_number()
 }
 
 site * lattice :: search_site(site *A)
-{	
+{
 	//cout<<"w search jestem"<<endl;
 	site *_old_site=0;
-	
+
 	//vector <site> :: iterator K;
 	int iter=0;
 /*
@@ -969,33 +967,31 @@ site * lattice :: search_site(site *A)
 			}
 	}
 	*/
-	
-	
-	for(unsigned int i=0;i<atom_list.size();i++)
-		{
-	
+
+
+	for(unsigned int i=0;i<atom_list.size();i++){
 			if( site(atom_list[i]) == (site(A)) )	//wykorzystany tu jest domyslny konstruktor site(const site &A) jesli site(*A)
-			{	
+			{
 				_old_site = atom_list[i];
 				iter++;
 				//cout<<"Szukanie Pierwsze|Drugie: "<<_old_site<<"| "<<&atom_list[i]<<endl;
 			}
 	}
-	
-	
+
+
 	if(iter>1){
 		control_output<<"In function search_site in lattice"<<endl;
 		control_output<<"ERROR: Many identical sites in sample. Check structure definition!"<<endl;
 		exit(0);
 	}
-	
+
 	return _old_site;
 	}
 
 double lattice :: get_latice_transition(int direction)
 {
 	double a=0.0;
-	
+
 	if(direction==1){
 		a=boundary_con_at.x;
 	}else if(direction==2){
@@ -1005,15 +1001,15 @@ double lattice :: get_latice_transition(int direction)
 	}else{
 		control_output<<"ERROR: lattice::get_latice_transition: wrong direction: "<<direction<<endl;exit(1);
 	}
-		
+
 	return a;
 }
 
 double lattice :: get_latice_const(int direction, int i)
-{	
+{
 	// i okresla ktora stala sieci z jakiej struktury, kolejnosc jak w structure.in
 	double a=0.0;
-	
+
 	if(direction==1){
 		a=x_trans[i];	//stala sieci w x pierwsza dodana z pliku structure.in
 	}else if(direction==2){
@@ -1023,7 +1019,7 @@ double lattice :: get_latice_const(int direction, int i)
 	}else{
 		control_output<<"ERROR: lattice::get_latice_const: wrong direction: "<<direction<<endl;exit(1);
 	}
-	
+
 	return a;
 }
 
@@ -1038,7 +1034,7 @@ bool lattice :: check_site_belonging_to_region(site *A){
 				return true;
 			}
 		}
-	}	
+	}
 	return false;
 }
 
@@ -1053,7 +1049,7 @@ bool lattice :: check_site_belonging_to_sim_area(site *A){
 			if((set_prec(z)>=set_prec(st_sim_area.z)) and (set_prec(z)<set_prec(end_sim_area.z))){
 					return true;
 	}}}
-		
+
 	return false;
 }
 
@@ -1070,11 +1066,11 @@ bool lattice :: check_site_mobile(site* node){
 		for( iters it=neighs.begin(); it != neighs.end();++it){
 			if( check_site_belonging_to_sim_area(*it) ){
 				is_mobile = true;
-				break;	
+				break;
 			}
 		}
 	}
-	
+
 	return is_mobile;
 }
 
@@ -1083,10 +1079,10 @@ void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*>
 	{
 		if(local_control_atom==control_atom)
 		control_output<<"Getting sity from nnboxes... "<<endl;
-		
+
 		tmp_atom_list.clear();
 		vector <long> used_boxes(27);
-		
+
 		int X=0;
 		int Y=0;
 		int Z=0;
@@ -1095,65 +1091,65 @@ void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*>
 		int r_maxx=int(interaction_zone.x);
 		int r_maxy=int(interaction_zone.y);
 		int r_maxz=int(interaction_zone.z);
-		
+
 		int xsize=x_size;	//int((end_region.x-st_region.x)/x_trans[latt_num]);
 		int ysize=y_size;	//int((end_region.y-st_region.y)/y_trans[latt_num]);
 		int zsize=z_size;	//int((end_region.z-st_region.z)/z_trans[latt_num]);
-		
+
 		int left_borderx = 0;	//int(st_region.x/x_trans[latt_num]);
 		int left_bordery = 0;	//int(st_region.y/y_trans[latt_num]);
 		int left_borderz = 0;	//int(st_region.z/z_trans[latt_num]);
-		
-		
+
+
 		int right_borderx = x_size;	//int(end_region.x/x_trans[latt_num]);
 		int right_bordery = y_size;	//int(end_region.y/y_trans[latt_num]);
 		int right_borderz = z_size;	//int(end_region.z/z_trans[latt_num]);
-		
+
 	if(local_control_atom==control_atom)
-{	
+{
 	control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
 	control_output<<"bef "<<tmp_atom_list.size()<<endl;
 	control_output<<" "<<left_borderx<<" "<<left_bordery<<" "<<left_borderz;
 	control_output<<" "<<right_borderx<<" "<<right_bordery<<" "<<right_borderz;
 	control_output<<" "<<xsize<<" "<<ysize<<" "<<zsize<<endl;
-}	
+}
 		for(int i=-r_maxx;i<=r_maxx;i++)
 		{
 			for(int j=-r_maxy;j<=r_maxy;j++)
 			{
-				for(int k=-r_maxz;k<=r_maxz;k++) 
-				{	
+				for(int k=-r_maxz;k<=r_maxz;k++)
+				{
 					border=0;
 					X=x+i;
 					Y=y+j;
 					Z=z+k;
-					
-					if(local_control_atom==control_atom)					
+
+					if(local_control_atom==control_atom)
 					control_output<<"XYZ: "<<(X)<<" "<<(Y)<<" "<<(Z)<<endl;
- 
+
 					if((X)>=0 and (Y)>=0 and (Z)>=0)
 						{
 							if((unsigned)X<x_size and (unsigned)Y<y_size and unsigned(Z)<z_size)
 							{
 								if(local_control_atom==control_atom)
 								control_output<<"hole"<<endl;
-								
+
 								int wasnt_used=1;
 								long boxid=matrix[X][Y][Z].get_box_id();
 								vector <long> :: iterator K;
-								
+
 								if(local_control_atom==control_atom)
 								control_output<<" box id: "<<boxid<<endl;
-							
-								
-								for(K=used_boxes.begin();K!=used_boxes.end();K++)							
+
+
+								for(K=used_boxes.begin();K!=used_boxes.end();K++)
 									{
 									if(long(*K)==boxid)
 										{
 											wasnt_used=0;
 										}
 									}
-								
+
 								if(wasnt_used)
 								{matrix[X][Y][Z].get_sity_in_box(tmp_atom_list);
 								used_boxes.push_back(boxid);
@@ -1164,54 +1160,54 @@ void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*>
 							}
 						}
 
-					
+
 					if(X<left_borderx)
 						{X=X+xsize;
 						border=1;}
-					 
+
 					if(Y<left_bordery)
 						{Y=Y+ysize;
 						border=1;}
-					
+
 					if(Z<left_borderz)
 						{Z=Z+zsize;
 					border=1;}
-					
+
 					if(X>=right_borderx)
 						{X=X-xsize;
 					 border=1;}
-					 
+
 					if(Y>=right_bordery)
 						{Y=Y-ysize;
 					border=1;}
-					
+
 					if(Z>=right_borderz)
 						{Z=Z-zsize;
 					border=1;}
-					
-					if(local_control_atom==control_atom)				
+
+					if(local_control_atom==control_atom)
 					{control_output<<"XYZ aft borders: "<<(X)<<" "<<(Y)<<" "<<(Z)<<endl;
 				//	if((x+i)>=0 and (y+j)>=0 and (z+k)>=0)
 					}
 						if(border)
-						{	
+						{
 							if(local_control_atom==control_atom)
 							control_output<<"border: "<<endl;
 							long boxid=matrix[X][Y][Z].get_box_id();
 							if(local_control_atom==control_atom)
 							control_output<<" box id: "<<boxid<<endl;
-							
+
 							int wasnt_used=1;
 							vector <long> :: iterator K;
-								
-							for(K=used_boxes.begin();K!=used_boxes.end();K++)							
+
+							for(K=used_boxes.begin();K!=used_boxes.end();K++)
 							{
 								if(long(*K)==boxid)
 								{
 									wasnt_used=0;
 									}
-								
-								
+
+
 								}
 							if(wasnt_used)
 							{matrix[X][Y][Z].get_sity_in_box(tmp_atom_list);
@@ -1221,15 +1217,15 @@ void lattice::get_sity_from_nnbox(int x,int y, int z,int latt_num,vector <site*>
 
 							}
 							}
-		
+
 		if(local_control_atom==control_atom)
-		control_output<<"aft "<<tmp_atom_list.size()<<endl;	
-					
+		control_output<<"aft "<<tmp_atom_list.size()<<endl;
+
 		}	}	}
 	if(local_control_atom==control_atom)
-	control_output<<"aft "<<tmp_atom_list.size()<<endl;	
-	} 
-	
+	control_output<<"aft "<<tmp_atom_list.size()<<endl;
+	}
+
 void lattice :: jumps_shell_init(){
 	control_output<<"Initialized jump zone: ";
 //	cout<<"Init jump zone "<<endl;
@@ -1274,7 +1270,7 @@ void lattice :: jumps_shell_init(){
 				}
 			}
 		}
-		
+
 	//Sprawdza
 	//atom_list[K]->show_neigh(typ);
 		double ATOM=atom_list[K]->get_atom();
@@ -1286,15 +1282,15 @@ void lattice :: jumps_shell_init(){
 				control_output<<endl;
 				control_output<<i<<" ";
 				atom_neigh[i]->show_site();
-			}		
-		}	
+			}
+		}
 	}
-	
+
 	control_output<<"with coordination zones: ";
-	
+
 	max_coordination_number=0;
 	for(unsigned int i=0; i<cor_zone.size();i++)
-			{	
+			{
 				int cor_nr=cor_zone[i];
 				control_output<<cor_nr<<" ";
 				if(max_coordination_number<cor_nr)
@@ -1303,22 +1299,22 @@ void lattice :: jumps_shell_init(){
 				}
 			}
 			control_output<<endl;
-}	
+}
 
 int lattice :: get_max_coordination_number(){
 	return max_coordination_number;
 }
 
 void lattice :: interaction_shell_init(){
-	control_output<<"Initiated interaction zone ";	
+	control_output<<"Initiated interaction zone ";
 	//TUTAJ PETLA OD pot->rmin[i]
 	unsigned  int zones_number= POTENCIALY->get_coordination_number();
 	double rmin=0.0,rmax=0.0;
 	vector <int> cor_zone;
 	cor_zone.reserve(4);
 	int zone=-1;
-	
-	
+
+
 	for(unsigned int K=0;K<atom_list.size();K++)
 	{
 		for(unsigned int i=0;i<zones_number;i++)
@@ -1366,9 +1362,9 @@ void lattice :: interaction_shell_init(){
 			//{
 			//	cout<<i<<" "<<atom_neigh[i]<<" ";
 			//	atom_neigh[i]->show_site();
-			//}		
+			//}
 		}
-			
+
 	}
 	}
 	control_output<<"with coordination zones: ";
@@ -1377,26 +1373,26 @@ void lattice :: interaction_shell_init(){
 		control_output<<cor_zone[i]<<" ";
 	}
 	control_output<<endl;
-	
-}	
+
+}
 
 void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_list, vector <site*> &atom_neigh)
 {
 	//wczytuje sasiadow atomu atom_list do tablicy sasiadow w klasie site
-	
+
 	//control_output<<"Init interaction zone ";
 	//cout<<"Init interaction zone "<<endl;
 
 	double r_maxx=rmax;	//interaction_zone.x;
 	double r_maxy=rmax;	//interaction_zone.y;
 	double r_maxz=rmax;	//interaction_zone.z;
-		
+
 	double boundary_conx=0.0;
 	double boundary_cony=0.0;
-	double boundary_conz=0.0;	
-		
+	double boundary_conz=0.0;
+
 	if(typ)  // typ= 1 oznacza atomy
-	{	
+	{
 	//	control_output<<"for atom exchange"<<endl;
 		boundary_conx = boundary_con_at.x;
 		boundary_cony = boundary_con_at.y;
@@ -1404,38 +1400,38 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 	}
 	else
 	{
-		
+
 	//	control_output<<"for energy calculation"<<endl;
 		boundary_conx = boundary_con_en.x;
 		boundary_cony = boundary_con_en.y;
 		boundary_conz = boundary_con_en.z;
 	}
-	
+
 
 	double st_areax=st_region.x;
 	double st_areay=st_region.y;
 	double st_areaz=st_region.z;
-	
+
 	double ed_areax=end_region.x;
 	double ed_areay=end_region.y;
 	double ed_areaz=end_region.z;
-	
+
 	//control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
 	//control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
 	//control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
-		
-	int set_x = 1; 
+
+	int set_x = 1;
 	int set_y = 1;
 	int set_z = 1;
-	
+
 //	int set_writex = 1;
 //	int set_writey = 1;
 //	int set_writez = 1;
-	
+
 
 //	for(int K=0;K<atom_list.size();K++)
 	//{
-		
+
 		vector <site*> tmp_neigbours;
 		tmp_neigbours.clear();
 		tmp_neigbours.reserve(50);
@@ -1448,56 +1444,56 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 
 		//sprawdzam czy atom jest w obszarze symulacji   simul_atoms_init
 	if(check_site_belonging_to_region(atom_list)){
-	
+
 	if(ATOM==control_atom)
 	{	control_output<<"ATOM: "<<ATOM<<endl;
 		local_control_atom=control_atom;
 		atom_list->show_site();
-	}	
+	}
 	else
 	{
-		local_control_atom=-5;	
+		local_control_atom=-5;
 	}
 			//warunki brzegowe dla atomu w obszarze symulacji, dla ktorego bedziemy szukac sasiadow!!!
 			//okreslam jego pozycje wzgledem warunkow brzegowych
-							
+
 		if((set_prec(x0-r_maxx) < set_prec(st_areax)) or (set_prec(x0+r_maxx) >= set_prec(ed_areax)))  // do funkcji wektor lattice:: find_atom_BC(x0,y0,z0)
-		{	
+		{
 				if(ATOM==control_atom)
 				control_output<<"atom na granicy x"<<endl;
-			
+
 			if(set_prec(boundary_conx) < 0)
 			{set_x = 2;
-			
+
 				if(ATOM==control_atom)
 				control_output<<"set x take nn site for all: 2"<<endl;
-			
+
 			}	// do 1 sasiada
 			else if (set_prec(boundary_conx) == 0)
 			{set_x = 0;
-			
+
 			if(ATOM==control_atom)
 			control_output<<"set x no boundary condition: 0"<<endl;
-			
+
 			}	// anuluj wpisywanie
 			else if (set_prec(boundary_conx) > 0)
 			{
 				int control=0;
-				
+
 				if(set_prec(x0-r_maxx) < set_prec(st_areax)) 		//przesun x0 o wektor +translate
 				{set_x = -1;
-				
+
 				if(ATOM==control_atom)
 				control_output<<"set x coppy cell on right: -1"<<endl;							//UWAGA na blad oba if prawdziwe tylo ze nie ma else to 2 if jest robiony
-				
+
 				control++;
 				}
 				if (set_prec(x0+r_maxx) >= set_prec(ed_areax))	//przesun o wektor -translate
 				{set_x = 1;
-			
+
 				if(ATOM==control_atom)
 				control_output<<"set x coppy cell on left: 1"<<endl;
-			
+
 				control++;
 				}
 				if(control>=2)
@@ -1505,16 +1501,16 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 					control_output<<"Bad interractions radius -> cell_vector to big  "<<endl;
 					exit(0);}
 			}
-					
+
 			}
 		else
 		{set_x = 2;
-		
+
 		if(ATOM==control_atom)
 		control_output<<"x atom w srodku"<<endl;
-	
+
 		}	// do 1 sasiada
-		
+
 			//to samo dla y i z
 		if((set_prec(y0-r_maxy) < set_prec(st_areay)) or (set_prec(y0+r_maxy) >= set_prec(ed_areay)))
 		{
@@ -1550,14 +1546,14 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				control_output<<"Bad interractions radius -> cell_vector to big  "<<endl;
 					exit(0);}
 			}
-					
+
 			}
 		else
 		{set_y = 2;
 		if(ATOM==control_atom)
 		control_output<<"y atom w srodku"<<endl;
 		}
-		
+
 		if((set_prec(z0-r_maxz) < set_prec(st_areaz)) or (set_prec(z0+r_maxz) >= set_prec(ed_areaz)))
 		{
 			if(ATOM==control_atom)
@@ -1592,7 +1588,7 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 					control_output<<"Bad interractions radius -> cell_vector to big  "<<endl;
 					exit(0);}
 			}
-					
+
 			}
 		else
 		{set_z = 2;
@@ -1602,22 +1598,22 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 		}
 		//okreslilem pozycje wybranego atomu i teraz
 		//dla wybranego atomu skanuje cala liste atomow w poszukiwaniu jego sasiadow
-		
+
 		//nowy obiekt box pelniacy role situ, bedzie zawieral sity mieszczace sie w danym boxie
 		// vector sitow
 		// put_site i get_site
-		
+
 		vector <site*> tmp_atom_list;
 		tmp_atom_list.reserve(200);  //lista z adresami do bliskich boxow bedacych w sferze odidzialywania.
 		//int o;
 	//	cin>>o;
-		
+
 		if(control_atom==ATOM)
 		{
 			control_output<<"Checking myRound for get_sity_from_nnbox "<<endl;
 			control_output<<int(x0/x_trans[latt_num])<<" "<<int(y0/y_trans[latt_num])<<" "<<int(z0/z_trans[latt_num])<<" "<<latt_num<<endl;
 		}
-		
+
 		get_sity_from_nnbox(int(x0/x_trans[latt_num]),int(y0/y_trans[latt_num]),int(z0/z_trans[latt_num]),latt_num,tmp_atom_list);
 
 	//	if(ATOM==control_atom)
@@ -1625,11 +1621,11 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 
 		// matrix[][][].get_box(tmp_atom_list);
 		// matrix +1 razy 26 kombinacje +/-1 | +/-1 | +/-1 bo tyle jest najblizszych boxow
-		//site *neighbour=0; 
+		//site *neighbour=0;
 //				neighbour = &matrix[i];
-		//if (r2<=(rmax*rmax) and r2 >= (rmin*rmin))	
-		// 		tmp_atom_list.pusch_back();	
-		
+		//if (r2<=(rmax*rmax) and r2 >= (rmin*rmin))
+		// 		tmp_atom_list.pusch_back();
+
 		for(unsigned int i=0;i<tmp_atom_list.size();i++)
 			{
 				//wczytuje wspolrzedne potencjalnego sasiada
@@ -1638,288 +1634,288 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				double z=tmp_atom_list[i]->get_z();//I->get_z();
 				site *neighbour=0;
 				neighbour = tmp_atom_list[i];		//zapisz adres komorki ktora moze okazac sie sasiadem
-		
+
 				if(ATOM==control_atom)
 				control_output<< set_x<<" "<<set_y<<" "<<set_z<<endl;
-				
+
 	//			int set_writex = 0;
 	//			int set_writey = 0;
-	//			int set_writez = 0;	
-				
+	//			int set_writez = 0;
+
 				if (check_site_belonging_to_region(neighbour))	//sprawdza czy site jest w obszerze symulacji
 					{
-					double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-					
+					double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// warunek dla wylaczonych warunkow brzegowych boundary =0
 					// atom jest we wnetrzu obszaru symulacji
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))	//jesli sasiad znajduje sie w sferze odzidzialywania
-					{			
+					{
 							tmp_neigbours.push_back(neighbour);						//dodaj go do listy sasiadow danego sita glownego
 					}
-					
+
 					////////////////atom jet na brzegu, warunki brzegowe aktywne, boundary >0
 					if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
-				}	
+
+				}
 				// to byli sasiezie jesli warungi brzegowe byly aktywne
 				//teraz jesli sa nieaktywne, boundary<0
 				///////////////// warunki dla sasiedniego atomu   SPRAWDZIC
 				//~(check_site_belonging_to_sim_area(neighbour))
-				
+
 				if(boundary_conx < 0)	// bierze sasiadow spoza strefy symulacji do nn
 				{
 				if((x<st_sim_area.x) or (x>=end_sim_area.x))	// w kierunku x - sciana
 				{
 				if((y>=st_sim_area.y) and (y<end_sim_area.y))
 				{
-				if((z>=st_sim_area.z) and (z<end_sim_area.z))	
-				{	
-				
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+				if((z>=st_sim_area.z) and (z<end_sim_area.z))
+				{
+
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 							if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-				
+
 				if(boundary_cony < 0)
 				{
 				if((y<st_sim_area.y) or (y>=end_sim_area.y))		//sciana y +/-
 				{
 				if((x>=st_sim_area.x) and (x<end_sim_area.x))
 				{
-				if((z>=st_sim_area.z) and (z<end_sim_area.z))	
-				{	
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+				if((z>=st_sim_area.z) and (z<end_sim_area.z))
+				{
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-				
-				
+
+
 				if(boundary_conz < 0)
 				{
 				if((z<st_sim_area.z) or (z>=end_sim_area.z))
@@ -1928,181 +1924,181 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				{
 				if((y>=st_sim_area.y) and (y<end_sim_area.y))
 				{
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-				
-				
+
+
 				if(boundary_conx < 0 and boundary_cony < 0)		// krawedz z translate +/-x,+/-y
 				{
 				if((x<st_sim_area.x) or (x>=end_sim_area.x))
 				{
 				if((y<st_sim_area.y) or (y>=end_sim_area.y))
 				{
-				if((z>=st_sim_area.z) and (z<end_sim_area.z))	
-				{	
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+				if((z>=st_sim_area.z) and (z<end_sim_area.z))
+				{
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-			
+
 				if(boundary_conx < 0 and boundary_conz < 0) // y
 				{
 				if((x<st_sim_area.x) or (x>=end_sim_area.x))
@@ -2111,89 +2107,89 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				{
 				if((y>=st_sim_area.y) and (y<end_sim_area.y))
 				{
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-				
+
 				if(boundary_cony < 0 and boundary_conz < 0) //krawedzie x
 				{
 				if((y<st_sim_area.y) or (y>=end_sim_area.y))
@@ -2202,92 +2198,92 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				{
 				if((x>=st_sim_area.x) and (x<end_sim_area.x))
 				{
-				
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-				
-					
-				if(boundary_conx < 0 and boundary_cony < 0 and boundary_conz < 0) // wierzcholki 
+
+
+				if(boundary_conx < 0 and boundary_cony < 0 and boundary_conz < 0) // wierzcholki
 				{
 				if((y<st_sim_area.y) or (y>=end_sim_area.y))
 				{
@@ -2295,96 +2291,96 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 				{
 				if((x<st_sim_area.x) or (x>=end_sim_area.x))
 				{
-				
-				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+
+				double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 					// wnetrze
 					if (set_prec(r2)<=set_prec(rmax*rmax) and set_prec(r2) >= set_prec(rmin*rmin))
 					{
-						tmp_neigbours.push_back(neighbour);	
+						tmp_neigbours.push_back(neighbour);
 					}
-					
+
 										if(boundary_conx > 0 )	// przesun komorke symulacji Ox o wektro boundary_conx w lewo lub prawo/ ste_x
 					{
 
-						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))	//sprawdz sfere odidzialywan
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0)	// y - sciany
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0)+(z-z0)*(z-z0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if( boundary_conz > 0 )
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x-x0)*(x-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);			
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0)
 					{
-						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0); 
-				
+						double r2tr = (y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(z-z0)*(z-z0);
+
 						//cout<<"r2 "<<r2tr<<endl;
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_conz > 0)	//przesun komorke Ox i Oz
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y-y0)*(y-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_cony > 0 and boundary_conz > 0)	//y i z		- krawedzie
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0)+(x-x0)*(x-x0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 					if(boundary_conx > 0 and boundary_cony > 0 and boundary_conz > 0) // z,y,z - rogi
 					{
-						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0); 
-				
+						double r2tr = (z+(set_z*boundary_conz)-z0)*(z+(set_z*boundary_conz)-z0)+(x+(set_x*boundary_conx)-x0)*(x+(set_x*boundary_conx)-x0)+(y+(set_y*boundary_cony)-y0)*(y+(set_y*boundary_cony)-y0);
+
 						if (set_prec(r2tr)<=set_prec(rmax*rmax) and set_prec(r2tr) >= set_prec(rmin*rmin))
 						{
-							tmp_neigbours.push_back(neighbour);	
+							tmp_neigbours.push_back(neighbour);
 						}
 					}
-					
+
 				}}}
 				}
-			
+
 			/////////////
-							
-				
+
+
 			}
 	}
-			
+
 	//		control_output<<"NEIGH at: "<<ATOM<<endl;
 	//		atom_list->show_neigh(1);
 	//		control_output<<"NEIGH en: "<<ATOM<<endl;
@@ -2393,7 +2389,7 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 	atom_neigh=tmp_neigbours;
 //	atom_list->put_neighbours(tmp_neigbours, typ);
 	//atom_list->show_neigh(typ);
-		
+
 
 //	if(ATOM==control_atom)
 	//{
@@ -2402,16 +2398,16 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 		//{
 	//		control_output<<i<<" ";
 		//	tmp_neigbours[i]->show_site();
-	//	}	
+	//	}
 //	}
-		
-		
-	
-		
+
+
+
+
 	/*
 	 * zeby zmienic sita w boxie potrzeba funkcji w box
 	 * matrix[1][1][1].sity[1].show_site();
-		
+
 	 * zeby odwolac sie do konkretnego sita w boxie trzeba podac koordynaty
 	 * site* site_in_box_at(double x,double  y,double  z)
 	 * {
@@ -2420,15 +2416,15 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 		 * vector <site*> tmp;
 		 * tmp.clear();
 		 * tmp.reserve(2);
-		 * 
+		 *
 		 * matrix[int(x)][][].get_sity_in_box(tmp);
 		 *
 		 *  for(int i=0;i<tmp.size();i++)
 		 * 		{
 			 * 		if ( site(tmp[i]) == Site )
 		 * 			{
-			 * 			wsk=tmp[i]	
-			 * 		}		
+			 * 			wsk=tmp[i]
+			 * 		}
 			 * 		else
 			 * 		{
 				 * 		exit(0);
@@ -2438,7 +2434,7 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 		 * return wsk;
 		 * }
 	 * */
-	
+
 //	}
 	//koniec petli for K po atom_list
 	//control_output<<endl;
@@ -2459,17 +2455,17 @@ void lattice :: check_neighbours(int typ)
 					control_output<<"i j k "<<i<<" "<<j<<" "<<k<<endl;
 					atom_inbox.clear();
 					matrix[i][j][k].get_sity_in_box(atom_inbox);
-					
+
 					for(unsigned int l=0;l<atom_inbox.size();l++)
 					{
 						atom_inbox[l]->show_site();
 						atom_inbox[l]->show_neigh(typ);
 					}
-					
+
 				}
 			}
 		}
-	
+
 }
 
 void lattice :: check_atoms()
@@ -2485,24 +2481,24 @@ void lattice :: check_atoms()
 					control_output<<"i j k "<<i<<" "<<j<<" "<<k<<endl;
 					atom_inbox.clear();
 					matrix[i][j][k].get_sity_in_box(atom_inbox);
-					
+
 					for(unsigned int l=0;l<atom_inbox.size();l++)
 					{
 						atom_inbox[l]->show_site();
 					}
-					
+
 				}
 			}
 		}
-	
+
 }
 
 
 lattice :: ~lattice()
 {
 	}
-	
-	
+
+
 /*------------------------------------------------------*/
 
 void lattice::simulation_set(double _r_min, double _r_max, wektor a,wektor b,wektor c,wektor d, wektor _max_zone, wektor e, wektor f)
@@ -2514,7 +2510,7 @@ void lattice::simulation_set(double _r_min, double _r_max, wektor a,wektor b,wek
 	boundary_con_en=d;
 	st_region=e;
 	end_region=f;
-	interaction_zone=_max_zone; 
+	interaction_zone=_max_zone;
 
 	atoms_list_init();
 	sim_atoms_list_init();
@@ -2538,7 +2534,7 @@ void lattice::simulation_set(double _r_min, double _r_max, wektor a,wektor b,wek
 //	boundary_con_en.show_wektor();
 //	boundary_con_at.show_wektor();
 
-	
+
 }
 
 void lattice::simulation_initialize(){
@@ -2550,24 +2546,24 @@ bool lattice :: check_boundary_conditions(wektor *wsk)
 {
 	control_output<<"Checking boundary conditions... "<<endl;
 	int status=0;
-	
+
 //	double r_maxx=interaction_zone.x;
 //	double r_maxy=interaction_zone.y;
 //	double r_maxz=interaction_zone.z;
-		
+
 	double boundary_conx=0.0;
 	double boundary_cony=0.0;
-	double boundary_conz=0.0;	
-		
+	double boundary_conz=0.0;
+
 	//	control_output<<"for atom exchange"<<endl;
 	boundary_conx = wsk->x;
 	boundary_cony = wsk->y;
 	boundary_conz = wsk->z;
-	
+
 	double st_areax=st_region.x;
 	double st_areay=st_region.y;
 	double st_areaz=st_region.z;
-	
+
 	double ed_areax=end_region.x;
 	double ed_areay=end_region.y;
 	double ed_areaz=end_region.z;
@@ -2587,7 +2583,7 @@ bool lattice :: check_boundary_conditions(wektor *wsk)
 		exit(0);
 		}
 	if (boundary_conz>0 and boundary_conz != (ed_areaz-st_areaz))
-	{	
+	{
 		control_output<< "Wrong z translation vector in boundary condition. "<<endl;
 		control_output<< "Or too large region area. "<<endl;
 		control_output<<"Must be equal trans in structure.in file. if want PBC! "<<endl;
@@ -2610,36 +2606,36 @@ void lattice :: refresh_structure(string file_name)
 	double X;
 	double Y;
 	double Z;
-	
+
 //	int i=0;
 //	int j=0;
-//	int k=0; 
+//	int k=0;
 	long n =0;
 	file_structure>>n;
-	
+
 	for(long l=0;l<n;l++)
 	{
 	file_structure>>atom>>X>>Y>>Z;
-	
-	
+
+
 	int typ=get_atom_type(atom);
 	int sublatt=get_sub_lattice_type(X,Y,Z,0);
 	site ATOM(X,Y,Z,typ,sublatt,0);
-	
+
 	site* wsk=0;
 	wsk=&ATOM;
 	put_atom(int(X/x_trans[0]),int(Y/y_trans[0]),int(Z/z_trans[0]),wsk);
-		
-	
+
+
 	}
-	
+
 	file_structure.close();
-} 
+}
 
 /*-----------------------------------------------------------*/
-	
+
 bool lattice :: reinit_sim_area(wektor a, wektor b, set<site*> &vatoms){
-	
+
 	if(MOVE_SIM_REGION){	//przesunac obszar symulacji
 		control_output<<"reinit_sim_area:"<<endl;
 		st_sim_area.show();
@@ -2648,7 +2644,7 @@ bool lattice :: reinit_sim_area(wektor a, wektor b, set<site*> &vatoms){
 		end_sim_area += b;
 		st_sim_area.show();
 		end_sim_area.show();
-		sim_atoms_list_init();  	
+		sim_atoms_list_init();
 
 		set_atoms_list(vatoms,0);
 		init_events_list(vatoms);
@@ -2658,14 +2654,14 @@ bool lattice :: reinit_sim_area(wektor a, wektor b, set<site*> &vatoms){
 }
 
 void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
-	
+
 		int typ=-1;
 		set <site* > tmp;
 
 		for (set<site*>::iterator it=OLD.begin(); it!=OLD.end(); ++it){
 
 			typ=(*it)->get_atom();
-			
+
 			if(typ==0){
 				if(check_site_belonging_to_sim_area((*it))){
 					tmp.insert((*it));
@@ -2686,7 +2682,7 @@ void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 		for (set<site*>::iterator it=ADD.begin(); it!=ADD.end(); ++it){
 
 			typ=(*it)->get_atom();
-			
+
 			if(typ==0){
 				if(check_site_belonging_to_sim_area( (*it) ) ){
 					tmp.insert((*it));count_vac_ok++;
@@ -2705,28 +2701,28 @@ void lattice :: update_vac_list( set<site*> &ADD,  set <site*> &OLD){
 		for ( set<site*>::iterator it = OLD.begin(); it != OLD.end(); ++it){
 			(*it)->reset_vindex();
 		}
-	
+
 		ADD.clear();
 		OLD.clear();
 		//przepisz i nadaj Vindexy sitom
 		int i = 0;
 		for ( set<site*>::iterator it = tmp.begin(); it != tmp.end(); ++it){
-		
+
 			(*it)->set_vindex(i);
 //			tmp[i]->show_site();
 //			tmp[i]->show_neigh(1);
 			OLD.insert((*it));
 			i++;
-		} 
-	
+		}
+
 }
 
-	
+
 /*-----------------------------------------------------------*/
 
 void lattice::read_structure(string file_name,wektor start,wektor end,wektor set_st, int lattice_nr)
-{	
-		
+{
+
 //	int o;
 	wektor set_vec=set_st;
 	wektor st_vec=start;
@@ -2734,7 +2730,7 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 
 
 	if( st_vec.lower(st_region) or end_region.lower(end_vec) ){
-		control_output<<"ERROR: in conf.in. Try to load structure bigger than defined region"<<endl; 
+		control_output<<"ERROR: in conf.in. Try to load structure bigger than defined region"<<endl;
 		set_vec.show();
 		st_vec.show();
 		end_vec.show();
@@ -2747,13 +2743,13 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 	wektor delta= (end_vec-st_vec);
 	//delta.show_wektor();
 	wektor size = (set_vec+delta);
-	        
+
 	//size.show_wektor();
 	//set_vec.show_wektor();
 	//st_vec.show_wektor();
 	//end_vec.show_wektor();
 	//delta.show_wektor();
-	
+
 	long n =0;
 	ifstream file_structure(file_name.c_str(),ios :: in);
 	string atom;
@@ -2770,19 +2766,19 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 	int k=int(st_vec.z/z_trans[0]);
 	control_output<<"st "<<i<<" "<<j<<" "<<k<<endl;
 	i=int(end_vec.x/x_trans[0]);
-	j=int(end_vec.y/y_trans[0]);   
+	j=int(end_vec.y/y_trans[0]);
 	k=int(end_vec.z/z_trans[0]);
-	control_output<<"end "<<i<<" "<<j<<" "<<k<<endl; 
+	control_output<<"end "<<i<<" "<<j<<" "<<k<<endl;
 	int kounter=0;
 //	int kounter2=0;
-	
+
 	for(long i=0;i<n;i++)
 	{
 	string line;
 	while (getline(file_structure,line)){
 	if( !line.empty() and (line.find_first_not_of(' ') != std::string::npos) ){
 	double buf;
-	vector <double> values;	
+	vector <double> values;
 	stringstream ss(line);
 	ss >> atom;
 	while ( ss >> buf ){values.push_back(buf);}
@@ -2790,11 +2786,11 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 //	control_output<<"wczytano: "<<values.size()<<" "<<atom;
 //	for (int vi=0;vi<values.size();vi++){ control_output<<" "<<values[vi];}
 //	control_output<<endl;
-//	kounter++;	
+//	kounter++;
 	X=values[0];Y=values[1];Z=values[2];
 
 	if(values.size() > 3 ){
-		dx=values[3];dy=values[4];dz=values[5]; 
+		dx=values[3];dy=values[4];dz=values[5];
 		if((values.size() -6) <= jumps.size() ){
 		for(unsigned int ni=6;ni<values.size();ni++){
 			jumps[(ni-6)]=values[ni];
@@ -2804,7 +2800,7 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 			exit(1);
 		}
 	}
-	
+
 	if((X>=set_vec.x)&&(Y>=set_vec.y)&&(Z>=set_vec.z))
 		{	//cout<<"wczytano1 "<<atom<<" "<<X<<" "<<Y<<" "<<Z<<endl;
 			//cin>>o;
@@ -2815,8 +2811,8 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 			int typ=get_atom_type(atom);
 			int sublatt=get_sub_lattice_type(X,Y,Z,lattice_nr);
 			site ATOM(X,Y,Z,typ,sublatt,lattice_nr);
-			
-			if(values.size() > 3){		
+
+			if(values.size() > 3){
 				ATOM.set_drx(dx);ATOM.set_dry(dy);ATOM.set_drz(dz);
 				ATOM.set_jumps(jumps);
 			}
@@ -2828,20 +2824,20 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 				kounter++;
 			put_atom(int(X/x_trans[0]),int(Y/y_trans[0]),int(Z/z_trans[0]),wsk);
 		//	cin>>o;
-			
-		//	if(atom=="Al")	
+
+		//	if(atom=="Al")
 		//	matrix[X][Y][Z].set_atom(2);
 		//	if(atom=="Fe")
 		//	matrix[X][Y][Z].set_atom(0);
 			//cout<<"wczytaj "<<atom<<endl;
 			}
-	
+
 		}
 	}}}
 	file_structure.close();
 	control_output<<"Total readed: "<<kounter<<endl;
-	}	
-  
+	}
+
 /*----------------------------------------------------------*/
 
 
@@ -2852,20 +2848,20 @@ int lattice :: get_sub_lattice_type(double X, double Y, double Z, int lattice_nr
 	double x = fmod(X,x_trans[lattice_nr]);
 	double y = fmod(Y,y_trans[lattice_nr]);
 	double z = fmod(Z,z_trans[lattice_nr]);
-	
+
 //	cout<<"For "<<x<<" "<<y<<" "<<z<<" find sublatice type"<<endl;
-	
+
 //	cells[lattice_nr] vector zawiera sity z komurki elementarnej dla sieci lattice_nr
-	
+
 	for(unsigned int i=0;i<cells[lattice_nr].size();i++)	//iteruje po sitach w cells
 	{											//dla kazdego situ sprawdz czy x,y,z rownaja sie tym z bazy x,y,z
-		
+
 		double cx=cells[lattice_nr][i].get_x();	//pobierz wspolrzedne w cell
 		double cy=cells[lattice_nr][i].get_y();
 		double cz=cells[lattice_nr][i].get_z();
-		
+
 		//porownaj z dokladnoscia
-		
+
 		if(set_prec(x)==set_prec(cx) and set_prec(y)==set_prec(cy) and set_prec(z)==set_prec(cz) )	//jesli sie rowna to pobierz sub_lattice_type
 		{
 			sublatice_type=cells[lattice_nr][i].get_sub_latt();
@@ -2881,7 +2877,7 @@ void lattice :: put_site(int x, int y, int z, site *Site)
 //	control_output<<"put: "<<x<<" "<<y<<" "<<z<<endl;
 	matrix[x][y][z].put_site(*Site);
 	}
-	
+
 void lattice :: put_atom(int x, int y, int z, site *Site)
 {
 	//cout<<"put: "<<x<<" "<<y<<" "<<z<<endl;
@@ -2889,7 +2885,7 @@ void lattice :: put_atom(int x, int y, int z, site *Site)
 	matrix[x][y][z].put_atom(*Site);
 //	matrix[x][y][z].show_sity();
 	}
-  
+
 double lattice :: move(double x2, double x1, int dir)
  {
 	double r2x=0.0;														//x2 - polozenie wakancji przed skokiem
@@ -2903,7 +2899,7 @@ double lattice :: move(double x2, double x1, int dir)
 		if((x2-x1)>0){																//i atom ruszy sie w lewo
 			r2x=(x2 - boundary_con - x1);												//		control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;
 		}else{																		//i atom ruszy sie w prawo
-			r2x=(x2 + boundary_con - x1);												//		control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;								
+			r2x=(x2 + boundary_con - x1);												//		control_output<<" r2x: "<<x2<<" "<<x1<<" "<<" "<<boundary_con<<" "<<r2x<<endl;
 		}
 	}
 	return r2x;															//dodatnie jesli atom ruszy sie w prawo
@@ -2914,11 +2910,11 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 {
 	stringstream total(name_of_file);
 	int all=0,sum=1;
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		sum=0;
@@ -2935,11 +2931,11 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
+
 		sum+=step;
-		
-	
-    
+
+
+
 	if( ((sum != 0) and (sum % step_break == 0)) or ((step == 0) and (step_break == 0)) )
 	{
 	double xs=make_pic_vec_st.x;
@@ -2977,7 +2973,7 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 		double j=0.0;
 		double k=0.0;
 		int atom = -3;
-		
+
 		i=atom_list[K]->get_x();
 		j=atom_list[K]->get_y();
 		k=atom_list[K]->get_z();
@@ -2986,39 +2982,39 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
 			if(atom>-1)
-			{	
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;	
+			{
+			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;
 			atoms++;
 			}
-		}	
-	
+		}
+
 	}
-file.seekp(0);	
+file.seekp(0);
 file<<atoms<<endl;
-file.close();	
-}		
+file.close();
+}
 
 }
 
 /*-------------------------------------------------------------------*/
 
 
-	
+
 wektor lattice::get_end_sim_wektor()
 {
 	wektor a=end_sim_area;
-	
-	return a; 	
+
+	return a;
 	}
-	
+
 wektor lattice::get_PB(){
-	return boundary_con_at;	
+	return boundary_con_at;
 }
 
 /*-------------------------------------------------------------------*/
 
 double lattice :: get_stech(int typ1,int typ2){
-	
+
 	double stech=0;
 	vector <site* > vtyp1;
 	vtyp1.reserve(20000);
@@ -3027,30 +3023,30 @@ double lattice :: get_stech(int typ1,int typ2){
 
 	set_atoms_list(vtyp1, typ1);
 	set_atoms_list(vtyp2, typ2);
-	
+
 	double N1=vtyp1.size();
 	double N2=vtyp2.size();
-	
+
 	stech=N1/(N1+N2);
 	return stech;
 
 }
-  
+
 
 void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file)
 {
-	
+
 	double stechinsample=get_stech(1,2);
 //	cout<<step<<" "<<stech<<" "<<stechinsample<<" "<<set_prec(stech,3)<<" "<<set_prec(stechinsample,3)<<endl;
 	if(set_prec(stech,3) == set_prec(stechinsample,3) )
 	{
 	stringstream total(name_of_file);
 	int all=0,sum=1;
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		sum=0;
@@ -3067,9 +3063,9 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
+
 		sum+=step;
-		
+
 	double xs=make_pic_vec_st.x;
 	double ys=make_pic_vec_st.y;
 	double zs=make_pic_vec_st.z;
@@ -3089,7 +3085,7 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 	name=s.str()+"stech.xyz";
 	ofstream file(name.c_str());
 
-	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ... 
+	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ...
 	file<<endl;
 	file<<endl;
 	file<<endl;
@@ -3109,7 +3105,7 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 		double j=0.0;
 		double k=0.0;
 		int atom = -3;
-		
+
 		i=atom_list[K]->get_x();
 		j=atom_list[K]->get_y();
 		k=atom_list[K]->get_z();
@@ -3118,17 +3114,17 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
 			if(atom>-1)
-			{	
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;	
+			{
+			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;
 			atoms++;
 			}
-		}	
-	
+		}
+
 	}
-file.seekp(0);	
+file.seekp(0);
 file<<atoms;
-file.close();	
-}		
+file.close();
+}
 
 }
 
@@ -3139,11 +3135,11 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 {
 	stringstream total(name_of_file);
 	int all=0,sum=1;
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		sum=0;
@@ -3160,9 +3156,9 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
+
 		sum+=step;
-	
+
 	if( ((sum != 0) and (sum % step_break == 0)) or ((step == 0) and (step_break == 0)) )
 	{
 	double xs=make_pic_vec_st.x;
@@ -3184,7 +3180,7 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 	name=s.str()+"diff.xyz";
 	ofstream file(name.c_str());
 
-	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ... 
+	file<<endl;	//UWAGA: dzielic przez vektor translacji x_trans , ...
 	file<<endl;
 	file<<endl;
 	file<<endl;
@@ -3204,12 +3200,12 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 		double j=0.0;
 		double k=0.0;
 		int atom = -3;
-		
+
 		i=atom_list[K]->get_x();
 		j=atom_list[K]->get_y();
 		k=atom_list[K]->get_z();
 		atom=atom_list[K]->get_atom();
-		
+
 		double dx = atom_list[K]->get_drx();
 		double dy = atom_list[K]->get_dry();
 		double dz = atom_list[K]->get_drz();
@@ -3222,19 +3218,19 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
 			if(atom>-1)
-			{	
+			{
 			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<" "<<dx<<" "<<dy<<" "<<dz;
 			for (unsigned int nj=0; nj<jumps.size();nj++){file<<" "<<jumps[nj];}
-			file<<endl;	
+			file<<endl;
 			atoms++;
 			}
-		}	
-	
+		}
+
 	}
-	file.seekp(0);	
+	file.seekp(0);
 	file<<atoms<<endl;
-	file.close();	
-	}		
+	file.close();
+	}
 
 }
 
@@ -3245,8 +3241,8 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 wektor lattice::get_st_sim_wektor()
 {
 	wektor a=st_sim_area;
-	
-	return a; 
+
+	return a;
 	}
 
 /*-------------------------------------------------------------------*//*------------------------------------------------------------------*/
@@ -3277,13 +3273,13 @@ void lattice :: get_sites(plaster &tmp){
 	if(end < L_B){control_output<<"ERROR in lattice::get_sites -> reservuars reached border "<<end<<endl; exit(0);}
 	if(end > R_B){control_output<<"ERROR in lattice::get_sites -> reservuars reached border "<<end<<endl; exit(0);}
 
-	
+
 	for(unsigned int i=0;i<atom_list.size();i++)
 	{
 
 		site *wsk_to_site = atom_list[i];
 		double d=0;		//atom displacement
-		
+
 		if(direction==1)
 		{
 			d=atom_list[i]->get_x();
@@ -3301,12 +3297,12 @@ void lattice :: get_sites(plaster &tmp){
 			control_output<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3: "<<direction<<endl;
 			exit(1);
 		}
-	//		UWAGA zaokraglanie 	
+	//		UWAGA zaokraglanie
 //		control_output<<"spr: "<<st<<" "<<d<<" "<<end<<endl;
 		if((st <= d )and (d < end) ){
 			unsigned int id=tmp.get_index();
 			if(tmp.get_name() == "block"){wsk_to_site->set_block_index(id);}
-			if(tmp.get_name() == "hist"){wsk_to_site->set_hist_index(id);}	
+			if(tmp.get_name() == "hist"){wsk_to_site->set_hist_index(id);}
 			if(tmp.get_name() == "rez"){wsk_to_site->set_rez_index(id);}
 			tmp.push_back(wsk_to_site);
 		}
@@ -3317,13 +3313,13 @@ void lattice :: get_sites(vector <plaster> &tmp){
 
 	int direction = tmp[0].get_direction();
 
-	
+
 	for(unsigned int i=0;i<atom_list.size();i++)
 	{
 
 		site *wsk_to_site = atom_list[i];
 		double d=0;		//atom placement
-		
+
 		if(direction==1)
 		{
 			d=wsk_to_site->get_x();
@@ -3341,9 +3337,9 @@ void lattice :: get_sites(vector <plaster> &tmp){
 			control_output<<"Wrong direction number in lattice::get_sites parameters| x-1|y-2|z-3: "<<direction<<endl;
 			exit(1);
 		}
-		
+
 		for(unsigned int ik=0; ik< tmp.size(); ik++){
-	
+
 			if(tmp[ik].get_st() <= d  and d < tmp[ik].get_end()){
 		//		control_output<<"dla "<<d<<" zakres "<<miarka[ik]<<" "<<miarka[ik+1]<<" ";
 		//		control_output<<"dodalem";
@@ -3366,17 +3362,17 @@ void lattice :: get_sites(vector <plaster> &tmp){
 void lattice :: save_hist_dR(string file_name, int direction, double Time, double st_bin, double size_bin, double end_bin)
 {
 	int bins_nr = int((end_bin-st_bin)/size_bin)+1;		//zero dodac
-	
-	
+
+
 		vector < vector<long> > hist(atoms_type.size(),vector <long> (bins_nr,0)) ;
 	//2D : typ atomu i histogram
-	
-	
+
+
 	for(unsigned int i=0;i<sim_atom_list.size();i++)
 	{
 		int atom=sim_atom_list[i]->get_atom();
 		double d=0;		//atom displacement
-		
+
 		if(direction==1)
 		{
 			d=sim_atom_list[i]->get_drx();
@@ -3394,63 +3390,63 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 			cout<<"Wrong direction number in HIST parameters| x-1|y-2|z-3"<<endl;
 			exit(1);
 		}
-		
+
 	if(atom>0)	//wylaczam wakancje ze statystki
-	{	
+	{
 		int d_bin=int(d/size_bin);		//sprawdzic zaokraglanie
-		
+
 		if(d_bin>st_bin and d_bin<end_bin)		// zliczam tylko to co jest w zakresie
 		{
-			
+
 		//	cout<<"Bin range in HIST too small-> max_d: "<<d_bin<<endl;
 		//	cout<<sim_atom_list[i];
 		//	sim_atom_list[i]->show_site();
 		//	exit(1);
-			 
-		
+
+
 		if(d>=0)
 		{
 			d_bin=d_bin-int(st_bin/size_bin);
 			hist[atom][d_bin]++;
 		}
-		
+
 		if(d<0)
 		{
 			d_bin=d_bin-int(st_bin/size_bin);
 			hist[atom][d_bin]++;
 		}
-		
+
 	}
 	}
 	}
-	
-	
-	
-	
+
+
+
+
 	for(unsigned int i=1;i<atoms_type.size();i++)		//wylaczylem wakancje. W lattice w vectore atoms_type wakancje maja pozycje 0 i nazwe Fe
 	{
 	stringstream dir;
 	dir<<direction;
-	
+
 	string name_of_file=file_name+atoms_name[i]+dir.str()+".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 	for(unsigned int j=0;j<hist[i].size();j++)
 	{
 		out_data<<Time<<" "<<(j*size_bin+st_bin)<<" "<<hist[i][j]<<endl;
 	}
-	out_data<<endl;	
+	out_data<<endl;
 	}
 }
 
 double lattice :: calc_energy()
 {
 	double totE=0.0;
-//	omp_set_dynamic(1);	
+//	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
 	int LOCAL_THREADS = int(MAX_THREADS/2);
 
-	#pragma omp parallel shared(totE) num_threads(LOCAL_THREADS)	
-	{	
+	#pragma omp parallel shared(totE) num_threads(LOCAL_THREADS)
+	{
 //		if(omp_get_thread_num()==0){cout<<"Threat numbers in E: "<<omp_get_num_threads()<<endl;}
 		double E=0.0;
 		#pragma omp for nowait schedule(runtime)
@@ -3473,12 +3469,12 @@ double lattice :: calc_energy()
 double lattice :: calc_energy_global()
 {
 	double totE=0.0;
-//	omp_set_dynamic(1);	
+//	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
 	int LOCAL_THREADS = int(MAX_THREADS/2);
 
-	#pragma omp parallel shared(totE) num_threads(LOCAL_THREADS)	
-	{	
+	#pragma omp parallel shared(totE) num_threads(LOCAL_THREADS)
+	{
 //		if(omp_get_thread_num()==0){cout<<"Threat numbers in E: "<<omp_get_num_threads()<<endl;}
 		double E=0.0;
 		#pragma omp for nowait schedule(runtime)
@@ -3501,13 +3497,13 @@ double lattice :: calc_energy_global()
 
 void lattice :: save_energy(double Time, double Step, string name, int setON)
 {
-	string file="";	
+	string file="";
 	stringstream total(name);
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		file=name+"E";
@@ -3525,31 +3521,31 @@ void lattice :: save_energy(double Time, double Step, string name, int setON)
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 
-	
+
 	double Etotal=calc_energy();
 	string name_of_file= file + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 	out_data<<" "<<Step<<" "<<Time<<" "<<Etotal<<endl;
-	
+
 	if(setON==1){
 		Etotal=calc_energy_global();
 		name_of_file= file + "_global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
 		out_data<<" "<<Step<<" "<<Time<<" "<<Etotal<<endl;
 	}
-	
+
 }
 
 void lattice :: save_Natoms(double Time, double Step, string name, int setON)
-{		
+{
 
-	string file="";	
+	string file="";
 	stringstream total(name);
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		file=name+"N";
@@ -3566,7 +3562,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
+
 	string name_of_file = file + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 	unsigned int size = atoms_type.size();
@@ -3578,12 +3574,12 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 //	omp_set_num_threads(LOCAL_THREADS);
 //	omp_set_num_threads(MAX_THREADS);
 
-	#pragma omp parallel shared(results) num_threads(LOCAL_THREADS) 	
-	{	
+	#pragma omp parallel shared(results) num_threads(LOCAL_THREADS)
+	{
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
 		for(unsigned int i=0;i<atom_list.size();i++){
-			int atom=atom_list[i]->get_atom();			
+			int atom=atom_list[i]->get_atom();
 			int podsiec=atom_list[i]->get_sub_latt();
 			#pragma omp critical(collectN)
 			{
@@ -3604,9 +3600,9 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 		for(unsigned int j=0;j<sublattice;j++){
 					out_data<<" "<<results[i][j];
 	}}
-	out_data<<endl;	
+	out_data<<endl;
 	out_data.close();
-	
+
 	if(setON==1){
 		name_of_file= file + "_global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
@@ -3615,14 +3611,14 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 			for(unsigned int j=0;j<sublattice;j++){
 				out_data<<" "<<results_global[i][j];
 		}}
-		out_data<<endl;	
+		out_data<<endl;
 		out_data.close();
 	}
 
 }
 
 void lattice :: save_NandE(double Time, double Step, string name, int setON)
-{		
+{
 	omp_set_nested(1);
 //	omp_set_dynamic(0);
 //	int MAX_THREADS = omp_get_max_threads();
@@ -3647,7 +3643,7 @@ void lattice :: save_NandE(double Time, double Step, string name, int setON)
 		#pragma omp barrier
 	omp_set_nested(0);
 //	omp_set_dynamic(1);
-//	omp_set_num_threads(MAX_THREADS);	 
+//	omp_set_num_threads(MAX_THREADS);
 }
 
 
@@ -3656,13 +3652,13 @@ void lattice :: save_NandE(double Time, double Step, string name, int setON)
 
 string lattice :: get_file_name(string name, string format){
 
-	string file="";	
+	string file="";
 	stringstream total(name);
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 		file=name+format;
@@ -3679,51 +3675,51 @@ string lattice :: get_file_name(string name, string format){
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
+
 	return file;
 }
 
 void lattice :: save_SRO_deep(double Time, double Step, string name){
-	
-	
+
+
 	string name_of_file = get_file_name(name,"sro_deep") + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 
 	unsigned int size = get_atom_typ_numbers();
-	unsigned  int zones= POTENCIALY->get_coordination_number();	
+	unsigned  int zones= POTENCIALY->get_coordination_number();
 	vector < vector < vector <vector<long > > > > results(zones, vector < vector <vector<long > > > (size, vector < vector <long> > (sublattice,vector <long> (size, 0) ) ) );
 
 //	vector <vector<long > > results(size,vector <long> (sublattice,0));
-	
+
 	//cout<<results.size()<<" "<<results[0].size()<<" "<<results[0][0].size()<<endl;
-	
+
 	int MAX_THREADS = omp_get_max_threads();
-	
-	#pragma omp parallel shared(results) num_threads(MAX_THREADS) 	
-	{	
+
+	#pragma omp parallel shared(results) num_threads(MAX_THREADS)
+	{
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
 		for(unsigned int i=0;i<atom_list.size();i++){
 			if(check_site_belonging_to_sim_area(atom_list[i])){
 				vector <site*> neighbours;
 				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom();			
+				int typ1 = atom_list[i]->get_atom();
 				int podsiec=atom_list[i]->get_sub_latt();
 
 				for(unsigned int k =0;k<neighbours.size();k++){
-					if(check_site_belonging_to_sim_area(neighbours[k])){	
+					if(check_site_belonging_to_sim_area(neighbours[k])){
 						int typ2 = neighbours[k]->get_atom();
-						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);		
+						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
 						#pragma omp critical(collectSRO)
 						{
 //							cout<<"threadN: "<<omp_get_thread_num()<<endl;
 						results[zone][typ1][podsiec][typ2]++;
-						}		
+						}
 					}
 				}
 			}
 		}
-			 
+
 	}//koniec parallel
 
 	out_data<<" "<<Step<<" "<<Time;
@@ -3734,49 +3730,49 @@ void lattice :: save_SRO_deep(double Time, double Step, string name){
 				out_data<<" "<<results[i][j][k][l];
 	}}}}
 
-	out_data<<endl;	
+	out_data<<endl;
 	out_data.close();
 
 }
 
 void lattice :: save_SRO(double Time, double Step, string name){
-	
-	
+
+
 	string name_of_file = get_file_name(name,"sro") + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 
 	unsigned int size = get_atom_typ_numbers();
-	unsigned  int zones= POTENCIALY->get_coordination_number();	
+	unsigned  int zones= POTENCIALY->get_coordination_number();
 	vector < vector <vector<long > > > results(zones, vector <vector<long > > (size,vector <long> (size,0) ) );
-	
+
 	//cout<<results.size()<<" "<<results[0].size()<<" "<<results[0][0].size()<<endl;
-	
+
 	int MAX_THREADS = omp_get_max_threads();
-	
-	#pragma omp parallel shared(results) num_threads(MAX_THREADS) 	
-	{	
+
+	#pragma omp parallel shared(results) num_threads(MAX_THREADS)
+	{
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
 		for(unsigned int i=0;i<atom_list.size();i++){
 			if(check_site_belonging_to_sim_area(atom_list[i])){
 				vector <site*> neighbours;
 				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom();			
-				
+				int typ1 = atom_list[i]->get_atom();
+
 				for(unsigned int k =0;k<neighbours.size();k++){
-					if(check_site_belonging_to_sim_area(neighbours[k])){	
+					if(check_site_belonging_to_sim_area(neighbours[k])){
 						int typ2 = neighbours[k]->get_atom();
-						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);		
+						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
 						#pragma omp critical(collectSRO)
 						{
 //							cout<<"threadN: "<<omp_get_thread_num()<<endl;
 						results[zone][typ1][typ2]++;
-						}		
+						}
 					}
 				}
 			}
 		}
-			 
+
 	}//koniec parallel
 
 	out_data<<" "<<Step<<" "<<Time;
@@ -3785,22 +3781,22 @@ void lattice :: save_SRO(double Time, double Step, string name){
 			for(unsigned int k=0;k<size;k++){
 				out_data<<" "<<results[i][j][k];
 	}}}
-	out_data<<endl;	
+	out_data<<endl;
 	out_data.close();
 
 }
 
 void lattice :: save_dR(double Time, long Step, string name, int setON)
 {
-	string fileR="";	
-	string fileR2="";	
+	string fileR="";
+	string fileR2="";
 
 	stringstream total(name);
-	
+
 	int word_count=0 ;
     string word;
     while( total >> word ) ++word_count;
-    
+
 	if(word_count == 1)
 	{
 			fileR=name+"dR";
@@ -3819,18 +3815,18 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 			}
 	}else if(word_count>2){control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
 	else{control_output<<"ERROR in lattice::make_pic->file_name: "<<word_count<<endl;exit(1);}
-	
-	string name_of_fileR = fileR + ".dat";	
-	string name_of_fileR2 = fileR2 + ".dat";	
-	
+
+	string name_of_fileR = fileR + ".dat";
+	string name_of_fileR2 = fileR2 + ".dat";
+
 	ofstream out_data(name_of_fileR.c_str(),ios :: app);
 	out_data.precision(10);
 
 	ofstream out_data1(name_of_fileR2.c_str(),ios :: app);
 	out_data1.precision(10);
-	
+
 	int size=atoms_type.size();
-	
+
 	vector <wektor> results1(size,wektor());
 	vector <wektor> results3(size,wektor());
 	vector <double> results2_0(size,0.0);
@@ -3846,13 +3842,13 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 	vector <double> results4_global(size,0.0);
 
 #pragma omp parallel shared(results1,results3,results4,results2_0,results2_1,results2_2,\
-				results1_global,results3_global,results4_global,results2_0_global,results2_1_global,results2_2_global)	
+				results1_global,results3_global,results4_global,results2_0_global,results2_1_global,results2_2_global)
 	{
 //	if(omp_get_thread_num()==0){cout<<"Threat numbers R: "<<omp_get_num_threads()<<endl;}
 
 	#pragma omp for nowait schedule(runtime)
 
-	for(unsigned int i=0;i<atom_list.size();i++){	
+	for(unsigned int i=0;i<atom_list.size();i++){
 		int atom=atom_list[i]->get_atom();
 		if(atom<0){cout<<"Atom type <0 in save_dR "<<endl;exit(0);}
 
@@ -3863,7 +3859,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		long int j1=atom_list[i]->get_jumps(1);
 		long int j2=atom_list[i]->get_jumps(2);
 
-		
+
 		if(check_site_belonging_to_sim_area(atom_list[i])){
 			#pragma omp critical(collectR)
 			{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
@@ -3909,11 +3905,11 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		for(unsigned int i=0;i<results2_0.size();i++){
 			out_data<<" "<<results1[i].x<<" "<<results1[i].y<<" "<<results1[i].z<<" "<<results2_0[i]<<" "<<results2_1[i]<<" "<<results2_2[i];
 		}
-		out_data<<endl;	
+		out_data<<endl;
 		out_data.close();
 	}
 	#pragma omp section
-	{	
+	{
 		out_data1<<Step<<" "<<Time;
 		for(unsigned int i=0;i<results4.size();i++){
 			out_data1<<" "<<results3[i].x<<" "<<results3[i].y<<" "<<results3[i].z<<" "<<results4[i];
@@ -3921,7 +3917,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		out_data1<<endl;
 		out_data1.close();
 	}
-	}//koniec omp sections	
+	}//koniec omp sections
 
 	if(setON==1){
 
@@ -3930,7 +3926,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 	name_of_fileR2= fileR2 + "_global.dat";
 	ofstream out_data1(name_of_fileR2.c_str(),ios :: app);
 	#pragma omp parallel sections num_threads(2)
-	{	
+	{
 	#pragma omp section
 	{
 	out_data<<Step<<" "<<Time;
@@ -3938,11 +3934,11 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 			out_data<<" "<<results1_global[i].x<<" "<<results1_global[i].y<<" "<<results1_global[i].z<<" ";
 			out_data<<results2_0_global[i]<<" "<<results2_1_global[i]<<" "<<results2_2_global[i];
 		}
-		out_data<<endl;	
+		out_data<<endl;
 		out_data.close();
 	}
 	#pragma omp section
-	{	
+	{
 		out_data1<<Step<<" "<<Time;
 		for(unsigned int i=0;i<results4_global.size();i++){
 			out_data1<<" "<<results3_global[i].x<<" "<<results3_global[i].y<<" ";
@@ -3951,13 +3947,13 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		out_data1<<endl;
 		out_data1.close();
 	}
-	}//koniec omp sections	
-	
+	}//koniec omp sections
+
 	}//end of if globla setON
-	
-	
+
+
 }
-	
+
 void lattice :: clear_dR()
 {
 	//cout<<"Clear displacements"<<endl;
@@ -3969,11 +3965,11 @@ void lattice :: clear_dR()
 
 
 void lattice :: update_events(site* sajt){
-	
+
 //	int o;																	//	sajt->show_site();
 //	cout<<"press"<<endl;
 //	cin>>o;																	//	control_output<<"prze events: "<<EVENTY->size()<<endl;
-	if( check_site_belonging_to_sim_area(sajt) ){	
+	if( check_site_belonging_to_sim_area(sajt) ){
 //		control_output<<"Main: "<<endl;
 		update_site_events(sajt);
 //		control_output<<"Neighs: "<<endl;									//search for vacancy in neigh for sajt and update
@@ -3981,8 +3977,8 @@ void lattice :: update_events(site* sajt){
 		typedef vector <site*>::iterator iters;
 		sajt->read_site_neighbours(neighs,1,0);
 		for( iters it=neighs.begin(); it != neighs.end();++it){
-			if( check_site_belonging_to_sim_area(*it) ){	
-				update_site_events( (*it) );			
+			if( check_site_belonging_to_sim_area(*it) ){
+				update_site_events( (*it) );
 			}else{
 				if(TRANSPARENT){
 					update_site_events((*it));
@@ -3995,13 +3991,13 @@ void lattice :: update_events(site* sajt){
 		if(TRANSPARENT){
 //			control_output<<"Main: "<<endl;
 			update_site_events(sajt);
-//			control_output<<"Neighs: "<<endl;	
+//			control_output<<"Neighs: "<<endl;
 			vector <site*> neighs;
 			typedef vector <site*>::iterator iters;
 			sajt->read_site_neighbours(neighs,1,0);
 			for( iters it=neighs.begin(); it != neighs.end();++it){
-				if( check_site_belonging_to_sim_area(*it) ){	
-					update_site_events( (*it) );			
+				if( check_site_belonging_to_sim_area(*it) ){
+					update_site_events( (*it) );
 				}else{
 					if(TRANSPARENT){
 						update_site_events((*it));
@@ -4018,16 +4014,16 @@ void lattice :: update_events(site* sajt){
 }
 
 void lattice :: update_site_events(site* sajt){
-	
+
 //	sajt->show_site();
 //	sajt->show_neigh(1);
 //	control_output<<"updating site events: "<<EVENTY->size();
-	
+
 	clear_events_index(sajt);
 //	control_output<<" deleted site events: "<<EVENTY->size();
 
 	typedef vector <pairjump>::iterator iterevec;
-	vector <pairjump> tmp_events; 
+	vector <pairjump> tmp_events;
 	int typ = sajt->get_atom();
 	if(typ==0){
 		if(TRANSPARENT){
@@ -4037,13 +4033,13 @@ void lattice :: update_site_events(site* sajt){
 		}
 	}
 
-	list <pairjump>::iterator point2l; 
+	list <pairjump>::iterator point2l;
 	for( iterevec it=tmp_events.begin(); it != tmp_events.end();++it){
 		site* tmp=(*it).get_vac_to_jump();
 		if(sajt == tmp){
 		point2l = EVENTY->insert( EVENTY->end(),(*it));
 		tmp->add_events_index(point2l);
-		
+
 //		control_output<<"added events: "<<&(*point2l)<<endl;
 
 //		it->show();
@@ -4054,7 +4050,7 @@ void lattice :: update_site_events(site* sajt){
 		}
 	}
 //	control_output<<" added site events: "<<EVENTY->size()<<endl;
-	
+
 }
 
 void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
@@ -4065,24 +4061,24 @@ void lattice :: create_events_index(site* siteV, vector <pairjump> &tmp_events){
 	skoki.reserve(50);
 	vector <site*> neighbour;
 	siteV->read_site_neighbours(neighbour,1,0);
-	
+
 //	control_output<<"nn: "<<neighbour.size()<<endl;
 	for(unsigned int k =0;k<neighbour.size();k++){
 		if( check_site_belonging_to_sim_area(neighbour[k]) ){
 			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
 //			(neighbour[k])->show_site();
-			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	
+			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );
 //			control_output<<"atom/zone: "<<atom<<"/"<<zone<<endl;
 
 			double E1= ( POTENCIALY->get_energy(siteV) ) + ( POTENCIALY->get_energy(neighbour[k]) ) - ( POTENCIALY->get_energy(siteV,neighbour[k]) );
-			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) ) 
-			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) ) 
+			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) )
+			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) )
 			+ ( POTENCIALY->get_energy(siteV,atom,neighbour[k],0) );
 			double barrier=1000.0;
 //			control_output<<"E1/E2: "<<E1<<" / "<<E2<<endl;
-//			control_output<<"BAR: "<<BARIERY<<endl;		
-			barrier=(*BARIERY)[atom][zone];		
-//			control_output<<"bar: "<<barrier<<endl;		
+//			control_output<<"BAR: "<<BARIERY<<endl;
+			barrier=(*BARIERY)[atom][zone];
+//			control_output<<"bar: "<<barrier<<endl;
 			double bariera=(E1+E2)/2+barrier-E1;		// 	--policz bariere
 			pairjump tmp(siteV,neighbour[k],E1,E2,barrier,bariera);
 			skoki.push_back(tmp);
@@ -4101,24 +4097,24 @@ void lattice :: create_events_trans(site* siteV, vector <pairjump> &tmp_events){
 	skoki.reserve(50);
 	vector <site*> neighbour;
 	siteV->read_site_neighbours(neighbour,1,0);
-	
+
 //	control_output<<"nn: "<<neighbour.size()<<endl;
 	for(unsigned int k =0;k<neighbour.size();k++){
 		if( (check_site_belonging_to_sim_area(siteV)) or (check_site_belonging_to_sim_area(neighbour[k])) ){				//<<<----- check_site_mobile()
 			int atom = neighbour[k]->get_atom();		//wczytaj typ atomu sasiada atomowego wakancji
 //			(neighbour[k])->show_site();
-			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );	
+			unsigned int zone = ( POTENCIALY->check_coordination_zone(siteV,neighbour[k]) );
 //			control_output<<"atom/zone: "<<atom<<"/"<<zone<<endl;
 
 			double E1= ( POTENCIALY->get_energy(siteV) ) + ( POTENCIALY->get_energy(neighbour[k]) ) - ( POTENCIALY->get_energy(siteV,neighbour[k]) );
-			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) ) 
-			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) ) 
+			double E2= ( POTENCIALY->get_energy(siteV,atom) ) + ( POTENCIALY->get_energy(neighbour[k],0) )
+			- ( POTENCIALY->get_energy(siteV,0,neighbour[k],0) ) - ( POTENCIALY->get_energy(siteV,atom,neighbour[k],atom) )
 			+ ( POTENCIALY->get_energy(siteV,atom,neighbour[k],0) );
 			double barrier=1000.0;
 //			control_output<<"E1/E2: "<<E1<<" / "<<E2<<endl;
-//			control_output<<"BAR: "<<BARIERY<<endl;		
-			barrier=(*BARIERY)[atom][zone];		
-//			control_output<<"bar: "<<barrier<<endl;		
+//			control_output<<"BAR: "<<BARIERY<<endl;
+			barrier=(*BARIERY)[atom][zone];
+//			control_output<<"bar: "<<barrier<<endl;
 			double bariera=(E1+E2)/2+barrier-E1;		// 	--policz bariere
 			pairjump tmp(siteV,neighbour[k],E1,E2,barrier,bariera);
 			skoki.push_back(tmp);
