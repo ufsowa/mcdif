@@ -901,10 +901,11 @@ void lattice::atoms_list_init()
 	//			control_output<<i<<" "<<j<<" "<<k;
 	//			control_output<<" "<<ATOM<<" "<<tmp_vector[l]<<endl;
 
-
+			  	int ATOM=tmp_vector[l]->get_atom();
+				if(ATOM >= 0 ){
 					site * wsk_site=tmp_vector[l];
 					atom_list.push_back(wsk_site);
-
+				}
 			}
 }}}
 
@@ -1015,6 +1016,8 @@ double lattice :: get_latice_const(int direction, int i)
 }
 
 bool lattice :: check_site_belonging_to_region(site *A){
+	int atom=A->get_atom();
+	if(atom >= 0){
 	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
 	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
 	double z = (A->get_z());  											//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
@@ -1025,21 +1028,22 @@ bool lattice :: check_site_belonging_to_region(site *A){
 				return true;
 			}
 		}
-	}
+	}}
 	return false;
 }
 
 bool lattice :: check_site_belonging_to_sim_area(site *A){
+	int atom=A->get_atom();
+	if(atom >= 0){
 	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
 	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
 	double z = (A->get_z());  											//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
 																		//	control_output<<st_sim_area.z<<" "<<end_sim_area.z<<endl;
-
 	if((set_prec(x)>=set_prec(st_sim_area.x)) and (set_prec(x)<set_prec(end_sim_area.x))){
 		if((set_prec(y)>=set_prec(st_sim_area.y)) and (set_prec(y)<set_prec(end_sim_area.y))){
 			if((set_prec(z)>=set_prec(st_sim_area.z)) and (set_prec(z)<set_prec(end_sim_area.z))){
 					return true;
-	}}}
+	}}}}
 
 	return false;
 }
@@ -2972,9 +2976,8 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
-			if(atom>-1)
-			{
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;
+			if(atom >= -1){
+			file<<get_atom_name(atom)<<" "<<i<<" "<<j<<" "<<k<<endl;
 			atoms++;
 			}
 		}
@@ -3104,9 +3107,8 @@ void lattice :: pic_stech(long step,double stech, wektor make_pic_vec_st, wektor
 
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
-			if(atom>-1)
-			{
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<endl;
+			if(atom >= -1){
+			file<<get_atom_name(atom)<<" "<<i<<" "<<j<<" "<<k<<endl;
 			atoms++;
 			}
 		}
@@ -3208,9 +3210,8 @@ void lattice :: pic_diff(long step,long step_break, wektor make_pic_vec_st, wekt
 	//	cout<<endl;
 		if((i>=xs and i<=xe) and (j>=ys and j<=ye) and (k>=zs and k<=ze))
 		{
-			if(atom>-1)
-			{
-			file<<atoms_name[atom]<<" "<<i<<" "<<j<<" "<<k<<" "<<dx<<" "<<dy<<" "<<dz;
+			if(atom >= -1){
+			file<<get_atom_name(atom)<<" "<<i<<" "<<j<<" "<<k<<" "<<dx<<" "<<dy<<" "<<dz;
 			for (unsigned int nj=0; nj<jumps.size();nj++){file<<" "<<jumps[nj];}
 			file<<endl;
 			atoms++;
@@ -3419,7 +3420,7 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 	stringstream dir;
 	dir<<direction;
 
-	string name_of_file=file_name+atoms_name[i]+dir.str()+".dat";
+	string name_of_file=file_name+get_atom_name(i)+dir.str()+".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
 	for(unsigned int j=0;j<hist[i].size();j++)
 	{

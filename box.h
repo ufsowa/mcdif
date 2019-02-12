@@ -15,11 +15,11 @@ class box
 	public:
 	
 	box(){
-		sity.reserve(4);
+		sity.reserve(14);
 //		cout<<"Pojemonosc tablicy rezerwuje: "<<sity.capacity()<<" "<<&sity<<" ";
 		};
 	box(long _id){
-		sity.reserve(4);
+		sity.reserve(14);
 		box_id=_id;
 //		cout<<"Pojemonosc tablicy rezerwuje: "<<sity.capacity()<<" "<<&sity<<" ";
 		};	
@@ -28,7 +28,7 @@ class box
 	box(const box &i)
 	{	
 		sity.clear();
-		sity.reserve(4);
+		sity.reserve(14);
 		sity=i.sity;
 		box_id=i.box_id;
 	};
@@ -38,7 +38,7 @@ class box
 		if(this != &i)
 		{
 			sity.clear();
-			sity.reserve(4);
+			sity.reserve(14);
 			sity=i.sity;
 			return *this;
 		}
