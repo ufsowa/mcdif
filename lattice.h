@@ -57,8 +57,6 @@ vector <vector<site> > cells;
 
 vector <int> atoms_type;			//zawiera typy atomow 0 is reserved for vacancy
 vector <string> atoms_name;			//ZAMIENIC NA KEY MAP
-vector <int> atoms_spin;			//ZAMIENIC NA KEY MAP
-
 
 unsigned int x_size;			// obszar wykorzystany na zbudowanie siatki w pamieci
 unsigned int y_size;
@@ -130,7 +128,7 @@ void pic_stech(long step,double stech, wektor make_pic_vec_st, wektor make_pic_v
 void pic_diff(long step,long step_break,wektor st, wektor end, string name_of_file);
 
 //initialization of sites
-void add_atom_type(int new_atom, string new_name, int new_spin);
+void add_atom_type(int new_atom, string new_name);
 void add_sublatt_typ(int sublatt, int atomtyp);
 void put_site(int x,int y,int z,site* Site);
 void put_atom(int x,int y,int z,site* Site);

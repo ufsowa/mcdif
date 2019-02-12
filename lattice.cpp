@@ -142,17 +142,17 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		for (int i=0;i<nr_atoms;i++)
 			{
 				double x=0.0,y=0.0,z=0.0;
-				int atom=1, spin=1;
+				int atom=1;
 				string name="";
 				int sub_lat_name;
-				unit_cell>>x>>y>>z>>atom>>name>>spin>>sub_lat_name;
+				unit_cell>>x>>y>>z>>atom>>name>>sub_lat_name;
 				control_output<<x<<" "<<y<<" "<<z<<" "<<atom<<" "<<name<<" "<<sub_lat_name<<" || ";
 				control_output<<endl;
 
 				if(x<x_translation and y<y_translation and z<z_translation)
 				{
 					add_sublatt_typ(sub_lat_name, atom);
-					add_atom_type(atom,name,spin);	//dodaje typy uzytych atomow
+					add_atom_type(atom,name);	//dodaje typy uzytych atomow
 					atoms_incell.push_back(site(x,y,z,atom,sub_lat_name,l));
 				}
 				else
@@ -434,28 +434,28 @@ void lattice :: add_sublatt_typ(int sublatt, int atom_typ)
 }
 
 
-void lattice :: add_atom_type(int new_atom, string new_name, int new_spin){
+void lattice :: add_atom_type(int new_atom, string new_name){
 	int add_new_type = 1;
 
 	//vacancies must be handled by user in structure.in
+	// It is assumed that vacancies have name "Ze" and typ=0
 	//	if(atoms_type.size() < 1)	//zawsze na poczatek dodaje wakancje do pustej listy
 	//	{
 	//		atoms_type.push_back(0);
-	//		atoms_name.push_back("Fe");
-	//	control_output<<"in add at. new typ: "<< 0 <<" "<<"Fe"<<endl; ALOALO
+	//		atoms_name.push_back("Ze");
+	//	control_output<<"in add at. new typ: "<< 0 <<" "<<"Ze"<<endl; ALOALO
 	//	}
 
 	for(unsigned int index=0; index<atoms_type.size();index++){
 		int old_atom = atoms_type[index];
-		int old_spin = atoms_spin[index];
 		string old_name = atoms_name[index];
 
 		//	control_output<<"in add at. old typ: "<< old_atom<<" "<<atoms_name[iter]<<endl;
 
 		if(old_atom == new_atom){	// check if type is already added
 			add_new_type = 0;
-			if((old_name != new_name) or (old_spin != new_spin)){  // check if not fault in atoms/spins/names
-				control_output<<"ERROR in add at. new typ: "<<new_atom<<" "<<new_name<<" "<<new_spin<<endl;
+			if((old_name != new_name)){  // check if not fault in atoms/spins/names
+				control_output<<"ERROR in add at. new typ: "<<new_atom<<" "<<new_name<<endl;
 				control_output<<"atoms in cells duplicated and ignored"<<endl;;
 			}
 		}
@@ -464,7 +464,6 @@ void lattice :: add_atom_type(int new_atom, string new_name, int new_spin){
 	if(add_new_type){
 		atoms_type.push_back(new_atom); // [0]=1;[1]=0;[2]=2
 		atoms_name.push_back(new_name);     // [0]="Ni";[1]="Fe";[2]="Al"
-		atoms_spin.push_back(new_spin);	// [0]=0;[1]=-1;[2]=1
 				//control_output<<"in add at. new typ: "<< new_atom<<" "<<name<<endl;
 	}
 
@@ -486,20 +485,10 @@ unsigned int lattice :: get_atom_typ_numbers()
 
 /**
     scenario:
- 	I have site of type = 1. Whant its name and spin.
+ 	I have site of type (spin) = 1. Whant its name.
     Common point is the same index. Find index for type =1  in atoms_type.
     then use this index to get name or spin.
  */
-
-int lattice :: get_atom_spin(int typ){
-	int pozycja=0;
-	for(unsigned int i=0;i<atoms_type.size();i++){
-		if(typ == atoms_type[i])
-			break;
-		pozycja++;
-	}
-	return atoms_spin[pozycja];
-}
 
 string lattice :: get_atom_name(int typ){
 	int pozycja=0;
@@ -521,11 +510,13 @@ int lattice :: get_atom_type(string name){
 
 	return atoms_type[pozycja];
 }
-
+/**
+	Self check
+ */
 int lattice :: get_atom_type(int spin){
 	int pozycja=0;
-	for(unsigned int i=0;i<atoms_spin.size();i++){
-		if(spin == atoms_spin[i])
+	for(unsigned int i=0;i<atoms_type.size();i++){
+		if(spin == atoms_type[i])
 			break;
 		pozycja++;
 	}
