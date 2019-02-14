@@ -85,10 +85,6 @@ void potential :: init_cvm(std::ifstream &energy_file, unsigned int size_V, unsi
 				control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
 				control_output<<ls<<" "<<k<<" "<<pot<<endl;
 			}
-			if( k >= size_V){
-				control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
-				control_output<<ls<<" "<<k<<" "<<pot<<endl;exit(0);
-			}
 			ECI[ls][k]=pot;
 		}
 	}
@@ -97,7 +93,8 @@ void potential :: init_cvm(std::ifstream &energy_file, unsigned int size_V, unsi
 	//so need just read all parameters a and b for evry cluster/type
 	//functions[cluster_size][atom type][a,b]
 	energy_file>>text>>functions_size;
-	if(text!="FunParameters:"){control_output<<"Bad format in energy.in. 'FunParameters:'/="<<text<<"'"<<endl; exit(0);}
+	if(text!="FunParameters:"){control_output<<"Bad format in energy.in. 'FunParameters:'/="<<text<<"'"<<endl;
+		control_output<<"You have more types in energy.in than declared in structure.in"<<endl;exit(1);}
 	for (unsigned int ls=0;ls<functions_size;ls++){
 		ORT_FUN.push_back(vector <double>(4,0.0) );		//[cluster_size][eci1,eci2,eci3]
 		double a=0.0, b=0.0, c=0.0, d=0.0;
@@ -107,16 +104,15 @@ void potential :: init_cvm(std::ifstream &energy_file, unsigned int size_V, unsi
 			control_output<<"WARRNING:You try overwritte function parameters in energy.in file!"<<endl;
 			control_output<<ls<<" "<<ORT_FUN[ls][0]<<ORT_FUN[ls][1]<<ORT_FUN[ls][2]<<ORT_FUN[ls][3]<<endl;
 		}
-		if(ls >= functions_size){
-			control_output<<"You have more types in energy.in than declared in structure.in"<<endl;
-			control_output<<ls<<endl;exit(0);
-		}
 		ORT_FUN[ls][0]=a;
 		ORT_FUN[ls][1]=b;
 		ORT_FUN[ls][2]=c;
 		ORT_FUN[ls][3]=d;
-
 	}
+
+	energy_file>>text;
+	if(text!="END"){control_output<<"Bad format in energy.in. 'END'/="<<text<<"'"<<endl;
+		control_output<<"You have more types in energy.in than declared in structure.in"<<endl;exit(1);}
 
 	for(unsigned int jj=0; jj<rmin.size(); jj++){
 		control_output<<"Zapisane odziaływania: rmin "<<rmin[jj]<<" rmax "<<rmax[jj]<<endl;
@@ -167,27 +163,23 @@ void potential :: init_ising(std::ifstream &energy_file, unsigned int size_V, un
 								//cout<<"Promien oddzialywania: "<<r1<<" "<<r2<<endl																	//int o;//cin>>o;
 			}else{
 				energy_file>>i>>j>>pot;
-				if(V[ls][i][j]!=0.0){
-				control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
-				control_output<<i<<" "<<j<<" "<<pot<<endl;
-			}
-			if( (i >= size_V) or (j >= size_V)){
-				control_output<<"You have more interactions in energy.in than declared types in structure.in"<<endl;
-				control_output<<i<<" "<<j<<" "<<pot<<endl;exit(0);
-			}
-			if(rmin.size() != ls){
-				control_output<<"You have declared more coordination zones than interactions in energy.in"<<endl;
-				control_output<<rmin.size()<<" "<<ls<<" "<<rmin.back()<<" "<<rmax.back()<<endl;exit(0);
-			}
-		//cout<<text<<endl;
-		//cout<<"Oddzialywanie: i j V "<<i<<" "<<j<<" "<<pot<<endl;
-		//int o;
-		//cin>>o;
+					if(V[ls][i][j]!=0.0){
+						control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
+						control_output<<i<<" "<<j<<" "<<pot<<endl;exit(1);}
+					if( (i >= size_V) or (j >= size_V)){
+						control_output<<"You have more interactions in energy.in than declared types in structure.in"<<endl;
+						control_output<<i<<" "<<j<<" "<<pot<<endl;exit(0);}
+					if(rmin.size() != (ls+1) ) {
+						control_output<<"You have declared more coordination zones than interactions in energy.in"<<endl;
+						control_output<<"rmin.size()"<<" "<<"zone no."<<" "<<"rmin.back()"<<" "<<"rmax.back()"<<endl;
+						control_output<<rmin.size()<<" "<<ls<<" "<<rmin.back()<<" "<<rmax.back()<<endl;exit(1);}
 
-			V[ls][i][j]=pot;
-			}
+				V[ls][i][j]=pot;}
 		}
 	}
+	energy_file>>text;
+	if(text != "END"){
+		control_output<<"You have bad format in energy.in"<<endl;exit(1);}
 
 	show();
 	control_output<<"Ising potentials initialized-> "<<atoms_type<<" "<<sublattices;
@@ -217,7 +209,7 @@ void potential :: add_barrier(const pairjump &jump){
 	site* vac_to_jump = jump.get_vac_to_jump();
 	site* atom_to_jump = jump.get_atom_to_jump();
 
-	int ATOM = atom_to_jump->get_atom();
+	int ATOM = atom_to_jump->get_atom("add_barier");
 	int NR_LATa = atom_to_jump->get_sub_latt();
 	int NR_LATv = vac_to_jump->get_sub_latt();
 
@@ -311,10 +303,13 @@ void potential :: read_bars(string file_input){
 
 double potential::get_barier(site* node1, site* node2){
 	unsigned int zone = check_coordination_zone(node1,node2);
-	int atom1 = node1->get_atom();
-	int atom2 = node2->get_atom();
-
-	return bars[zone][atom1][atom2];
+	int atom1 = node1->get_atom("get_barrier");
+	int atom2 = node2->get_atom("get_barrier");
+	if(bars.size() > (unsigned) zone){
+		return bars[zone][atom1][atom2];}
+	else{
+		control_output<<"ERROR: V size is lower then en_neigh zone: "<<bars.size()<<"<="<<zone<<endl;exit(1);
+	}
 }
 
 void potential :: show(){
@@ -360,93 +355,6 @@ unsigned int potential::get_zone(double r){
 	return zon;
 }
 
-double potential :: get_energy(site *atom)
-{
-//	cout<<"get_energy() for "<<endl;
-	double Vsite=0.0;
-//	int zone=0;
-	int A=atom->get_atom(); //typ atomu
-//	atom->show_site();
-//	atom->show_neigh(0);
-//	int o;
-//	cin>>o;
-//	control_output<<"Rozmiar V.size: "<<V.size()<<endl;
-	for(unsigned int j=0;j<V.size();j++)
-	{
-//	control_output<<"jestem pot1 "<<endl;
-
-		vector <site*> neigh;
-//		control_output<<"jestem pot2 "<<endl;
-		atom->read_site_neighbours(neigh,0,j);//jego sasiedzi energetyczni
-
-//	control_output<<"jestem pot3 "<<endl;
-
-	//	cout<<"Strefa numer: "<<j<<endl;
-	//	for (int t=0;t<neigh.size();t++)
-	//	{
-	//		neigh[t]->show_site();
-	//	}
-		//licz energie konfiguracji
-		for(unsigned int i=0;i < neigh.size();i++)
-		{
-			int B = neigh[i]->get_atom();
-			//atom->show_site();
-			//neigh[i]->show_site();
-		//zone=check_coordination_zone(atom, neigh[i]);
-			Vsite=Vsite+V[j][A][B];
-//		cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
-		}
-	}
-//	int o;
-	//cin>>o;
-
-//	V=get_energy(A,neigh);
-	return Vsite;
-}
-
-double potential :: get_energy(site *atom, int typ)
-{
-//	cout<<"get_energy() for "<<endl;
-	double Vsite=0.0;
-	//int zone=0;
-	int A=typ; //typ atomu
-//	atom->show_site();
-//	atom->show_neigh(0);
-//	int o;
-//	cin>>o;
-//	control_output<<"Rozmiar V.size: "<<V.size()<<endl;
-	for(unsigned int j=0;j<V.size();j++)
-	{
-//	control_output<<"jestem pot1 "<<endl;
-
-		vector <site*> neigh;
-//		control_output<<"jestem pot2 "<<endl;
-		atom->read_site_neighbours(neigh,0,j);//jego sasiedzi energetyczni
-
-//	control_output<<"jestem pot3 "<<endl;
-
-	//	cout<<"Strefa numer: "<<j<<endl;
-	//	for (int t=0;t<neigh.size();t++)
-	//	{
-	//		neigh[t]->show_site();
-	//	}
-		//licz energie konfiguracji
-		for(unsigned int i=0;i < neigh.size();i++)
-		{
-			int B = neigh[i]->get_atom();
-			//atom->show_site();
-			//neigh[i]->show_site();
-		//zone=check_coordination_zone(atom, neigh[i]);
-			Vsite=Vsite+V[j][A][B];
-//		cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
-		}
-	}
-//	int o;
-	//cin>>o;
-
-//	V=get_energy(A,neigh);
-	return Vsite;
-}
 
 
 
@@ -502,20 +410,102 @@ int potential :: check_coordination_zone(site *A, site *B){
 //	return V;
 //}
 
+double potential :: get_energy(site *atom){
+//	control_output<<"get_energy(site)"<<endl;
+	double Vsite=0.0;
+//	int zone=0;
+	int A=atom->get_atom("get_energy A"); //typ atomu
+//	atom->show_site();
+//	atom->show_neigh(0);
+//	int o;
+//	cin>>o;
+//	control_output<<"get_energy(site) V.size: "<<V.size()<<" "<<A<<endl;
+
+	for(unsigned int j=0;j<V.size();j++){
+		vector <site*> neigh;
+//		control_output<<"get_energy(site) for zone: "<<j<<endl;
+		atom->read_site_neighbours(neigh,0,j);
+
+	//	cout<<"Strefa numer: "<<j<<endl;
+	//	for (int t=0;t<neigh.size();t++)
+	//	{
+	//		neigh[t]->show_site();
+	//	}
+		//licz energie konfiguracji
+		for(unsigned int i=0;i < neigh.size();i++){
+			int B = neigh[i]->get_atom("get_energy B");
+			//atom->show_site();
+			//neigh[i]->show_site();
+			//zone=check_coordination_zone(atom, neigh[i]);
+//			control_output<<"get_energy(site) for neigh: "<<i<<" "<<A<<" "<<B<<" "<<j<<endl;
+			Vsite=Vsite+V[j][A][B];
+			//cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
+		}
+	}
+	return Vsite;
+}
+
+double potential :: get_energy(site *atom, int typ){
+//	cout<<"get_energy() for "<<endl;
+	double Vsite=0.0;
+	//int zone=0;
+	int A=typ; //typ atomu
+//	atom->show_site();
+//	atom->show_neigh(0);
+//	int o;
+//	cin>>o;
+//	control_output<<"Rozmiar V.size: "<<V.size()<<endl;
+	for(unsigned int j=0;j<V.size();j++){
+//	control_output<<"jestem pot1 "<<endl;
+
+		vector <site*> neigh;
+//		control_output<<"jestem pot2 "<<endl;
+		atom->read_site_neighbours(neigh,0,j);//jego sasiedzi energetyczni
+
+//	control_output<<"jestem pot3 "<<endl;
+
+	//	cout<<"Strefa numer: "<<j<<endl;
+	//	for (int t=0;t<neigh.size();t++)
+	//	{
+	//		neigh[t]->show_site();
+	//	}
+		//licz energie konfiguracji
+		for(unsigned int i=0;i < neigh.size();i++)
+		{
+			int B = neigh[i]->get_atom("get_energy(site typ)");
+			//atom->show_site();
+			//neigh[i]->show_site();
+		//zone=check_coordination_zone(atom, neigh[i]);
+			Vsite=Vsite+V[j][A][B];
+//		cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
+		}
+	}
+//	int o;
+	//cin>>o;
+
+//	V=get_energy(A,neigh);
+	return Vsite;
+}
+
 double potential :: get_energy(site *atom1, site* atom2){
-//	cout<<"get_energy(site site)"<<endl;
+//	control_output<<"get_energy(site site)"<<endl;
 	double Vinter=0.0;
 	int zone=-1;
-	int A=atom1->get_atom();
-	int B=atom2->get_atom();
+	int A=atom1->get_atom("energy for siteA");
+	int B=atom2->get_atom("energy for siteB");
 	vector <site*> neigh;
 	//int zones = atom1->get_no_zones();
 	zone=check_coordination_zone(atom1, atom2);
+//	control_output<<"get_energy(site site): "<<A<<" "<<B<<" "<<zone<<endl;
 	if(zone<0){Vinter=0.0;}
-	else{Vinter=V[zone][A][B];}
+	else if(V.size() > (unsigned) zone){Vinter=V[zone][A][B];}
+	else{
+		control_output<<"ERROR: V size is lower then en_neigh zone: "<<V.size()<<"<="<<zone<<endl;exit(1);
+	}
 	//atom1->show_site();
 	//atom2->show_site();
 	//cout<<V[zone][A][B]<<endl;
+//	control_output<<"get_energy(site site) END"<<endl;
 
 	return Vinter;
 }
@@ -530,7 +520,10 @@ double potential :: get_energy(site *atom1, int typ1, site* atom2, int typ2){
 	//int zones = atom1->get_no_zones();
 	zone=check_coordination_zone(atom1, atom2);
 	if(zone<0){Vinter=0.0;}
-	else{Vinter=V[zone][A][B];}
+	else if(V.size() > (unsigned) zone){Vinter=V[zone][A][B];}
+	else{
+		control_output<<"ERROR: V size is lower then en_neigh zone: "<<V.size()<<"<="<<zone<<endl;exit(1);
+	}
 
 	//atom1->show_site();
 	//atom2->show_site();

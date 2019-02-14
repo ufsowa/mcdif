@@ -113,6 +113,14 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		control_output<<y_left_border<<" "<<y_right_border<<" "<<y_translation<<endl;
 		control_output<<z_left_border<<" "<<z_right_border<<" "<<z_translation<<endl;
 
+		if( (x_left_border > x_size*x_translation) or (x_right_border > x_size*x_translation) )
+			{control_output<<"Erorr: Structure out of the region"<<endl; exit(1);}
+		if( (y_left_border > y_size*y_translation) or (y_right_border > y_size*y_translation) )
+			{control_output<<"Erorr: Structure out of the region"<<endl; exit(1);}
+		if( (z_left_border > z_size*z_translation) or (z_right_border > z_size*z_translation) )
+			{control_output<<"Erorr: Structure out of the region"<<endl; exit(1);}
+		control_output<<"boundaries "<<endl;
+
 		//zapisanie rozmiaru komorki elementarnej
 		x_trans.push_back(x_translation);
 		y_trans.push_back(y_translation);
@@ -477,10 +485,17 @@ int lattice :: get_size(int typ){
 	else{control_output<<"ERROR in lattice::get_size() "<<typ<<endl;exit(1);}
 }
 
-unsigned int lattice :: get_atom_typ_numbers()
-{
-	unsigned int vec_size=atoms_type.size();
-	return vec_size;
+/**
+ * 	Return numer fo atoms types defined in structure.in
+ *  Extract faked atoms with types < 0.
+ */
+unsigned int lattice :: get_atom_typ_numbers(){
+	unsigned int counter=0;
+	for(unsigned int i=0;i<atoms_type.size();i++){
+		if(atoms_type[i] >= 0)
+			counter++;
+	}
+	return counter;
 }
 
 /**
@@ -489,7 +504,6 @@ unsigned int lattice :: get_atom_typ_numbers()
     Common point is the same index. Find index for type =1  in atoms_type.
     then use this index to get name or spin.
  */
-
 string lattice :: get_atom_name(int typ){
 	int pozycja=0;
 	for(unsigned int i=0;i<atoms_type.size();i++){
@@ -846,14 +860,12 @@ void lattice::sim_atoms_list_init()
 					wsk_site=tmp_vector[l];
 
 				//	control_output<<"wskaznik "<<wsk_site<<endl;
-					if(check_site_belonging_to_sim_area(wsk_site))
-					{
+					if(check_site_belonging_to_sim_area(wsk_site)){
 						int atom = wsk_site->get_atom();
 
 					//	control_output<<"Atom in sim: "<<atom<<endl;
 
-						if(atom >= 0)
-						{
+						if(atom >= 0){
 							sim_atom_list.push_back(wsk_site);
 							//control_output<<" "<<atom<<" "<<tmp_vector[l]<<endl;
 						}
@@ -872,8 +884,7 @@ control_output<<"Atoms list - ok: "<<sim_atom_list.size()<<endl;
 
 
 
-void lattice::atoms_list_init()
-{	//int o;
+void lattice::atoms_list_init(){
 	control_output<<"atom list init.."<<endl;
 	//cin>>o;
 	vector <site*> tmp_vector;
@@ -882,32 +893,24 @@ void lattice::atoms_list_init()
 
 
 
-	for(unsigned int i=0;i<x_size;i++)
-	{
-	for(unsigned int j=0;j<y_size;j++)
-	{
-
-		for(unsigned int k=0;k<z_size;k++)
-		{
-			tmp_vector.clear();
+	for(unsigned int i=0;i<x_size;i++){
+	for(unsigned int j=0;j<y_size;j++){
+	for(unsigned int k=0;k<z_size;k++){
+		tmp_vector.clear();
 	//		control_output<<i<<" "<<j<<" "<<k<<endl;
 	//		matrix[i][j][k].show_sity();
-			matrix[i][j][k].get_sity_in_box(tmp_vector);
-
-
-			for(unsigned int l=0;l<tmp_vector.size();l++)
-			{
-	//			int ATOM=tmp_vector[l]->get_atom();
-	//			control_output<<i<<" "<<j<<" "<<k;
-	//			control_output<<" "<<ATOM<<" "<<tmp_vector[l]<<endl;
-
-			  	int ATOM=tmp_vector[l]->get_atom();
-				if(ATOM >= 0 ){
-					site * wsk_site=tmp_vector[l];
+		matrix[i][j][k].get_sity_in_box(tmp_vector);
+		for(unsigned int l=0;l<tmp_vector.size();l++){
+			site *wsk_site=0;
+			wsk_site=tmp_vector[l];
+			if(check_site_belonging_to_region(wsk_site)){
+				int atom = wsk_site->get_atom();
+				if(atom >= 0){
 					atom_list.push_back(wsk_site);
 				}
 			}
-}}}
+		}
+	}}}
 
 	//for(int i=0;i<atom_list.size();i++)
 //		{
@@ -2507,9 +2510,6 @@ void lattice::simulation_set(double _r_min, double _r_max, wektor a,wektor b,wek
 	end_region=f;
 	interaction_zone=_max_zone;
 
-	atoms_list_init();
-	sim_atoms_list_init();
-
 	Rmin=_r_min;
 	Rmax=_r_max;
 
@@ -3430,8 +3430,9 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 	}
 }
 
-double lattice :: calc_energy()
-{
+double lattice :: calc_energy(){
+	control_output<<"STARTCALE "<<endl;
+
 	double totE=0.0;
 //	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
@@ -3454,12 +3455,14 @@ double lattice :: calc_energy()
 	}
 //	omp_set_dynamic(0);
 //	control_output<<"tot thread "<<totE<<endl;
+	control_output<<"ENDCALE "<<totE<<endl;
 
 	return (totE/2.0);
 }
 
-double lattice :: calc_energy_global()
-{
+double lattice :: calc_energy_global(){
+	control_output<<"STARTCALEGLOBAL"<<endl;
+
 	double totE=0.0;
 //	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
@@ -3482,6 +3485,7 @@ double lattice :: calc_energy_global()
 	}
 //	omp_set_dynamic(0);
 //	control_output<<"tot thread "<<totE<<endl;
+	control_output<<"ENDCALEGLOBAL "<<totE<<endl;
 
 	return (totE/2.0);
 }

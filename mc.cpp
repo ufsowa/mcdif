@@ -579,27 +579,31 @@ double exchange_mechanism(lattice *sample, long steps, double T){
 	return time;
 }
 
-void direct_exchange(lattice *sample,long steps,double T)
-{
+void direct_exchange(lattice *sample,long steps,double T){
+	//control_output<<"direct start"<<endl;
+
 	double beta=1.0/(kB*T);	
 	long Nsize=sample->get_sim_atom_number();
 
 	for (long i=0; i<steps; i++){
 		long N1=(long)(rnd()*Nsize);
-		long N2=(long)(rnd()*Nsize);		
-		site *site1=0;	
+		long N2=(long)(rnd()*Nsize);
+		site *site1=0;
 		site *site2=0;
+		//control_output<<"direct get site: "<<N1<<" "<<N2<<" "<<Nsize<<endl;
 		site1=sample->get_site(N1);
 		site2=sample->get_site(N2);
+		//control_output<<"direct end get"<<endl;
 		int typ1 = site1->get_atom();
 		int typ2 = site2->get_atom();
-
+		//control_output<<"direct get1 energy: "<<typ1<<" "<<typ2<<endl;
 		double E1=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
+		//control_output<<"direct set atoms"<<endl; 
 		site1->set_atom(typ2);
 		site2->set_atom(typ1);
+		//control_output<<"direct get2 energy"<<endl;
 		double E2=pot.get_energy(site1)+pot.get_energy(site2)-pot.get_energy(site1,site2);
 		double dE=E2-E1;
-
 		if(dE > 0 ){
 			double p = exp(-beta*dE);
 			double R = rnd();
@@ -608,9 +612,11 @@ void direct_exchange(lattice *sample,long steps,double T)
 				site2->set_atom(typ2);
 			}
 		}
-	}
+		//control_output<<"direct end set atoms"<<endl; 
 
-}	
+	}
+	//control_output<<"direct end"<<endl;
+}
 
 double vac_mechanism(lattice *sample,long number_of_steps,long direct_step, double T, int file_nr)
 {	
@@ -1685,17 +1691,14 @@ return time/100.0;
 
 int save_results(lattice *sample, vector <task> &savings, string output, double a, double b)
 {
-	//control_output<<"Save: "<<name<<endl;
-	
+	//control_output<<"Save start"<<endl;
+
 	for(unsigned int i=0;i<savings.size();i++)
 	{
 		string name="";
 		name=savings[i].get_name();
-		//if(name==output)
-		//{
-				
-			if(name=="make_pic")
-			{	
+		if(name=="make_pic"){
+				control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=7){control_output<<"Wrong parameter list in conf.in -> make_pic: 7"<<endl;exit(1);}
@@ -1704,6 +1707,8 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 	    		wektor make_pic_vec_st(parameters[1],parameters[2],parameters[3]);
 	    		wektor make_pic_vec(parameters[4],parameters[5],parameters[6]);	
 				sample->makepic(b,step_make,make_pic_vec_st,make_pic_vec, output);
+				control_output<<"ENDSAVING: "<<name<<endl;
+
 			}
 			else if(name=="pic_stech")
 			{
@@ -1731,27 +1736,34 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 			}
 			else if(name=="Energy")
 			{	
+				control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> Energy: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_energy(a,b,output,global_on);
+				control_output<<"ENDSAVING: "<<name<<endl;
+
 			}
 			else if(name=="Natoms")
 			{
+				control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> Natoms: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_Natoms(a,b,output,global_on);
+				control_output<<"ENDSAVING: "<<name<<endl;
 			}
 			else if(name=="NandE")
 			{
+				control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> EandE: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_NandE(a,b,output,global_on);
+				control_output<<"ENDSAVING: "<<name<<endl;
 			}
 			else if(name=="SRO")
 			{

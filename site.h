@@ -90,6 +90,7 @@ double get_z();
 double get_position(int dir);
 wektor get_position();
 unsigned int get_atom();
+unsigned int get_atom(string msg);
 int get_sub_latt();
 double get_drx();
 double get_dry();

@@ -430,10 +430,15 @@ int site :: get_rez_index(){return rez_index;}
 unsigned int site :: get_atom(){
 	if(atom < -1){
 		control_output<<"ERROR: atom type < 0. Bad lattice introduction: "<<atom<<endl;exit(0);}
-	if(atom == -1){control_output<<"WARNING: atom type = -1: "<<atom<<endl;}
 	return atom;
 }
 
+unsigned int site :: get_atom(string msg){
+	if(atom < -1){
+		control_output<<"ERROR: atom type < 0. Bad lattice introduction: "<<atom<<endl;exit(0);}
+	if(atom == -1){control_output<<"WARNING: atom type = -1: "<<msg<<endl;}
+	return atom;
+}
 
 void site :: reset_vindex(){ Vindex = -1;}
 
