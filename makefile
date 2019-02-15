@@ -1,7 +1,7 @@
 data := $(shell date +%d%m%Y)	
 NAME=mcdif_${data}
 CC=g++
-CFLAGS=-std=c++11 -Wall -c
+CFLAGS=-std=c++11 -g -Wall -c
 #mcdif_${data} 
 
 ${NAME}: generators.o site.o lattice.o mc.o potential.o mymath.o opcja.o plaster.o pairjump.o

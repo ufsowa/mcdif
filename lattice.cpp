@@ -904,10 +904,7 @@ void lattice::atoms_list_init(){
 			site *wsk_site=0;
 			wsk_site=tmp_vector[l];
 			if(check_site_belonging_to_region(wsk_site)){
-				int atom = wsk_site->get_atom();
-				if(atom >= 0){
-					atom_list.push_back(wsk_site);
-				}
+				atom_list.push_back(wsk_site);
 			}
 		}
 	}}}
@@ -1019,8 +1016,6 @@ double lattice :: get_latice_const(int direction, int i)
 }
 
 bool lattice :: check_site_belonging_to_region(site *A){
-	int atom=A->get_atom();
-	if(atom >= 0){
 	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
 	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
 	double z = (A->get_z());  											//	control_output<<st_sim_area.y<<" "<<end_sim_area.y<<endl;
@@ -1031,7 +1026,7 @@ bool lattice :: check_site_belonging_to_region(site *A){
 				return true;
 			}
 		}
-	}}
+	}
 	return false;
 }
 
@@ -1441,7 +1436,7 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 		int latt_num=atom_list->get_latt_number();
 
 		//sprawdzam czy atom jest w obszarze symulacji   simul_atoms_init
-	if(check_site_belonging_to_region(atom_list)){
+	if(check_site_belonging_to_sim_area(atom_list)){
 
 	if(ATOM==control_atom)
 	{	control_output<<"ATOM: "<<ATOM<<endl;
@@ -1640,7 +1635,7 @@ void lattice :: sites_zone_init(int typ, double rmin, double rmax, site *atom_li
 	//			int set_writey = 0;
 	//			int set_writez = 0;
 
-				if (check_site_belonging_to_region(neighbour))	//sprawdza czy site jest w obszerze symulacji
+				if (check_site_belonging_to_sim_area(neighbour))	//sprawdza czy site jest w obszerze symulacji
 					{
 					double r2 = (x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0);
 
@@ -2901,8 +2896,8 @@ double lattice :: move(double x2, double x1, int dir)
 }
 
 
-void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file)
-{
+void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file){
+	control_output<<"makepic START1"<<endl;
 	stringstream total(name_of_file);
 	int all=0,sum=1;
 
@@ -2941,17 +2936,14 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	double ye=make_pic_vec_ed.y;
 	double ze=make_pic_vec_ed.z;
 
-//	int Nx=xe-xs;
-//	int Ny=ye-ys;
-//	int Nz=ze-zs;
-
 	stringstream s;
-
 	string name;
+	control_output<<"makepic START2: "<<s<<" "<<name<<" "<<sum<<endl;
 	s<<(sum);
+	control_output<<"makepic START3"<<endl;
 	name=s.str()+"pic.xyz";
 	ofstream file(name.c_str());
-
+	control_output<<"makepic START4"<<endl;
 	file<<"          "<<endl;
 	file<<endl;
 	file<<endl;
@@ -2960,7 +2952,7 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	//Nz=Nz-1;
 	long atoms=0;
 	//vector <site> :: iterator K;
-
+	control_output<<"makepic START5"<<endl;
 	for(unsigned int K=0;K<atom_list.size();K++)
 	{
 		//K->show_site();
@@ -2987,7 +2979,7 @@ file.seekp(0);
 file<<atoms<<endl;
 file.close();
 }
-
+	control_output<<"makepic END"<<endl;
 }
 
 /*-------------------------------------------------------------------*/
@@ -3395,9 +3387,14 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 		//	sim_atom_list[i]->show_site();
 		//	exit(1);
 
-
-		if(d>=0)
-		{
+		control_output<<"ERROR: THIS need to be fixed"<<endl;
+		if(atom < -1){ FAIL}
+		if(atom== -1){
+			atom = atoms_type.size() -1;
+			//this requires a check that no type larger that atoms_type.size was used.
+			//in lattice::add_atoms
+		}
+		if(d>=0){
 			d_bin=d_bin-int(st_bin/size_bin);
 			hist[atom][d_bin]++;
 		}
@@ -3575,7 +3572,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
 		for(unsigned int i=0;i<atom_list.size();i++){
-			int atom=atom_list[i]->get_atom();
+			int atom=atom_list[i]->get_atom("saveN");
 			int podsiec=atom_list[i]->get_sub_latt();
 			#pragma omp critical(collectN)
 			{
@@ -3584,6 +3581,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 					results[atom][podsiec]++;
 					}
 				if(setON){
+					control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
 					results_global[atom][podsiec]++;
 				}
 			}
@@ -3699,16 +3697,17 @@ void lattice :: save_SRO_deep(double Time, double Step, string name){
 			if(check_site_belonging_to_sim_area(atom_list[i])){
 				vector <site*> neighbours;
 				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom();
+				int typ1 = atom_list[i]->get_atom("save_sro_deepA");
 				int podsiec=atom_list[i]->get_sub_latt();
 
 				for(unsigned int k =0;k<neighbours.size();k++){
 					if(check_site_belonging_to_sim_area(neighbours[k])){
-						int typ2 = neighbours[k]->get_atom();
+						int typ2 = neighbours[k]->get_atom("save_sro_deepB");
 						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
 						#pragma omp critical(collectSRO)
 						{
 //							cout<<"threadN: "<<omp_get_thread_num()<<endl;
+						control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
 						results[zone][typ1][podsiec][typ2]++;
 						}
 					}
@@ -3753,15 +3752,16 @@ void lattice :: save_SRO(double Time, double Step, string name){
 			if(check_site_belonging_to_sim_area(atom_list[i])){
 				vector <site*> neighbours;
 				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom();
+				int typ1 = atom_list[i]->get_atom("save_sroA");
 
 				for(unsigned int k =0;k<neighbours.size();k++){
 					if(check_site_belonging_to_sim_area(neighbours[k])){
-						int typ2 = neighbours[k]->get_atom();
+						int typ2 = neighbours[k]->get_atom(save_sroB);
 						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
 						#pragma omp critical(collectSRO)
 						{
 //							cout<<"threadN: "<<omp_get_thread_num()<<endl;
+						control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
 						results[zone][typ1][typ2]++;
 						}
 					}
@@ -3845,7 +3845,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 	#pragma omp for nowait schedule(runtime)
 
 	for(unsigned int i=0;i<atom_list.size();i++){
-		int atom=atom_list[i]->get_atom();
+		int atom=atom_list[i]->get_atom("save_dR");
 		if(atom<0){cout<<"Atom type <0 in save_dR "<<endl;exit(0);}
 
 		double dx=atom_list[i]->get_drx();
@@ -3872,8 +3872,9 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 			}
 		}
 		if(setON){
-			#pragma omp critical(collectR)
-			{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
+			#pragma omp critical(collectR){
+			//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
+			control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
 			results1_global[atom].x=results1_global[atom].x+dx;
 			results1_global[atom].y=results1_global[atom].y+dy;
 			results1_global[atom].z=results1_global[atom].z+dz;

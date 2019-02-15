@@ -1,4 +1,4 @@
 #!/bin/bash 
 rm *.dat rm *.xyz
-#time env OMP_NUM_THREADS=1 OMP_SCHEDULE="static" ./mcdif_* conf.in
+time env OMP_NUM_THREADS=1 OMP_SCHEDULE="static" ./mcdif_* conf.in
 

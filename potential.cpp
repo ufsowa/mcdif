@@ -437,7 +437,11 @@ double potential :: get_energy(site *atom){
 			//atom->show_site();
 			//neigh[i]->show_site();
 			//zone=check_coordination_zone(atom, neigh[i]);
-//			control_output<<"get_energy(site) for neigh: "<<i<<" "<<A<<" "<<B<<" "<<j<<endl;
+			if(B<0 or A < 0){
+				control_output<<"get_energy(site) for neigh: "<<i<<" "<<A<<" "<<B<<" "<<j<<endl;
+				control_output<<"Initialization of structure went wrong. You have atom with type < 0"<<endl;
+				exit(1);
+			}
 			Vsite=Vsite+V[j][A][B];
 			//cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
 		}
@@ -475,7 +479,11 @@ double potential :: get_energy(site *atom, int typ){
 			int B = neigh[i]->get_atom("get_energy(site typ)");
 			//atom->show_site();
 			//neigh[i]->show_site();
-		//zone=check_coordination_zone(atom, neigh[i]);
+			if(B<0 or A < 0){
+				control_output<<"get_energy(site) for neigh: "<<i<<" "<<A<<" "<<B<<" "<<j<<endl;
+				control_output<<"Initialization of structure went wrong. You have atom with type < 0"<<endl;
+				exit(1);
+			}
 			Vsite=Vsite+V[j][A][B];
 //		cout<<"V[j][A][B]: "<<V[j][A][B]<<endl;
 		}
@@ -493,6 +501,12 @@ double potential :: get_energy(site *atom1, site* atom2){
 	int zone=-1;
 	int A=atom1->get_atom("energy for siteA");
 	int B=atom2->get_atom("energy for siteB");
+	if(B<0 or A < 0){
+		control_output<<"get_energy(site) for neigh: "<<A<<" "<<B<<endl;
+		control_output<<"Initialization of structure went wrong. You have atom with type < 0"<<endl;
+		exit(1);
+	}
+
 	vector <site*> neigh;
 	//int zones = atom1->get_no_zones();
 	zone=check_coordination_zone(atom1, atom2);
@@ -500,7 +514,8 @@ double potential :: get_energy(site *atom1, site* atom2){
 	if(zone<0){Vinter=0.0;}
 	else if(V.size() > (unsigned) zone){Vinter=V[zone][A][B];}
 	else{
-		control_output<<"ERROR: V size is lower then en_neigh zone: "<<V.size()<<"<="<<zone<<endl;exit(1);
+		control_output<<"ERROR: V size is lower then en_neigh zone: "<<V.size()<<"<="<<zone<<endl;
+		control_output<<"Probably energy.in is corrupted"<<endl;exit(1);
 	}
 	//atom1->show_site();
 	//atom2->show_site();
@@ -516,6 +531,12 @@ double potential :: get_energy(site *atom1, int typ1, site* atom2, int typ2){
 	int zone=-1;
 	int A=typ1;
 	int B=typ2;
+	if(B<0 or A < 0){
+		control_output<<"get_energy(site) for neigh: "<<A<<" "<<B<<endl;
+		control_output<<"Initialization of structure went wrong. You have atom with type < 0"<<endl;
+		exit(1);
+	}
+
 	vector <site*> neigh;
 	//int zones = atom1->get_no_zones();
 	zone=check_coordination_zone(atom1, atom2);
@@ -531,15 +552,3 @@ double potential :: get_energy(site *atom1, int typ1, site* atom2, int typ2){
 
 	return Vinter;
 }
-
-//double potential :: getV1(int _at1,int _at2)
-//{
-	//cout<<V[_at1][_at2]<<" VV";
-//	return V[0][_at1][_at2];
-//	}
-
-//double potential :: getV2(int _at1,int _at2)
-//{
-	//cout<<V[_at1][_at2]<<" VV";
-//	return V[0][_at1][_at2];
-//	}
