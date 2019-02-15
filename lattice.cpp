@@ -236,16 +236,13 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	//		}
 	//	}
 
-//cin>>o;
-
-
-
-
 	}
-
-	//wczytuje energie do tablicy potencjalow V znajduje sie w klasie potencial
-
-
+	//check atoms type in case of of type -1 and types lower than size for savings
+	for(unsigned tt=0; tt<atoms_type(size);tt++){
+		if(atoms_type[i] >= atoms_type.size() ){
+			control_output<<"Error: atoms type > types"<<endl;
+		}
+	}
 }
 
 long lattice :: get_atoms_number()
