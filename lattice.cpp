@@ -19,6 +19,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	long iter=0;
 	matrix.clear();
 	matrix.reserve(50000);
+	bool faked_atoms = false;
 	for(int i=0;i < int(x_size);i++)
     {
 		//cout<<i<<" ";
@@ -27,32 +28,6 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 
 	}
 
-/*	for(int i=0;i < int(x_size);i++)
-	{
-		matrix[i].clear();
-		matrix[i].reserve(100);
-		for(int j=0;j < int(y_size);j++)
-		{
-			matrix[i].push_back(vector<box> ());
-		}
-	}
-
-	for(int i=0;i < int(x_size);i++)
-	{
-	for(int j=0;j < int(y_size);j++)
-	{
-		matrix[i][j].clear();
-		matrix[i][j].reserve(100);
-		for(int k=0;k < int(z_size);k++)
-		{box item(iter);
-		cout<<i<<" "<<j<<" "<<k<<" ";
-		matrix[i][j].push_back(item);
-		cout<<&matrix[i][j][k]<<endl;
-		}
-	}
-	}
-
-*/
 	for(int i=0;i < int(x_size);i++)
     {
 		for(int j=0;j < int(y_size);j++)
@@ -102,8 +77,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	unit_cell>>text>>nr_struct;
 
 	//iteruje dla kazdej struktury
-	for(int l=0;l<nr_struct;l++)
-	{
+	for(int l=0;l<nr_struct;l++){
 		unit_cell>>text>>x_left_border>>y_left_border>>z_left_border;
 		unit_cell>>x_right_border>>y_right_border>>z_right_border;
 		unit_cell>>x_translation>>y_translation>>z_translation;
@@ -129,17 +103,10 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		// tablica vecorow do przechowywania sitow. Pelni role sitow/boxow w ktorych siedza atomy o double cord: 1<=1.44 <2
 		//wypelnione -3. atom <0 means that site is not used in simulation
 
-
-
-		//cin>>o;
-		//liczba atom w tej komorce do wczytania
+		//cin>>o;	//liczba atom w tej komorce do wczytania
 		unit_cell>>text>>nr_atoms;
 		control_output<<"atoms in unit cell: "<<nr_atoms<<endl;
-		//cin>>o;
-
-
-	//	cout<<"LATTICE"<<endl;
-	//	matrix[2][2][2].show_site();
+		//cin>>o;//	cout<<"LATTICE"<<endl;//	matrix[2][2][2].show_site();
 
 		vector <site> atoms_incell;
 		atoms_incell.reserve(10);
@@ -147,100 +114,82 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		unit_cell>>text;
 
 		//wczytuje uzyte atomy komorki do tablicy
-		for (int i=0;i<nr_atoms;i++)
-			{
-				double x=0.0,y=0.0,z=0.0;
-				int atom=1;
-				string name="";
-				int sub_lat_name;
-				unit_cell>>x>>y>>z>>atom>>name>>sub_lat_name;
-				control_output<<x<<" "<<y<<" "<<z<<" "<<atom<<" "<<name<<" "<<sub_lat_name<<" || ";
-				control_output<<endl;
+		for (int i=0;i<nr_atoms;i++){
+			double x=0.0,y=0.0,z=0.0;
+			int atom=1;
+			string name="";
+			int sub_lat_name;
+			unit_cell>>x>>y>>z>>atom>>name>>sub_lat_name;
+			control_output<<x<<" "<<y<<" "<<z<<" "<<atom<<" "<<name<<" "<<sub_lat_name<<" || ";
+			control_output<<endl;
 
-				if(x<x_translation and y<y_translation and z<z_translation)
-				{
-					add_sublatt_typ(sub_lat_name, atom);
-					add_atom_type(atom,name);	//dodaje typy uzytych atomow
-					atoms_incell.push_back(site(x,y,z,atom,sub_lat_name,l));
-				}
-				else
-			 	{
-					control_output<<"Erorr: Atoms in cell behind cell. Site cord must be < trans"<<endl;
-					exit(0);
-				}
-
+			if(x<x_translation and y<y_translation and z<z_translation){
+				add_sublatt_typ(sub_lat_name, atom);
+				add_atom_type(atom,name);
+				if(atom == -1){faked_atoms = true;}		//needed for types check at the end of lattice()
+				atoms_incell.push_back(site(x,y,z,atom,sub_lat_name,l));
+			}else{
+				control_output<<"Erorr: Atoms in cell behind cell. Site cord must be < trans"<<endl;exit(0);
 			}
+		}
 
 		control_output<<"atoms in cell: "<<atoms_incell.size()<<endl;
 
 		cells.push_back(atoms_incell);
 
 		//cin>>o;
-		for(double x=x_left_border;x<x_right_border;x=x+x_translation)
-		{
-		for(double y=y_left_border;y<y_right_border;y=y+y_translation)
-		{
-			for(double z=z_left_border;z<z_right_border;z=z+z_translation)
-			{
-				vector <site> :: iterator K;
-		//wpiasnie atom komorki elementarnej do vectora atomow
-				for(K=atoms_incell.begin();K!=atoms_incell.end();K++)
-				{
-					double X=K->get_x();
-					double Y=K->get_y();
-					double Z=K->get_z();
-					int ATOM=K->get_atom();
-					int name=K->get_sub_latt();
+		for(double x=x_left_border;x<x_right_border;x=x+x_translation){
+		for(double y=y_left_border;y<y_right_border;y=y+y_translation){
+		for(double z=z_left_border;z<z_right_border;z=z+z_translation){
+			vector <site> :: iterator K;
+			//wpiasnie atom komorki elementarnej do vectora atomow
+			for(K=atoms_incell.begin();K!=atoms_incell.end();K++){
+				double X=K->get_x();
+				double Y=K->get_y();
+				double Z=K->get_z();
+				int ATOM=K->get_atom();
+				int name=K->get_sub_latt();
+				//control_output<<" "<<name;
 
-					//control_output<<" "<<name;
-
-					if(set_prec(x+X)<set_prec(x_right_border) and set_prec(y+Y)<set_prec(y_right_border) and set_prec(z+Z)<set_prec(z_right_border))
-					{
+				if(set_prec(x+X)<set_prec(x_right_border) and set_prec(y+Y)<set_prec(y_right_border) and set_prec(z+Z)<set_prec(z_right_border)){
 					//	control_output<<set_prec(x+X)<<" "<<set_prec(y+Y)<<" "<<set_prec(z+Z)<<" "<<ATOM<<" / ";
 					//	control_output<<x_trans[l]<<" "<<y_trans[l]<<" "<<z_trans[l]<<" || ";
 						site new_site(set_prec(x+X),set_prec(y+Y),set_prec(z+Z),ATOM,name,l);
 					//	cout<<"Adres new_site w funkcji: "<<&new_site<<endl;
-//						int a = myRound((x+X)/x_trans[l]);
-	//					int b = myRound((y+Y)/y_trans[l]);
-		//				int c = myRound((z+Z)/z_trans[l]);
+					//	int a = myRound((x+X)/x_trans[l]);
+					//	int b = myRound((y+Y)/y_trans[l]);
+					//	int c = myRound((z+Z)/z_trans[l]);
 						int a = int((x+X)/x_trans[l]);
 						int b = int((y+Y)/y_trans[l]);
 						int c = int((z+Z)/z_trans[l]);
-		//				control_output<<a<<" "<<b<<" "<<c<<endl;
+					//	control_output<<a<<" "<<b<<" "<<c<<endl;
 						matrix[a][b][c].put_site(new_site);
 					//	cout<<"Jeszcze raz sprawdzam sity w boxie z lattice"<<endl;
-			//			matrix[a][b][c].show_sity();
-					//	int o;
-					//	cin>>o;
-
-
-					}
+					//	matrix[a][b][c].show_sity();
+					//	int o; cin>>o;
 				}
 			}
-		}
-		}
-
-
+		}}}
 
 		control_output<<"structure " <<l<<" readed ok"<<endl;
 
-	//	for(int i=0;i<int(x_size);i++)
-	//	{
-	//		for(int j=0;j<int(y_size);j++)
-	//		{
-	//			for(int k=0;k<int(z_size);k++)
-	//			{
-	//				control_output<<"i j k "<<i<<" "<<j<<" "<<k<<endl;
-	//				matrix[i][j][k].show_sity();
-	//			}
-	//		}
-	//	}
+	//	for(int i=0;i<int(x_size);i++){
+	//	for(int j=0;j<int(y_size);j++){
+	//	for(int k=0;k<int(z_size);k++){
+	//		control_output<<"i j k "<<i<<" "<<j<<" "<<k<<endl;
+	//		matrix[i][j][k].show_sity();
+	//	}}}
 
 	}
-	//check atoms type in case of of type -1 and types lower than size for savings
-	for(unsigned tt=0; tt<atoms_type(size);tt++){
-		if(atoms_type[i] >= atoms_type.size() ){
-			control_output<<"Error: atoms type > types"<<endl;
+	// Check atoms type in case of a type -1 and types lower than size for savings
+	// All atoms types must be lower than atoms_type_size() -2 if faked_atom = true
+	int max_type = atoms_type.size();
+	if(faked_atoms){max_type--;}
+	for(unsigned int tt=0; tt<atoms_type.size();tt++){
+		if(atoms_type[tt] >= max_type ){
+			control_output<<"Error: Bad atoms types: "<<atoms_type[tt]<<" "<<max_type<<endl;
+			control_output<<"Atoms types must be lower than the size of types due to the faster savings: results[atom]"<<endl;
+			control_output<<"When faked_atoms = true then we reserve the last atom index in types for it."<<endl;exit(1);
 		}
 	}
 }
@@ -3340,84 +3289,58 @@ void lattice :: get_sites(vector <plaster> &tmp){
 }
 
 
-void lattice :: save_hist_dR(string file_name, int direction, double Time, double st_bin, double size_bin, double end_bin)
-{
+void lattice :: save_hist_dR(string file_name, int direction, double Time, double st_bin, double size_bin, double end_bin){
 	int bins_nr = int((end_bin-st_bin)/size_bin)+1;		//zero dodac
 
-
-		vector < vector<long> > hist(atoms_type.size(),vector <long> (bins_nr,0)) ;
+	vector < vector<long> > hist(atoms_type.size(),vector <long> (bins_nr,0)) ;
 	//2D : typ atomu i histogram
 
-
-	for(unsigned int i=0;i<sim_atom_list.size();i++)
-	{
-		int atom=sim_atom_list[i]->get_atom();
+	for(unsigned int i=0;i<sim_atom_list.size();i++){
+		int atom=sim_atom_list[i]->get_atom("save_hist_dR");
 		double d=0;		//atom displacement
 
-		if(direction==1)
-		{
+		if(direction==1){
 			d=sim_atom_list[i]->get_drx();
 		}
-		else if(direction==2)
-		{
+		else if(direction==2){
 			d=sim_atom_list[i]->get_dry();
 		}
-		else if(direction==3)
-		{
+		else if(direction==3){
 			d=sim_atom_list[i]->get_drz();
-		}
-		else
-		{
+		}else{
 			cout<<"Wrong direction number in HIST parameters| x-1|y-2|z-3"<<endl;
 			exit(1);
 		}
 
-	if(atom>0)	//wylaczam wakancje ze statystki
-	{
+		if(atom < -1){ control_output<<"ERROR: Atom type lower than -1 (faked). This is serious!"<<endl;
+			control_output<<"Bad initialization of lattice and interactions"<<endl; exit(1);}
+
 		int d_bin=int(d/size_bin);		//sprawdzic zaokraglanie
 
-		if(d_bin>st_bin and d_bin<end_bin)		// zliczam tylko to co jest w zakresie
-		{
-
+		if(d_bin>st_bin and d_bin<end_bin){
 		//	cout<<"Bin range in HIST too small-> max_d: "<<d_bin<<endl;
 		//	cout<<sim_atom_list[i];
 		//	sim_atom_list[i]->show_site();
 		//	exit(1);
-
-		control_output<<"ERROR: THIS need to be fixed"<<endl;
-		if(atom < -1){ FAIL}
-		if(atom== -1){
-			atom = atoms_type.size() -1;
-			//this requires a check that no type larger that atoms_type.size was used.
-			//in lattice::add_atoms
+			if(atom == -1){atom = atoms_type.size() -1;}	//check at the end of lattice()
+			if(d>=0){
+				d_bin=d_bin-int(st_bin/size_bin);
+				hist[atom][d_bin]++;
+			}
+			if(d<0){
+				d_bin=d_bin-int(st_bin/size_bin);
+				hist[atom][d_bin]++;
+			}
 		}
-		if(d>=0){
-			d_bin=d_bin-int(st_bin/size_bin);
-			hist[atom][d_bin]++;
-		}
-
-		if(d<0)
-		{
-			d_bin=d_bin-int(st_bin/size_bin);
-			hist[atom][d_bin]++;
-		}
-
-	}
-	}
 	}
 
-
-
-
-	for(unsigned int i=1;i<atoms_type.size();i++)		//wylaczylem wakancje. W lattice w vectore atoms_type wakancje maja pozycje 0 i nazwe Fe
-	{
+	for(unsigned int i=1;i<atoms_type.size();i++){
 	stringstream dir;
 	dir<<direction;
 
 	string name_of_file=file_name+get_atom_name(i)+dir.str()+".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
-	for(unsigned int j=0;j<hist[i].size();j++)
-	{
+	for(unsigned int j=0;j<hist[i].size();j++){
 		out_data<<Time<<" "<<(j*size_bin+st_bin)<<" "<<hist[i][j]<<endl;
 	}
 	out_data<<endl;
@@ -3578,7 +3501,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 					results[atom][podsiec]++;
 					}
 				if(setON){
-					control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
+					if(atom == -1){atom = atoms_type.size() -1;}	//check at the end of lattice()
 					results_global[atom][podsiec]++;
 				}
 			}
@@ -3680,38 +3603,27 @@ void lattice :: save_SRO_deep(double Time, double Step, string name){
 	unsigned  int zones= POTENCIALY->get_coordination_number();
 	vector < vector < vector <vector<long > > > > results(zones, vector < vector <vector<long > > > (size, vector < vector <long> > (sublattice,vector <long> (size, 0) ) ) );
 
-//	vector <vector<long > > results(size,vector <long> (sublattice,0));
-
-	//cout<<results.size()<<" "<<results[0].size()<<" "<<results[0][0].size()<<endl;
-
 	int MAX_THREADS = omp_get_max_threads();
 
 	#pragma omp parallel shared(results) num_threads(MAX_THREADS)
 	{
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
-		for(unsigned int i=0;i<atom_list.size();i++){
-			if(check_site_belonging_to_sim_area(atom_list[i])){
-				vector <site*> neighbours;
-				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom("save_sro_deepA");
-				int podsiec=atom_list[i]->get_sub_latt();
-
-				for(unsigned int k =0;k<neighbours.size();k++){
-					if(check_site_belonging_to_sim_area(neighbours[k])){
-						int typ2 = neighbours[k]->get_atom("save_sro_deepB");
-						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
-						#pragma omp critical(collectSRO)
-						{
-//							cout<<"threadN: "<<omp_get_thread_num()<<endl;
-						control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
-						results[zone][typ1][podsiec][typ2]++;
-						}
-					}
+		for(unsigned int i=0;i<sim_atom_list.size();i++){
+			vector <site*> neighbours;
+			sim_atom_list[i]->read_site_neighbours(neighbours,1);
+			int typ1 = sim_atom_list[i]->get_atom("save_sro_deepA");
+			int podsiec = sim_atom_list[i]->get_sub_latt();
+			for(unsigned int k =0;k<neighbours.size();k++){
+				int typ2 = neighbours[k]->get_atom("save_sro_deepB");
+				unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
+				#pragma omp critical(collectSRO)
+				{
+				//	cout<<"threadN: "<<omp_get_thread_num()<<endl;
+				results[zone][typ1][podsiec][typ2]++;
 				}
 			}
 		}
-
 	}//koniec parallel
 
 	out_data<<" "<<Step<<" "<<Time;
@@ -3745,27 +3657,19 @@ void lattice :: save_SRO(double Time, double Step, string name){
 	{
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
-		for(unsigned int i=0;i<atom_list.size();i++){
-			if(check_site_belonging_to_sim_area(atom_list[i])){
-				vector <site*> neighbours;
-				atom_list[i]->read_site_neighbours(neighbours,1);
-				int typ1 = atom_list[i]->get_atom("save_sroA");
-
-				for(unsigned int k =0;k<neighbours.size();k++){
-					if(check_site_belonging_to_sim_area(neighbours[k])){
-						int typ2 = neighbours[k]->get_atom(save_sroB);
-						unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
-						#pragma omp critical(collectSRO)
-						{
-//							cout<<"threadN: "<<omp_get_thread_num()<<endl;
-						control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
-						results[zone][typ1][typ2]++;
-						}
-					}
+		for(unsigned int i=0;i<sim_atom_list.size();i++){
+			vector <site*> neighbours;
+			sim_atom_list[i]->read_site_neighbours(neighbours,1);
+			int typ1 = sim_atom_list[i]->get_atom("save_sroA");
+			for(unsigned int k =0;k<neighbours.size();k++){
+				int typ2 = neighbours[k]->get_atom("save_sroB");
+				unsigned int zone = POTENCIALY->check_coordination_zone(atom_list[i],neighbours[k]);
+				#pragma omp critical(collectSRO)
+				{
+					results[zone][typ1][typ2]++;
 				}
 			}
 		}
-
 	}//koniec parallel
 
 	out_data<<" "<<Step<<" "<<Time;
@@ -3827,15 +3731,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 	vector <double> results2_2(size,0.0);
 	vector <double> results4(size,0.0);
 
-	vector <wektor> results1_global(size,wektor());
-	vector <wektor> results3_global(size,wektor());
-	vector <double> results2_0_global(size,0.0);
-	vector <double> results2_1_global(size,0.0);
-	vector <double> results2_2_global(size,0.0);
-	vector <double> results4_global(size,0.0);
-
-#pragma omp parallel shared(results1,results3,results4,results2_0,results2_1,results2_2,\
-				results1_global,results3_global,results4_global,results2_0_global,results2_1_global,results2_2_global)
+	#pragma omp parallel shared(results1,results3,results4,results2_0,results2_1,results2_2)
 	{
 //	if(omp_get_thread_num()==0){cout<<"Threat numbers R: "<<omp_get_num_threads()<<endl;}
 
@@ -3843,7 +3739,8 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 
 	for(unsigned int i=0;i<atom_list.size();i++){
 		int atom=atom_list[i]->get_atom("save_dR");
-		if(atom<0){cout<<"Atom type <0 in save_dR "<<endl;exit(0);}
+		if(atom < -1){cout<<"Atom type <-1 in save_dR "<<endl;exit(1);}
+		if(atom == -1){atom = size - 1;}
 
 		double dx=atom_list[i]->get_drx();
 		double dy=atom_list[i]->get_dry();
@@ -3853,9 +3750,8 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		long int j2=atom_list[i]->get_jumps(2);
 
 
-		if(check_site_belonging_to_sim_area(atom_list[i])){
-			#pragma omp critical(collectR)
-			{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
+		#pragma omp critical(collectR)
+		{															//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
 			results1[atom].x=results1[atom].x+dx;
 			results1[atom].y=results1[atom].y+dy;
 			results1[atom].z=results1[atom].z+dz;
@@ -3866,25 +3762,7 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 			results3[atom].y=results3[atom].y+dy*dy;
 			results3[atom].z=results3[atom].z+dz*dz;
 			results4[atom]=results4[atom]+1;
-			}
 		}
-		if(setON){
-			#pragma omp critical(collectR){
-			//		cout<<"thread: "<<omp_get_thread_num()<<" "<<results1[0].x<<endl;
-			control_output<<"ERROR: THIS neeed to be fixed atom<0"<<endl;
-			results1_global[atom].x=results1_global[atom].x+dx;
-			results1_global[atom].y=results1_global[atom].y+dy;
-			results1_global[atom].z=results1_global[atom].z+dz;
-			results2_0_global[atom]=results2_0_global[atom]+j0;
-			results2_1_global[atom]=results2_1_global[atom]+j1;
-			results2_2_global[atom]=results2_2_global[atom]+j2;
-			results3_global[atom].x=results3_global[atom].x+dx*dx;
-			results3_global[atom].y=results3_global[atom].y+dy*dy;
-			results3_global[atom].z=results3_global[atom].z+dz*dz;
-			results4_global[atom]=results4_global[atom]+1;
-			}
-		}
-
 
 	}//koniec for
 	}//koniec omp parallel
@@ -3912,40 +3790,6 @@ void lattice :: save_dR(double Time, long Step, string name, int setON)
 		out_data1.close();
 	}
 	}//koniec omp sections
-
-	if(setON==1){
-
-	name_of_fileR= fileR + "_global.dat";
-	ofstream out_data(name_of_fileR.c_str(),ios :: app);
-	name_of_fileR2= fileR2 + "_global.dat";
-	ofstream out_data1(name_of_fileR2.c_str(),ios :: app);
-	#pragma omp parallel sections num_threads(2)
-	{
-	#pragma omp section
-	{
-	out_data<<Step<<" "<<Time;
-		for(unsigned int i=0;i<results2_0_global.size();i++){
-			out_data<<" "<<results1_global[i].x<<" "<<results1_global[i].y<<" "<<results1_global[i].z<<" ";
-			out_data<<results2_0_global[i]<<" "<<results2_1_global[i]<<" "<<results2_2_global[i];
-		}
-		out_data<<endl;
-		out_data.close();
-	}
-	#pragma omp section
-	{
-		out_data1<<Step<<" "<<Time;
-		for(unsigned int i=0;i<results4_global.size();i++){
-			out_data1<<" "<<results3_global[i].x<<" "<<results3_global[i].y<<" ";
-			out_data1<<results3_global[i].z<<" "<<results4_global[i];
-		}
-		out_data1<<endl;
-		out_data1.close();
-	}
-	}//koniec omp sections
-
-	}//end of if globla setON
-
-
 }
 
 void lattice :: clear_dR()

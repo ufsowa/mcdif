@@ -28,3 +28,9 @@ pairjump.o: pairjump.cpp pairjump.h site.h
 clean:
 	rm -rf *o
 	rm mcdif_*
+
+
+#debug mode: https://stackoverflow.com/questions/3718998/fixing-segmentation-faults-in-c
+# http://valgrind.org/docs/manual/quick-start.html#quick-start.intro
+# http://www.gnu.org/software/gdb/documentation/
+# 
