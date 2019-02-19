@@ -15,6 +15,5 @@ Simulation_area:/</
 Boundary_conditions:?energy_atoms?/<0/=0/0<vec_transition
 10 10 10 10 10 10
 Build_starting_structure:ile?yes?no/st_end_from/
-2 0
-left.in 10 0 0 50 40 40 0 0 0 0
-right.in 50 0 0 90 40 40 0 0 0 0
+1 0
+input.in 0 0 0 10 10 10 0 0 0 0

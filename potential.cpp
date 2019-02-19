@@ -163,12 +163,12 @@ void potential :: init_ising(std::ifstream &energy_file, unsigned int size_V, un
 								//cout<<"Promien oddzialywania: "<<r1<<" "<<r2<<endl																	//int o;//cin>>o;
 			}else{
 				energy_file>>i>>j>>pot;
-					if(V[ls][i][j]!=0.0){
-						control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
-						control_output<<i<<" "<<j<<" "<<pot<<endl;exit(1);}
 					if( (i >= size_V) or (j >= size_V)){
 						control_output<<"You have more interactions in energy.in than declared types in structure.in"<<endl;
 						control_output<<i<<" "<<j<<" "<<pot<<endl;exit(0);}
+					if(V[ls][i][j]!=0.0){
+						control_output<<"WARRNING:You try overwritte energy in energy.in file!"<<endl;
+						control_output<<i<<" "<<j<<" "<<pot<<endl;exit(1);}
 					if(rmin.size() != (ls+1) ) {
 						control_output<<"You have declared more coordination zones than interactions in energy.in"<<endl;
 						control_output<<"rmin.size()"<<" "<<"zone no."<<" "<<"rmin.back()"<<" "<<"rmax.back()"<<endl;

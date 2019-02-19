@@ -187,7 +187,7 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 	if(faked_atoms){max_type--;}
 	for(unsigned int tt=0; tt<atoms_type.size();tt++){
 		if(atoms_type[tt] >= max_type ){
-			control_output<<"Error: Bad atoms types: "<<atoms_type[tt]<<" "<<max_type<<endl;
+			control_output<<"Error: Bad atoms types: atom"<<atoms_type[tt]<<" max_type: "<<max_type<<endl;
 			control_output<<"Atoms types must be lower than the size of types due to the faster savings: results[atom]"<<endl;
 			control_output<<"When faked_atoms = true then we reserve the last atom index in types for it."<<endl;exit(1);
 		}
@@ -409,7 +409,7 @@ void lattice :: add_atom_type(int new_atom, string new_name){
 		if(old_atom == new_atom){	// check if type is already added
 			add_new_type = 0;
 			if((old_name != new_name)){  // check if not fault in atoms/spins/names
-				control_output<<"ERROR in add at. new typ: "<<new_atom<<" "<<new_name<<endl;
+				control_output<<"WARRNING in add at. new typ: "<<new_atom<<" "<<new_name<<endl;
 				control_output<<"atoms in cells duplicated and ignored"<<endl;;
 			}
 		}
@@ -807,7 +807,8 @@ void lattice::sim_atoms_list_init()
 
 				//	control_output<<"wskaznik "<<wsk_site<<endl;
 					if(check_site_belonging_to_sim_area(wsk_site)){
-						int atom = wsk_site->get_atom();
+						int atom = -3;
+						atom = wsk_site->get_atom();
 
 					//	control_output<<"Atom in sim: "<<atom<<endl;
 
@@ -977,7 +978,8 @@ bool lattice :: check_site_belonging_to_region(site *A){
 }
 
 bool lattice :: check_site_belonging_to_sim_area(site *A){
-	int atom=A->get_atom();
+	int atom = -3;
+	atom = A->get_atom();
 	if(atom >= 0){
 	double x = (A->get_x());											//control_output<<" "<<x<<" "<<y<<" "<<z<<endl;
 	double y = (A->get_y());											//	control_output<<st_sim_area.x<<" "<<end_sim_area.x<<endl;
@@ -2688,6 +2690,9 @@ void lattice::read_structure(string file_name,wektor start,wektor end,wektor set
 
 	long n =0;
 	ifstream file_structure(file_name.c_str(),ios :: in);
+	if(file_structure.fail()){
+		control_output<<"ERROR: File "<<file_name<<" not exist"<<endl;exit(1);}
+
 	string atom;
 	double X,dx=0.0;
 	double Y,dy=0.0;
@@ -3478,9 +3483,9 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 
 	string name_of_file = file + ".dat";
 	ofstream out_data(name_of_file.c_str(),ios :: app);
-	unsigned int size = atoms_type.size();
+	unsigned int size = get_atom_typ_numbers();
 	vector <vector<long > > results(size,vector <long> (sublattice,0));
-	vector <vector<long > > results_global(size,vector <long> (sublattice,0));
+	vector <vector<long > > results_global(atoms_type.size(),vector <long> (sublattice,0));
 	int MAX_THREADS = omp_get_max_threads();
 	int LOCAL_THREADS = int(MAX_THREADS/2);
 //	omp_set_dynamic(1);
@@ -3521,7 +3526,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 		name_of_file= file + "_global.dat";
 		ofstream out_data(name_of_file.c_str(),ios :: app);
 		out_data<<" "<<Step<<" "<<Time;
-		for(unsigned int i=0;i<size;i++){
+		for(unsigned int i=0;i<atoms_type.size();i++){
 			for(unsigned int j=0;j<sublattice;j++){
 				out_data<<" "<<results_global[i][j];
 		}}
