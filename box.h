@@ -63,43 +63,38 @@ class box
 	//	control_output<<"clear sity_size "<<sity.size()<<endl;
 		}
 	
-	void put_site(site &Site)
-	{
+	void put_site(site &Site){
 	//	control_output<<"Dodalem sita bdfb do boxa "<<sity.size()<<endl;
 	//	cout<<"Adres boxu: "<<this<<", tablicy sitow w boxie: "<<&sity<<" pojemonosc tablicy przed: "<<sity.capacity()<<endl;
 	//	cout<<" Adres dodawanego sita w put_site: "<<&Site<<endl;
 		int add =1;  
 	//	int addd=0;
-		vector <site> ::iterator I; 
+	//	vector <site> ::iterator I; 
 		
-		if(sity.size()==0)
-		{sity.push_back(Site);}
-		else
-		{
-		
-		//for(int j=0;j<sity.size();j++)
-		
-		for(I=sity.begin();I!=sity.end();I++)
-		{
+		if(sity.size()==0){
+			sity.push_back(Site);}
+		else{
+		//for(I=sity.begin();I!=sity.end();I++)
+		for(unsigned int j=0; j<sity.size(); j++){
 		//	control_output<<"W for"<<endl;
 			//sity[j]
-			if ( site(*I) == site(Site) )
-			{
+			//if ( site(*I) == site(Site) )
+			if ( sity[j] == Site ){
 				//control_output<<"replace:"<<endl;
-				
 				//for(int i=0;i<sity.size();i++)
 				//{
-				//	sity[i].show_site();
+				//sity[i].show_site();
+				sity[j] = Site;
 				//}
-				
-				sity.erase(I);
+				//*I = Site;
+//				sity.erase(I);
 				//sity.erase(sity.begin()+j);
 				//control_output<<"errase:"<<endl;
 				//for(int i=0;i<sity.size();i++)
 				//{
 				//	sity[i].show_site();
 				//}
-				sity.push_back(Site);
+//				sity.push_back(Site);
 				//control_output<<"adding:"<<endl;
 				//for(int i=0;i<sity.size();i++)
 				//{

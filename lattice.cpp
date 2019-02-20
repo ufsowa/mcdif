@@ -2848,7 +2848,6 @@ double lattice :: move(double x2, double x1, int dir)
 
 
 void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wektor make_pic_vec_ed, string name_of_file){
-	control_output<<"makepic START1"<<endl;
 	stringstream total(name_of_file);
 	int all=0,sum=1;
 
@@ -2889,12 +2888,9 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 
 	stringstream s;
 	string name;
-	control_output<<"makepic START2: "<<s<<" "<<name<<" "<<sum<<endl;
 	s<<(sum);
-	control_output<<"makepic START3"<<endl;
 	name=s.str()+"pic.xyz";
 	ofstream file(name.c_str());
-	control_output<<"makepic START4"<<endl;
 	file<<"          "<<endl;
 	file<<endl;
 	file<<endl;
@@ -2903,7 +2899,6 @@ void lattice :: makepic(long step,long step_break, wektor make_pic_vec_st, wekto
 	//Nz=Nz-1;
 	long atoms=0;
 	//vector <site> :: iterator K;
-	control_output<<"makepic START5"<<endl;
 	for(unsigned int K=0;K<atom_list.size();K++)
 	{
 		//K->show_site();
@@ -2930,7 +2925,6 @@ file.seekp(0);
 file<<atoms<<endl;
 file.close();
 }
-	control_output<<"makepic END"<<endl;
 }
 
 /*-------------------------------------------------------------------*/
@@ -3353,8 +3347,6 @@ void lattice :: save_hist_dR(string file_name, int direction, double Time, doubl
 }
 
 double lattice :: calc_energy(){
-	control_output<<"STARTCALE "<<endl;
-
 	double totE=0.0;
 //	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
@@ -3377,14 +3369,10 @@ double lattice :: calc_energy(){
 	}
 //	omp_set_dynamic(0);
 //	control_output<<"tot thread "<<totE<<endl;
-	control_output<<"ENDCALE "<<totE<<endl;
-
 	return (totE/2.0);
 }
 
 double lattice :: calc_energy_global(){
-	control_output<<"STARTCALEGLOBAL"<<endl;
-
 	double totE=0.0;
 //	omp_set_dynamic(1);
 	int MAX_THREADS = omp_get_max_threads();
@@ -3407,8 +3395,6 @@ double lattice :: calc_energy_global(){
 	}
 //	omp_set_dynamic(0);
 //	control_output<<"tot thread "<<totE<<endl;
-	control_output<<"ENDCALEGLOBAL "<<totE<<endl;
-
 	return (totE/2.0);
 }
 
@@ -3497,7 +3483,7 @@ void lattice :: save_Natoms(double Time, double Step, string name, int setON)
 //		if(omp_get_thread_num()==0){control_output<<"Threat numbers in N: "<<omp_get_num_threads()<<endl;}
 		#pragma omp for schedule(runtime)
 		for(unsigned int i=0;i<atom_list.size();i++){
-			int atom=atom_list[i]->get_atom("saveN");
+			int atom=atom_list[i]->get_atom();
 			int podsiec=atom_list[i]->get_sub_latt();
 			#pragma omp critical(collectN)
 			{

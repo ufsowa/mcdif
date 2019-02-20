@@ -414,7 +414,7 @@ double potential :: get_energy(site *atom){
 //	control_output<<"get_energy(site)"<<endl;
 	double Vsite=0.0;
 //	int zone=0;
-	int A=atom->get_atom("get_energy A"); //typ atomu
+	int A=atom->get_atom(); //typ atomu
 //	atom->show_site();
 //	atom->show_neigh(0);
 //	int o;
@@ -433,7 +433,7 @@ double potential :: get_energy(site *atom){
 	//	}
 		//licz energie konfiguracji
 		for(unsigned int i=0;i < neigh.size();i++){
-			int B = neigh[i]->get_atom("get_energy B");
+			int B = neigh[i]->get_atom();
 			//atom->show_site();
 			//neigh[i]->show_site();
 			//zone=check_coordination_zone(atom, neigh[i]);

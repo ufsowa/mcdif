@@ -1698,7 +1698,7 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 		string name="";
 		name=savings[i].get_name();
 		if(name=="make_pic"){
-				control_output<<"SAVING: "<<name<<endl;
+				//control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=7){control_output<<"Wrong parameter list in conf.in -> make_pic: 7"<<endl;exit(1);}
@@ -1707,7 +1707,7 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 	    		wektor make_pic_vec_st(parameters[1],parameters[2],parameters[3]);
 	    		wektor make_pic_vec(parameters[4],parameters[5],parameters[6]);	
 				sample->makepic(b,step_make,make_pic_vec_st,make_pic_vec, output);
-				control_output<<"ENDSAVING: "<<name<<endl;
+				//control_output<<"ENDSAVING: "<<name<<endl;
 
 			}
 			else if(name=="pic_stech")
@@ -1736,34 +1736,34 @@ int save_results(lattice *sample, vector <task> &savings, string output, double 
 			}
 			else if(name=="Energy")
 			{	
-				control_output<<"SAVING: "<<name<<endl;
+				//control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> Energy: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_energy(a,b,output,global_on);
-				control_output<<"ENDSAVING: "<<name<<endl;
+				//control_output<<"ENDSAVING: "<<name<<endl;
 
 			}
 			else if(name=="Natoms")
 			{
-				control_output<<"SAVING: "<<name<<endl;
+				//control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> Natoms: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_Natoms(a,b,output,global_on);
-				control_output<<"ENDSAVING: "<<name<<endl;
+				//control_output<<"ENDSAVING: "<<name<<endl;
 			}
 			else if(name=="NandE")
 			{
-				control_output<<"SAVING: "<<name<<endl;
+				//control_output<<"SAVING: "<<name<<endl;
 				vector <double> parameters;
 				savings[i].get_parameters(parameters);
 				if(parameters.size()!=1){control_output<<"Wrong parameter list in conf.in -> EandE: 1"<<endl;exit(1);}
 				int global_on = parameters[0];
 				sample->save_NandE(a,b,output,global_on);
-				control_output<<"ENDSAVING: "<<name<<endl;
+				//control_output<<"ENDSAVING: "<<name<<endl;
 			}
 			else if(name=="SRO")
 			{
@@ -1935,23 +1935,21 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 		ifstream chem("chem.in",ios :: in);	//lista potencjalow
 		vector <vector <double> > chem_list;
 		
-		if( chem.good() )
-		{
+		if( chem.good() ){
         std::string napis;
-     //   std::cout << "\nZawartosc pliku:" << std::endl;
-        while( !chem.eof() )
-        {
+     	//control_output << "\nZawartosc pliku:" <<endl;
+        while( !chem.eof() ){
             getline( chem, napis );
-            //control_output<<"String Line: "<< napis << std::endl;
+            //control_output<<"String Line: "<< napis <<endl;
             double data;
        		vector <double> line;
 			istringstream string_line(napis);
 //			int line_count=0;
 			while(string_line>>data)
 			{
-		//		cout<<typeid(data).name()<<" "<<data<<endl;
+				//control_output<<typeid(data).name()<<" "<<data<<endl;
 				line.push_back(data);
-		//		cout<<line.size()<<endl;
+				//control_output<<line.size()<<endl;
 			}
 			chem_list.push_back(line);
         }
@@ -1960,12 +1958,12 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 		} else {control_output<< "Error! Nie udalo otworzyc sie pliku chem.in!" << std::endl;
 		exit(0);
 		}
-		for(unsigned int i=0; i<chem_list.size();i++)
-		{	//cout<<chem_list[i].size()<<endl;
+		for(unsigned int i=0; i<chem_list.size();i++){
+			//control_output<<chem_list[i].size()<<endl;
 			if((chem_list[i].size() +1) != sample->get_atom_typ_numbers())	// +1 poniewaz wakancja
 			{
 				control_output<<"ERROR: execute_task: SGCMC in reading chem.in file. ";
-				control_output<<"Number of types different than declared in structure.dat file"<<endl;
+				control_output<<"Number of types different than declared in structure.dat file or file is corrupted"<<endl;
 				control_output<<"chem: "<<(chem_list[i].size()+1)<<" structure: "<<sample->get_atom_typ_numbers()<<endl;
 				exit(0);
 			}
@@ -1979,7 +1977,7 @@ int execute_task(task &comenda, vector <task> &savings, lattice *sample)
 			pot_chem.clear();
 			pot_chem.reserve(5);
 			pot_chem.push_back(0.0);
-			
+
 			stringstream s;
 			string file_name="";
 
