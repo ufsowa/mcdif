@@ -1,5 +1,5 @@
 Method: 1
-SGCMC 3 1000 20000 1000
+SGCMC 3 1000 20000 1600
 Save: 2
 NandE 1 1
 make_pic 7 100 0 0 0 50 50 50
@@ -13,7 +13,7 @@ Region_area:/</
 Simulation_area:/</
 0 0 0 50 50 50
 Boundary_conditions:?energy_atoms?/<0/=0/0<vec_transition
-50 50 50 50 50 50
+0 50 50 0 50 50
 Build_starting_structure:ile?yes?no/st_end_from/
 1 0
 input.in 0 0 0 50 50 50 0 0 0 0
