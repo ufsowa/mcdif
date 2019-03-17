@@ -16,6 +16,8 @@ To compile:
 make clean
 make
 
+Windows executable can be build with cygwin. Latest builds available in bin.
+
 To run:
 ./mcdif_{version} conf.in
 
