@@ -273,7 +273,7 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 	//}
 	long Nsize=sample->get_sim_atom_number();//sample->get_size();
 	int Ntyp = sample->get_atom_typ_numbers();
-	//cout<<"atoms: "<<Nsize<<" types: "<<Ntyp<<endl;
+	//control_output<<"atoms: "<<Nsize<<" types: "<<Ntyp<<endl;
 	
 	for(long m=0;m<number_of_steps;m++)
 	{
@@ -291,6 +291,9 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 		int typ=(int)(rnd()*Ntyp);
 		int new_typ=0;
 		new_typ=sample->get_atom_type(typ);
+		if(new_typ != typ){control_output<<"SGCMC: Fail in get_atom_typ"<<new_typ<<" "<<"typ"<<endl;exit(0);}
+		if(new_typ < 0){control_output<<"SGCMC: get_atom_typ return typ < 0"<<new_typ<<" "<<"typ"<<endl;exit(0);}
+
 		//cout<<typ<<" "<<rnd_typ<<" ";
 		if(new_typ != old_typ)					//warunek wyklucza podstawienie identyczne
 		{
@@ -315,15 +318,15 @@ void sgcmc(lattice *sample,long number_of_steps,double T, vector <double> &chem)
 			double new_chem=chem[new_typ];
 			double mi=new_chem-old_chem;
 			
-			//cout<<"Zamiana: "<<old_typ<<" "<<new_typ<<endl;
-			//cout<<old_chem<<" - "<<new_chem<<" = "<<mi<<endl;
-
 //licz prawdopodobienstwo: exp(-dE/kT) -> dE=E2-E1 -> E = U-u
 		    double P1=exp(beta*(mi-(new_E-old_E)));
-
+			double R1 = rnd();
+			//control_output<<m<<" "<<new_typ<<" "<<old_typ<<" ";
+			//control_output<<new_chem<<" - "<<old_chem<<" = "<<mi<<" "<<P1<<" <? "<<R1<<" ";
+			//control_output<<rnd_site->get_x()<<" "<<rnd_site->get_y()<<" "<<rnd_site->get_z()<<" "<<rnd_site->get_atom()<<endl;
+		
 		//zmien z powrotem na old_typ jesli zdarzenie to nie zostalo trafione rnd()
-			if(P1<rnd())
-			{
+			if(P1<R1){
 			rnd_site->set_atom(old_typ);
 			}
 		

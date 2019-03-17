@@ -82,6 +82,12 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		unit_cell>>x_right_border>>y_right_border>>z_right_border;
 		unit_cell>>x_translation>>y_translation>>z_translation;
 
+		if(text != "sample:"){
+			{control_output<<"ERROR: Wrong number of structures defined in structure.in"<<endl;
+			 control_output<<text<<" != sample:"<<endl;
+				exit(1);}
+		}
+
 		control_output<<"structure size: Lbord/Rbord/trans"<<endl;
 		control_output<<x_left_border<<" "<<x_right_border<<" "<<x_translation<<endl;
 		control_output<<y_left_border<<" "<<y_right_border<<" "<<y_translation<<endl;
@@ -106,12 +112,19 @@ lattice :: lattice(int _xsize,int _ysize,int _zsize ){
 		//cin>>o;	//liczba atom w tej komorce do wczytania
 		unit_cell>>text>>nr_atoms;
 		control_output<<"atoms in unit cell: "<<nr_atoms<<endl;
-		//cin>>o;//	cout<<"LATTICE"<<endl;//	matrix[2][2][2].show_site();
+		if(text != "atoms:"){
+			{control_output<<"ERROR: Missing atoms in structure.in"<<endl;}
+			 control_output<<text<<" != atoms:"<<endl; exit(1);
+		}
 
 		vector <site> atoms_incell;
 		atoms_incell.reserve(10);
 		atoms_incell.clear();
 		unit_cell>>text;
+		if(text != "positions:"){
+			{control_output<<"ERROR: Missing positions in structure.in"<<endl;}
+			 control_output<<text<<" != positions:"<<endl; exit(1);
+		}
 
 		//wczytuje uzyte atomy komorki do tablicy
 		for (int i=0;i<nr_atoms;i++){
@@ -409,8 +422,8 @@ void lattice :: add_atom_type(int new_atom, string new_name){
 		if(old_atom == new_atom){	// check if type is already added
 			add_new_type = 0;
 			if((old_name != new_name)){  // check if not fault in atoms/spins/names
-				control_output<<"WARRNING in add at. new typ: "<<new_atom<<" "<<new_name<<endl;
-				control_output<<"atoms in cells duplicated and ignored"<<endl;;
+				control_output<<"ERROR in add at. new typ: "<<new_atom<<" | "<<new_name<<endl;
+				control_output<<"atoms in cells duplicated and ignored"<<endl;exit(0);
 			}
 		}
 	}
