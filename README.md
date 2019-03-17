@@ -32,3 +32,10 @@ Output:
 *.xyz
 control_output.dat - log file 
 
+See examples for usage.
+
+Recommended softwares:
+gnuplot for plotting
+http://www.gnuplot.info/
+rasmol for 3D view
+http://www.rasmol.org/software/RasMol_Latest_Manual.html
