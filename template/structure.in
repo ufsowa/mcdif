@@ -1,30 +1,23 @@
 structures:
-4
-fill_vect/</st-end-trans
-0 0 0 50 50 50 2 2 2
+3
+sample:
+0 0 0 8 10 10 2 2 2
 atoms:
 2
-atom_position:/x,y,z,typ,name,sublatice/
+positions:
 0 0 0 1 Ni 0
 1 1 1 2 Al 1
-fill_vect/</st-end-trans
-18 18 18 24 24 24 2 2 2
+sample:
+4 4 4 6 6 6 2 2 2
 atoms:
 2
-atom_position:/x,y,z,typ,name,sublatice/
+positions:
 0 0 0 0 Ze 0
 1 1 1 0 Ze 1
-fill_vect/</st-end-trans
-0 0 0 4 50 50 2 2 2
+sample:
+8 0 0 10 10 10 2 2 2
 atoms:
 2
-atom_position:/x,y,z,typ,name,sublatice/
-0 0 0 0 Ze 0
-1 1 1 0 Ze 1
-fill_vect/</st-end-trans
-46 0 0 50 50 50 2 2 2
-atoms:
-2
-atom_position:/x,y,z,typ,name,sublatice/
-0 0 0 0 Ze 0
-1 1 1 0 Ze 1
+positions:
+0 0 0 1 Ni 0
+1 1 1 2 Al 1
