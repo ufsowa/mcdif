@@ -1,0 +1,98 @@
+#!rasmol -script
+# File: VIEW.RSML
+# Creator: RasMol Version 2.7.5.2
+
+zap
+load xyz "0PIC.XYZ"
+background [0,0,0]
+set ambient 40
+set specular on
+set specpower 8
+
+reset
+slab off
+rotate x 113
+rotate y 49
+rotate z -15
+
+colour axes [255,255,255]
+set axes on
+set boundingbox on
+set unitcell off
+set bondmode and
+dots off
+
+
+# Avoid Colour Problems!
+select all
+colour bonds none
+colour backbone none
+colour hbonds none
+colour ssbonds none
+colour ribbons none
+colour white
+
+# Atoms
+colour atoms cpk
+spacefill 150
+set shadow off
+
+# Bonds
+wireframe off
+
+# Ribbons
+ribbons off
+
+# Backbone
+backbone off
+
+# Labels
+labels off
+
+# Monitors
+monitors off
+
+ssbonds off
+hbonds off
+
+echo "Press any key to continue"
+pause
+
+zap
+load xyz "100PIC.XYZ"
+rotate x 113
+rotate y 49
+rotate z -15
+
+colour axes [255,255,255]
+set axes on
+set boundingbox on
+# Atoms
+colour atoms cpk
+spacefill 150
+set shadow off
+
+# Bonds
+wireframe off
+
+echo "Press any key to continue"
+pause
+
+zap
+echo "1000PIC.XYZ"
+load xyz "1000PIC.XYZ"
+rotate x 113
+rotate y 49
+rotate z -15
+
+colour axes [255,255,255]
+set axes on
+set boundingbox on
+# Atoms
+colour atoms cpk
+spacefill 150
+set shadow off
+
+# Bonds
+wireframe off
+pause
