@@ -2,8 +2,8 @@ This file contains description of MonteCarlo simulation.
 
 ################
 The Iron Platinum (FePt) alloy modelled is within simple Ising Hamiltonian approach.
-Energy model assumes interraction within two coordination zones.
-Simulation uses direct exchange alghoritm in canonical ensamble.
+Energy model assumes interaction within two coordination zones.
+Simulation uses Direct Exchange alghoritm in Canonical ensemble.
 
 ################
 Data to be collected are: 
