@@ -1,12 +1,17 @@
 This file contains description of MonteCarlo simulation.
 
 ################
-The Iron Platinum (FePt) alloy modelled is within simple Ising Hamiltonian approach.
-Energy model assumes interaction within two coordination zones.
-Simulation uses Direct Exchange alghoritm in Canonical ensemble.
+Simulated is reorientation phenoemena in FePt nanolayers
+Publication: 
 
 ################
-Data to be collected are: 
+The Iron Platinum (FePt) alloy modelled is within simple Ising Hamiltonian approach.
+Energy model assumes interraction within two coordination zones.
+Simulation uses direct exchange alghoritm in canonical ensamble.
+Surface is introduced be removing Periodic Boundary Condition in Z direction.
+
+################
+Data to be collected are:
 Internal energy of the system (dirE.dat)
 Number of atoms (dirN.dat)
 Snapshots of the structure (*pic.xyz)

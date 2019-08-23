@@ -1,0 +1,22 @@
+Method: 1
+RESIDENT 4 2000 500 10000 1400
+Save: 3
+NandE 1 0
+Rd2 0
+make_pic 7 100 0 0 0 50 50 50
+Options: 0
+Memory_Size:
+25 25 25
+Atomic_zone:
+1.39 2.1 1.5 1.5 1.5
+Region_area:
+0 0 0 50 50 50
+Simulation_area:
+0 0 0 50 50 50
+Boundary_conditions:
+50 50 50 50 50 50
+Build_starting_structure:
+1 1
+input.in 0 0 0 50 50 50 0 0 0 0
+
+

@@ -1,0 +1,21 @@
+Method: 1
+SGCMC 3 1000 2000 1400
+Save: 2
+NandE 1 0
+make_pic 7 100 0 0 0 40 40 40
+Options: 0
+Memory_Size:
+20 20 20
+Atomic_zone:
+1.39 2.1 1.5 1.5 1.5
+Region_area:
+0 0 0 40 40 40
+Simulation_area:
+0 0 0 40 40 40
+Boundary_conditions:
+40 40 40 40 40 40
+Build_starting_structure:
+1 0
+input.in 0 0 0 30 30 30 0 0 0 0
+
+

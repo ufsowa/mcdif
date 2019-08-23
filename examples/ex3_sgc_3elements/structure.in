@@ -1,0 +1,17 @@
+structures:
+2
+sample:
+0 0 0 2 2 2 2 2 2
+atoms:
+2
+positions:
+0 0 0 0 Ze 0
+1 1 1 0 Ze 1
+sample:
+0 0 0 40 40 40 2 2 2
+atoms:
+2
+positions:
+0 0 0 1 Ni 0
+1 1 1 2 Al 1
+
