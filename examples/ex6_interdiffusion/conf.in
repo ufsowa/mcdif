@@ -1,8 +1,9 @@
 Method: 1
 RESIDENT 4 2000 1000 10000 1400
-Save: 3
+Save: 4
 NandE 1 0
 Rd2 1 0
+HIST 4 0 50 1 1
 make_pic 7 100 0 0 0 50 50 50
 Options: 0
 Memory_Size:
