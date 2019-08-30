@@ -1,0 +1,25 @@
+Method: 1
+RESIDENT 4 2000 100 10000 1400
+Save: 3
+NandE 1 1
+HIST 4 0 50 1 1
+make_pic 7 100 0 0 0 50 50 50
+Options: 3
+EQUILIBRATE 6 2 50 12 38 2 1
+RESERVUAR 5 8 4 1 1 50
+RESERVUAR 5 38 4 1 1 50
+Memory_Size:
+25 25 25
+Atomic_zone:
+1.39 2.1 1.5 1.5 1.5
+Region_area:
+0 0 0 50 50 50
+Simulation_area:
+12 0 0 38 50 50
+Boundary_conditions:
+0 50 50 0 50 50
+Build_starting_structure:
+2 1
+left.in 10 0 0 26 50 50 0 0 0 0
+right.in 26 0 0 40 50 50 0 0 0 0
+

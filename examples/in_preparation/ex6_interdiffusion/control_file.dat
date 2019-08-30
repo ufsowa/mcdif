@@ -1,0 +1,699 @@
+conf.in
+Reading METHODS...
+RESIDENT par: 2000 100 10000 1400 
+Reading SAVINGS...
+NandE par: 1 
+HIST par: 0 50 1 1 
+make_pic par: 100 0 0 0 50 50 50 
+Reading OPTIONS...
+EQUILIBRATE par: 2 50 12 38 2 1 
+RESERVUAR par: 8 4 1 1 50 
+RESERVUAR par: 38 4 1 1 50 
+Reading PARAMETERS...
+Memory reserved for: 25 25 25
+Interacione wector: 
+1.5 1.5 1.5
+Sample region:
+0 0 0
+50 50 50
+simulation area:
+12 0 0
+38 50 50
+boundary conditions for energy and atom: 0 - non | 1 - nn | normal
+0 50 50
+0 50 50
+Bazowe struktury: 2
+left.in
+st_vec: 10 0 0
+end_vec: 26 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+right.in
+st_vec: 26 0 0
+end_vec: 40 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+Buduje matrix sitow
+unit_cell reading from structure.in...
+All conditions are taken with '/<' not '<=' 
+structure size: Lbord/Rbord/trans
+0 50 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 0 Fe 0 || 
+latt/typ:0/0 |sublatt_typ size 1 nr_sublattice 1
+size: |typ 1 |name: 1
+1 1 1 0 Fe 1 || 
+latt/typ:1/0 |sublatt_typ size 2 nr_sublattice 2
+size: |typ 1 |name: 1
+atoms in cell: 2
+structure 0 readed ok
+structure size: Lbord/Rbord/trans
+10 26 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 1 Ni 0 || 
+latt/typ:0/1 |sublatt_typ size 3 nr_sublattice 2
+size: |typ 2 |name: 2
+1 1 1 1 Ni 1 || 
+latt/typ:1/1 |sublatt_typ size 4 nr_sublattice 2
+size: |typ 2 |name: 2
+atoms in cell: 2
+structure 1 readed ok
+structure size: Lbord/Rbord/trans
+26 40 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 2 Al 0 || 
+latt/typ:0/2 |sublatt_typ size 5 nr_sublattice 2
+size: |typ 3 |name: 3
+1 1 1 2 Al 1 || 
+latt/typ:1/2 |sublatt_typ size 6 nr_sublattice 2
+size: |typ 3 |name: 3
+atoms in cell: 2
+structure 2 readed ok
+Initialize boundary conditions... 
+Boundary conditions initialized 
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Build sample...
+Clean sample...
+czytam sobie left.in
+31250
+st 5 0 0
+end 13 25 25
+Total readed: 10000
+Clean sample...
+czytam sobie right.in
+31250
+st 13 0 0
+end 20 25 25
+Total readed: 8750
+Zbudowano!
+atom list init..
+Atoms list - ok: 31250
+sim atom list init..
+Atoms list - ok: 16250
+Initialize potentials...
+energy_file reading from energy.in...
+Used energy model: Ising
+Zapisane odziaływania: rmin 1.6 rmax 1.8
+Zapisane odziaływania: rmin 1.9 rmax 2.1
+V^(k)_ij 0 0 0 0
+V^(k)_ij 0 1 0 0
+V^(k)_ij 0 2 0 0
+V^(k)_ij 0 0 1 0
+V^(k)_ij 0 1 1 -0.11
+V^(k)_ij 0 2 1 -0.11
+V^(k)_ij 0 0 2 0
+V^(k)_ij 0 1 2 -0.11
+V^(k)_ij 0 2 2 -0.11
+V^(k)_ij 1 0 0 0
+V^(k)_ij 1 1 0 0
+V^(k)_ij 1 2 0 0
+V^(k)_ij 1 0 1 0
+V^(k)_ij 1 1 1 0
+V^(k)_ij 1 2 1 0
+V^(k)_ij 1 0 2 0
+V^(k)_ij 1 1 2 0
+V^(k)_ij 1 2 2 0
+Ising potentials initialized-> 3 2 save_bar set: 3
+3 2 2
+0 0 0 0 0 0
+0 0 1 0 0 0
+2
+0 1 0 0 0 0
+0 1 1 0 0 0
+2 2
+1 0 0 0 0 0
+1 0 1 0 0 0
+2
+1 1 0 0 0 0
+1 1 1 0 0 0
+2 2
+2 0 0 0 0 0
+2 0 1 0 0 0
+2
+2 1 0 0 0 0
+2 1 1 0 0 0
+Initialized jump zone: with coordination zones: 0 9 13 14 
+Initiated interaction zone with coordination zones: 0 4 5 8 6 
+Actual options: 3
+EQUILIBRATE par: 2 50 12 38 2 1 
+Init equilibrations...
+do init_calc in blok: 0 0 12.000000 14.000000 V: 11.000000 A: 1239.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 1 1 14.000000 16.000000 V: 12.000000 A: 1238.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 2 2 16.000000 18.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 3 3 18.000000 20.000000 V: 20.000000 A: 1230.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 4 4 20.000000 22.000000 V: 18.000000 A: 1232.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 5 5 22.000000 24.000000 V: 10.000000 A: 1240.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 6 6 24.000000 26.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 7 7 26.000000 28.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 8 8 28.000000 30.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 9 9 30.000000 32.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 10 10 32.000000 34.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 11 11 34.000000 36.000000 V: 13.000000 A: 0.000000 B: 1237.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 12 12 36.000000 38.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 8.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 0 8.000000 12.000000 V: 1257.000000 A: 1243.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 38.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 1 38.000000 42.000000 V: 1261.000000 A: 0.000000 B: 1239.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Save init...
+do init_calc in hist: 0 0 0.000000 1.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 1 1 1.000000 2.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 2 2 2.000000 3.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 3 3 3.000000 4.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 4 4 4.000000 5.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 5 5 5.000000 6.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 6 6 6.000000 7.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 7 7 7.000000 8.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 8 8 8.000000 9.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 9 9 9.000000 10.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 10 10 10.000000 11.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 11 11 11.000000 12.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 12 12 12.000000 13.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 13 13 13.000000 14.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 14 14 14.000000 15.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 15 15 15.000000 16.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 16 16 16.000000 17.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 17 17 17.000000 18.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 18 18 18.000000 19.000000 V: 12.000000 A: 613.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 19 19 19.000000 20.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 20 20 20.000000 21.000000 V: 11.000000 A: 614.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 21 21 21.000000 22.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 22 22 22.000000 23.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 23 23 23.000000 24.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 24 24 24.000000 25.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 25 25 25.000000 26.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 26 26 26.000000 27.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 27 27 27.000000 28.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 28 28 28.000000 29.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 29 29 29.000000 30.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 30 30 30.000000 31.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 31 31 31.000000 32.000000 V: 9.000000 A: 0.000000 B: 616.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 32 32 32.000000 33.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 33 33 33.000000 34.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 34 34 34.000000 35.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 35 35 35.000000 36.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 36 36 36.000000 37.000000 V: 2.000000 A: 0.000000 B: 623.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 37 37 37.000000 38.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 38 38 38.000000 39.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 39 39 39.000000 40.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 40 40 40.000000 41.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 41 41 41.000000 42.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 42 42 42.000000 43.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 43 43 43.000000 44.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 44 44 44.000000 45.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 45 45 45.000000 46.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 46 46 46.000000 47.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 47 47 47.000000 48.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 48 48 48.000000 49.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 49 49 49.000000 50.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Starting schedule
+ Execute: RESIDENT par: 2000.000000 100.000000 10000.000000 1400.000000 
+Barriers initialized ...
+i 0j 0: 1000.000000
+i 0j 1: 1000.000000
+i 1j 0: 0.204000
+i 1j 1: 1000.000000
+i 2j 0: 0.402000
+i 2j 1: 1000.000000
+set atom list typ/size: 0 / 167
+set event list Vsize/EVENTS/po: 167 / 0 / 2253
+Warrning! EVENTS changed after init from:0 to: 2253 167 in step: 0
+conf.in
+Reading METHODS...
+RESIDENT par: 2000 100 10000 1400 
+Reading SAVINGS...
+NandE par: 1 
+HIST par: 0 50 1 1 
+make_pic par: 100 0 0 0 50 50 50 
+Reading OPTIONS...
+EQUILIBRATE par: 2 50 12 38 2 1 
+RESERVUAR par: 8 4 1 1 50 
+RESERVUAR par: 38 4 1 1 50 
+Reading PARAMETERS...
+Memory reserved for: 25 25 25
+Interacione wector: 
+1.5 1.5 1.5
+Sample region:
+0 0 0
+50 50 50
+simulation area:
+12 0 0
+38 50 50
+boundary conditions for energy and atom: 0 - non | 1 - nn | normal
+0 50 50
+0 50 50
+Bazowe struktury: 2
+left.in
+st_vec: 10 0 0
+end_vec: 26 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+right.in
+st_vec: 26 0 0
+end_vec: 40 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+Buduje matrix sitow
+unit_cell reading from structure.in...
+All conditions are taken with '/<' not '<=' 
+structure size: Lbord/Rbord/trans
+0 50 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 0 Fe 0 || 
+latt/typ:0/0 |sublatt_typ size 1 nr_sublattice 1
+size: |typ 1 |name: 1
+1 1 1 0 Fe 1 || 
+latt/typ:1/0 |sublatt_typ size 2 nr_sublattice 2
+size: |typ 1 |name: 1
+atoms in cell: 2
+structure 0 readed ok
+structure size: Lbord/Rbord/trans
+10 26 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 1 Ni 0 || 
+latt/typ:0/1 |sublatt_typ size 3 nr_sublattice 2
+size: |typ 2 |name: 2
+1 1 1 1 Ni 1 || 
+latt/typ:1/1 |sublatt_typ size 4 nr_sublattice 2
+size: |typ 2 |name: 2
+atoms in cell: 2
+structure 1 readed ok
+structure size: Lbord/Rbord/trans
+26 40 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 2 Al 0 || 
+latt/typ:0/2 |sublatt_typ size 5 nr_sublattice 2
+size: |typ 3 |name: 3
+1 1 1 2 Al 1 || 
+latt/typ:1/2 |sublatt_typ size 6 nr_sublattice 2
+size: |typ 3 |name: 3
+atoms in cell: 2
+structure 2 readed ok
+Initialize boundary conditions... 
+Boundary conditions initialized 
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Build sample...
+Clean sample...
+czytam sobie left.in
+31250
+st 5 0 0
+end 13 25 25
+Total readed: 10000
+Clean sample...
+czytam sobie right.in
+31250
+st 13 0 0
+end 20 25 25
+Total readed: 8750
+Zbudowano!
+atom list init..
+Atoms list - ok: 31250
+sim atom list init..
+Atoms list - ok: 16250
+Initialize potentials...
+energy_file reading from energy.in...
+Used energy model: Ising
+Zapisane odziaływania: rmin 1.6 rmax 1.8
+Zapisane odziaływania: rmin 1.9 rmax 2.1
+V^(k)_ij 0 0 0 0
+V^(k)_ij 0 1 0 0
+V^(k)_ij 0 2 0 0
+V^(k)_ij 0 0 1 0
+V^(k)_ij 0 1 1 -0.11
+V^(k)_ij 0 2 1 -0.11
+V^(k)_ij 0 0 2 0
+V^(k)_ij 0 1 2 -0.11
+V^(k)_ij 0 2 2 -0.11
+V^(k)_ij 1 0 0 0
+V^(k)_ij 1 1 0 0
+V^(k)_ij 1 2 0 0
+V^(k)_ij 1 0 1 0
+V^(k)_ij 1 1 1 0
+V^(k)_ij 1 2 1 0
+V^(k)_ij 1 0 2 0
+V^(k)_ij 1 1 2 0
+V^(k)_ij 1 2 2 0
+Ising potentials initialized-> 3 2 save_bar set: 3
+3 2 2
+0 0 0 0 0 0
+0 0 1 0 0 0
+2
+0 1 0 0 0 0
+0 1 1 0 0 0
+2 2
+1 0 0 0 0 0
+1 0 1 0 0 0
+2
+1 1 0 0 0 0
+1 1 1 0 0 0
+2 2
+2 0 0 0 0 0
+2 0 1 0 0 0
+2
+2 1 0 0 0 0
+2 1 1 0 0 0
+Initialized jump zone: with coordination zones: 0 9 13 14 
+Initiated interaction zone with coordination zones: 0 4 5 8 6 
+Actual options: 3
+EQUILIBRATE par: 2 50 12 38 2 1 
+Init equilibrations...
+do init_calc in blok: 0 0 12.000000 14.000000 V: 11.000000 A: 1239.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 1 1 14.000000 16.000000 V: 12.000000 A: 1238.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 2 2 16.000000 18.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 3 3 18.000000 20.000000 V: 20.000000 A: 1230.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 4 4 20.000000 22.000000 V: 18.000000 A: 1232.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 5 5 22.000000 24.000000 V: 10.000000 A: 1240.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 6 6 24.000000 26.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 7 7 26.000000 28.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 8 8 28.000000 30.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 9 9 30.000000 32.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 10 10 32.000000 34.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 11 11 34.000000 36.000000 V: 13.000000 A: 0.000000 B: 1237.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 12 12 36.000000 38.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 8.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 0 8.000000 12.000000 V: 1257.000000 A: 1243.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 38.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 1 38.000000 42.000000 V: 1261.000000 A: 0.000000 B: 1239.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Save init...
+do init_calc in hist: 0 0 0.000000 1.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 1 1 1.000000 2.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 2 2 2.000000 3.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 3 3 3.000000 4.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 4 4 4.000000 5.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 5 5 5.000000 6.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 6 6 6.000000 7.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 7 7 7.000000 8.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 8 8 8.000000 9.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 9 9 9.000000 10.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 10 10 10.000000 11.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 11 11 11.000000 12.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 12 12 12.000000 13.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 13 13 13.000000 14.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 14 14 14.000000 15.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 15 15 15.000000 16.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 16 16 16.000000 17.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 17 17 17.000000 18.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 18 18 18.000000 19.000000 V: 12.000000 A: 613.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 19 19 19.000000 20.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 20 20 20.000000 21.000000 V: 11.000000 A: 614.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 21 21 21.000000 22.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 22 22 22.000000 23.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 23 23 23.000000 24.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 24 24 24.000000 25.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 25 25 25.000000 26.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 26 26 26.000000 27.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 27 27 27.000000 28.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 28 28 28.000000 29.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 29 29 29.000000 30.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 30 30 30.000000 31.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 31 31 31.000000 32.000000 V: 9.000000 A: 0.000000 B: 616.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 32 32 32.000000 33.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 33 33 33.000000 34.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 34 34 34.000000 35.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 35 35 35.000000 36.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 36 36 36.000000 37.000000 V: 2.000000 A: 0.000000 B: 623.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 37 37 37.000000 38.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 38 38 38.000000 39.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 39 39 39.000000 40.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 40 40 40.000000 41.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 41 41 41.000000 42.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 42 42 42.000000 43.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 43 43 43.000000 44.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 44 44 44.000000 45.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 45 45 45.000000 46.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 46 46 46.000000 47.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 47 47 47.000000 48.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 48 48 48.000000 49.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 49 49 49.000000 50.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Starting schedule
+ Execute: RESIDENT par: 2000.000000 100.000000 10000.000000 1400.000000 
+Barriers initialized ...
+i 0j 0: 1000.000000
+i 0j 1: 1000.000000
+i 1j 0: 0.204000
+i 1j 1: 1000.000000
+i 2j 0: 0.402000
+i 2j 1: 1000.000000
+set atom list typ/size: 0 / 167
+set event list Vsize/EVENTS/po: 167 / 0 / 2253
+Warrning! EVENTS changed after init from:0 to: 2253 167 in step: 0
+conf.in
+Reading METHODS...
+RESIDENT par: 2000 100 10000 1400 
+Reading SAVINGS...
+NandE par: 1 
+HIST par: 0 50 1 1 
+make_pic par: 100 0 0 0 50 50 50 
+Reading OPTIONS...
+EQUILIBRATE par: 2 50 12 38 2 1 
+RESERVUAR par: 8 4 1 1 50 
+RESERVUAR par: 38 4 1 1 50 
+Reading PARAMETERS...
+Memory reserved for: 25 25 25
+Interacione wector: 
+1.5 1.5 1.5
+Sample region:
+0 0 0
+50 50 50
+simulation area:
+12 0 0
+38 50 50
+boundary conditions for energy and atom: 0 - non | 1 - nn | normal
+0 50 50
+0 50 50
+Bazowe struktury: 2
+left.in
+st_vec: 10 0 0
+end_vec: 26 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+right.in
+st_vec: 26 0 0
+end_vec: 40 50 50
+set_vec: 0 0 0
+load_lattice_nr: 0
+Buduje matrix sitow
+unit_cell reading from structure.in...
+All conditions are taken with '/<' not '<=' 
+structure size: Lbord/Rbord/trans
+0 50 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 0 Fe 0 || 
+latt/typ:0/0 |sublatt_typ size 1 nr_sublattice 1
+size: |typ 1 |name: 1
+1 1 1 0 Fe 1 || 
+latt/typ:1/0 |sublatt_typ size 2 nr_sublattice 2
+size: |typ 1 |name: 1
+atoms in cell: 2
+structure 0 readed ok
+structure size: Lbord/Rbord/trans
+10 26 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 1 Ni 0 || 
+latt/typ:0/1 |sublatt_typ size 3 nr_sublattice 2
+size: |typ 2 |name: 2
+1 1 1 1 Ni 1 || 
+latt/typ:1/1 |sublatt_typ size 4 nr_sublattice 2
+size: |typ 2 |name: 2
+atoms in cell: 2
+structure 1 readed ok
+structure size: Lbord/Rbord/trans
+26 40 2
+0 50 2
+0 50 2
+boundaries 
+atoms in unit cell: 2
+0 0 0 2 Al 0 || 
+latt/typ:0/2 |sublatt_typ size 5 nr_sublattice 2
+size: |typ 3 |name: 3
+1 1 1 2 Al 1 || 
+latt/typ:1/2 |sublatt_typ size 6 nr_sublattice 2
+size: |typ 3 |name: 3
+atoms in cell: 2
+structure 2 readed ok
+Initialize boundary conditions... 
+Boundary conditions initialized 
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Checking boundary conditions... 
+Boundary condition <=0 or PBC are fine.
+
+Build sample...
+Clean sample...
+czytam sobie left.in
+31250
+st 5 0 0
+end 13 25 25
+Total readed: 10000
+Clean sample...
+czytam sobie right.in
+31250
+st 13 0 0
+end 20 25 25
+Total readed: 8750
+Zbudowano!
+atom list init..
+Atoms list - ok: 31250
+sim atom list init..
+Atoms list - ok: 16250
+Initialize potentials...
+energy_file reading from energy.in...
+Used energy model: Ising
+Zapisane odziaływania: rmin 1.6 rmax 1.8
+Zapisane odziaływania: rmin 1.9 rmax 2.1
+V^(k)_ij 0 0 0 0
+V^(k)_ij 0 1 0 0
+V^(k)_ij 0 2 0 0
+V^(k)_ij 0 0 1 0
+V^(k)_ij 0 1 1 -0.11
+V^(k)_ij 0 2 1 -0.11
+V^(k)_ij 0 0 2 0
+V^(k)_ij 0 1 2 -0.11
+V^(k)_ij 0 2 2 -0.11
+V^(k)_ij 1 0 0 0
+V^(k)_ij 1 1 0 0
+V^(k)_ij 1 2 0 0
+V^(k)_ij 1 0 1 0
+V^(k)_ij 1 1 1 0
+V^(k)_ij 1 2 1 0
+V^(k)_ij 1 0 2 0
+V^(k)_ij 1 1 2 0
+V^(k)_ij 1 2 2 0
+Ising potentials initialized-> 3 2 save_bar set: 3
+3 2 2
+0 0 0 0 0 0
+0 0 1 0 0 0
+2
+0 1 0 0 0 0
+0 1 1 0 0 0
+2 2
+1 0 0 0 0 0
+1 0 1 0 0 0
+2
+1 1 0 0 0 0
+1 1 1 0 0 0
+2 2
+2 0 0 0 0 0
+2 0 1 0 0 0
+2
+2 1 0 0 0 0
+2 1 1 0 0 0
+Initialized jump zone: with coordination zones: 0 9 13 14 
+Initiated interaction zone with coordination zones: 0 4 5 8 6 
+Actual options: 3
+EQUILIBRATE par: 2 50 12 38 2 1 
+Init equilibrations...
+do init_calc in blok: 0 0 12.000000 14.000000 V: 11.000000 A: 1239.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 1 1 14.000000 16.000000 V: 12.000000 A: 1238.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 2 2 16.000000 18.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 3 3 18.000000 20.000000 V: 20.000000 A: 1230.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 4 4 20.000000 22.000000 V: 18.000000 A: 1232.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 5 5 22.000000 24.000000 V: 10.000000 A: 1240.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 6 6 24.000000 26.000000 V: 9.000000 A: 1241.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 7 7 26.000000 28.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 8 8 28.000000 30.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 9 9 30.000000 32.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 10 10 32.000000 34.000000 V: 15.000000 A: 0.000000 B: 1235.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 11 11 34.000000 36.000000 V: 13.000000 A: 0.000000 B: 1237.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in blok: 12 12 36.000000 38.000000 V: 10.000000 A: 0.000000 B: 1240.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 8.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 0 8.000000 12.000000 V: 1257.000000 A: 1243.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+RESERVUAR par: 38.000000 4.000000 1.000000 1.000000 50.000000 
+do init_calc in reservuar: 1 38.000000 42.000000 V: 1261.000000 A: 0.000000 B: 1239.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Save init...
+do init_calc in hist: 0 0 0.000000 1.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 1 1 1.000000 2.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 2 2 2.000000 3.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 3 3 3.000000 4.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 4 4 4.000000 5.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 5 5 5.000000 6.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 6 6 6.000000 7.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 7 7 7.000000 8.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 8 8 8.000000 9.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 9 9 9.000000 10.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 10 10 10.000000 11.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 11 11 11.000000 12.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 12 12 12.000000 13.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 13 13 13.000000 14.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 14 14 14.000000 15.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 15 15 15.000000 16.000000 V: 6.000000 A: 619.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 16 16 16.000000 17.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 17 17 17.000000 18.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 18 18 18.000000 19.000000 V: 12.000000 A: 613.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 19 19 19.000000 20.000000 V: 8.000000 A: 617.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 20 20 20.000000 21.000000 V: 11.000000 A: 614.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 21 21 21.000000 22.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 22 22 22.000000 23.000000 V: 3.000000 A: 622.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 23 23 23.000000 24.000000 V: 7.000000 A: 618.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 24 24 24.000000 25.000000 V: 4.000000 A: 621.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 25 25 25.000000 26.000000 V: 5.000000 A: 620.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 26 26 26.000000 27.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 27 27 27.000000 28.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 28 28 28.000000 29.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 29 29 29.000000 30.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 30 30 30.000000 31.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 31 31 31.000000 32.000000 V: 9.000000 A: 0.000000 B: 616.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 32 32 32.000000 33.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 33 33 33.000000 34.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 34 34 34.000000 35.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 35 35 35.000000 36.000000 V: 7.000000 A: 0.000000 B: 618.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 36 36 36.000000 37.000000 V: 2.000000 A: 0.000000 B: 623.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 37 37 37.000000 38.000000 V: 8.000000 A: 0.000000 B: 617.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 38 38 38.000000 39.000000 V: 6.000000 A: 0.000000 B: 619.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 39 39 39.000000 40.000000 V: 5.000000 A: 0.000000 B: 620.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 40 40 40.000000 41.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 41 41 41.000000 42.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 42 42 42.000000 43.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 43 43 43.000000 44.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 44 44 44.000000 45.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 45 45 45.000000 46.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 46 46 46.000000 47.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 47 47 47.000000 48.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 48 48 48.000000 49.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+do init_calc in hist: 49 49 49.000000 50.000000 V: 625.000000 A: 0.000000 B: 0.000000 ||0||0||0|0|0|0||0||0||0||0||0||0|
+Starting schedule
+ Execute: RESIDENT par: 2000.000000 100.000000 10000.000000 1400.000000 
+Barriers initialized ...
+i 0j 0: 1000.000000
+i 0j 1: 1000.000000
+i 1j 0: 0.204000
+i 1j 1: 1000.000000
+i 2j 0: 0.402000
+i 2j 1: 1000.000000
+set atom list typ/size: 0 / 167
+set event list Vsize/EVENTS/po: 167 / 0 / 2253
+Warrning! EVENTS changed after init from:0 to: 2253 167 in step: 0
